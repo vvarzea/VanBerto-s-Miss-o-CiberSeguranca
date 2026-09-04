@@ -1456,7 +1456,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if(Math.abs(c.speedY) < 0.5) c.speedY = (c.speedY >= 0 ? 1 : -1) * 0.5;
         // Acumular angulo proprio por critter
         if(c.angle === undefined) c.angle = c.phase;
-        c.angle += c.isBee ? 0.06 : 0.04;
+        c.angle += c.isDrone ? 0.06 : 0.04;
         c.x += c.speedX;
         c.y += c.speedY * Math.sin(c.angle);
         // Rebater nas bordas
@@ -1464,9 +1464,9 @@ window.addEventListener("DOMContentLoaded", () => {
         if(c.x > c.worldW-40) { c.x=c.worldW-40; c.speedX=-Math.abs(c.speedX); }
         if(c.y < 30)  { c.y=30;  c.speedY= Math.abs(c.speedY); }
         if(c.y > 310) { c.y=310; c.speedY=-Math.abs(c.speedY); }
-        const sc=c.isBee?0.75:0.80;
+        const sc=c.isDrone?0.75:0.80;
         // Batimento de asas — scaleY oscilante
-        const wingFlap=1+Math.sin(now*(c.isBee?18:9)+c.wingPhase)*(c.isBee?0.18:0.12);
+        const wingFlap=1+Math.sin(now*(c.isDrone?18:9)+c.wingPhase)*(c.isDrone?0.18:0.12);
         c.sprite.setFlipX(c.speedX < 0);
         c.sprite.setScale(sc, sc*wingFlap);
         c.sprite.setPosition(c.x, c.y);
@@ -1474,13 +1474,13 @@ window.addEventListener("DOMContentLoaded", () => {
         const pb=player.body;
         if(pb.right>c.x-32&&pb.left<c.x+32&&pb.bottom>c.y-26&&pb.top<c.y+26){
           c.collected=true; c.sprite.destroy(); c.sprite=null;
-          const pts=c.isBee?15:10;
+          const pts=c.isDrone?15:10;
           score+=pts; scoreText.setText(`🌟 Pontos: ${score}`);
-          showFloat(sceneRef,px,py-68,c.isBee?`🐝 Abelha +${pts}`:`🦋 Borboleta +${pts}`,c.isBee?"#ffd700":"#ff80c0");
+          showFloat(sceneRef,px,py-68,c.isDrone?`🛸 Drone +${pts}`:`📦 Pacote +${pts}`,c.isDrone?"#c0d8f0":"#ff80c0");
           if(Math.random()<0.4) showFloat(sceneRef,px,py-100,pickPraise(),"#ffd700");
           ensureAudio(); SFX.coin();
-          const tint=c.isBee?[0xffd700,0xff9500,0xffffff]:[0xff80c0,0xd0a0ff,0x80d0ff,0xffffff];
-          const pt=sceneRef.add.particles(0,0,"spark_item",{x:px,y:py,speed:{min:50,max:170},lifespan:380,quantity:c.isBee?14:12,scale:{start:0.9,end:0},gravityY:280,tint});
+          const tint=c.isDrone?[0xc0d8f0,0x40e0ff,0xffffff]:[0xff80c0,0xd0a0ff,0x80d0ff,0xffffff];
+          const pt=sceneRef.add.particles(0,0,"spark_item",{x:px,y:py,speed:{min:50,max:170},lifespan:380,quantity:c.isDrone?14:12,scale:{start:0.9,end:0},gravityY:280,tint});
           sceneRef.time.delayedCall(280,()=>pt.destroy());
           saveGame();
           // Respawnar após 5-9 segundos — usar session para ignorar se o nível mudou
@@ -1497,7 +1497,7 @@ window.addEventListener("DOMContentLoaded", () => {
             c.speedX = dir * (0.7 + Math.random() * 0.6);
             c.speedY = (Math.random() < 0.5 ? 1 : -1) * (0.5 + Math.random() * 0.5);
             c.angle = Math.random() * Math.PI * 2;
-            c.sprite=sceneRef.add.image(c.x,c.y,c.key).setDepth(2).setScale(c.isBee?0.75:0.80).setAlpha(0.92);
+            c.sprite=sceneRef.add.image(c.x,c.y,c.key).setDepth(2).setScale(c.isDrone?0.75:0.80).setAlpha(0.92);
           });
         }
       });
@@ -1843,7 +1843,7 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Animar borboletas e abelhas apanháveis
+    // Animar pacotes de dados e drones apanháveis
     malwareGroup.getChildren().forEach(m=>{
       if (!m.active || !m.body) return;
       const isBoss = !!m.getData("isBoss"); // bosses não devem girar como os vilões pequenos
@@ -1986,8 +1986,8 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   function drawBalloon() {} // mantida para compatibilidade
 
-  // ===== Borboletas e Abelhas apanháveis =====
-  // Calcula posições das flores do chão para poder enviar borboletas até lá
+  // ===== Drones e Pacotes de Dados apanháveis =====
+  // Calcula posições dos nós de sinal do chão para poder enviar pacotes de dados até lá
   function getFlowerPositions(worldW) {
     const flowers = [];
     for(let fi=0; fi<Math.floor(worldW/38); fi++){
@@ -2005,16 +2005,16 @@ window.addEventListener("DOMContentLoaded", () => {
     const count = 3 + Math.floor(currentLevel / 2); // 3 no nível 1, até ~12 nos últimos
     const session = _critterSession;
     for(let i=0; i<count; i++){
-      // Alternar: metade são borboletas, metade são abelhas
-      const isBee = (i % 2 === 0);
+      // Alternar: metade são pacotes de dados, metade são drones
+      const isDrone = (i % 2 === 0);
       const colorIdx = i % 5;
-      const key = isBee ? "item_abelha" : "item_borboleta_"+colorIdx;
+      const key = isDrone ? "item_drone" : "item_pacote_"+colorIdx;
       const x = 120 + Math.random() * (worldW - 240);
       const y = 60 + Math.random() * 260;
       const sprite = scene.add.image(x, y, key)
-        .setDepth(2).setScale(isBee ? 0.75 : 0.80).setAlpha(0.92);
+        .setDepth(2).setScale(isDrone ? 0.75 : 0.80).setAlpha(0.92);
       critters.push({
-        sprite, x, y, isBee, key,
+        sprite, x, y, isDrone, key,
         speedX: (Math.random() < 0.5 ? 1 : -1) * (0.7 + Math.random() * 0.6),
         speedY: (Math.random() < 0.5 ? 1 : -1) * (0.5 + Math.random() * 0.5),
         phase: Math.random() * Math.PI * 2,
@@ -4020,14 +4020,14 @@ window.addEventListener("DOMContentLoaded", () => {
     pipeExitDecor.forEach(o=>{try{o.destroy();}catch{}}); pipeExitDecor=[];
     clearMovingPlatforms();
     clearTrampolines(); // sem isto, um trampolim do nível anterior ficava "pendurado" na arena do boss
-    // Decorações do nível anterior (balões, borboletas/abelhas, flores nas plataformas) —
+    // Decorações do nível anterior (cadeados, pacotes de dados/drones, sinais nas plataformas) —
     // sem isto ficavam por destruir e continuavam visíveis/a voar durante o boss.
-    // _critterSession++ ANTES de limpar os arrays: sem isto, um balão/abelha/borboleta
+    // _critterSession++ ANTES de limpar os arrays: sem isto, um cadeado/drone/pacote
     // apanhado pouco antes do boss começar reaparecia sozinho (o seu delayedCall de
     // respawn ainda estava pendente) já sem estar no array ativo — ficava então uma
     // imagem "fantasma" para sempre parada e impossível de apanhar, porque updateCritters()
     // e o loop dos balões só percorrem o array atual, e o próprio loadLevel seguinte também
-    // só destrói o que está nesse array atual. Era esta a causa de abelhas/borboletas/balões
+    // só destrói o que está nesse array atual. Era esta a causa de drones/pacotes/cadeados
     // "parados" que apareciam ocasionalmente depois de um combate de boss.
     _critterSession++;
     balloons.forEach(b=>{ if(b.sprite) b.sprite.destroy(); if(b.gfx) b.gfx.destroy(); }); balloons=[];
@@ -6231,7 +6231,7 @@ window.addEventListener("DOMContentLoaded", () => {
   function startConfetti(durationMs=5000){
     const el=document.getElementById("confetti"); if(!el) return;
     el.classList.remove("hidden"); el.innerHTML="";
-    const emojis=["🎈","✨","⭐","🌟","🤖","🎁","🎊","🎉","🏆","🎀","🌈","💫","🥳","🎆","🎇","🪅","🏅","🎵","🎶","❤️","🌺","🦋","🐝"];
+    const emojis=["🎈","✨","⭐","🌟","🤖","🎁","🎊","🎉","🏆","🎀","🌈","💫","🥳","🎆","🎇","🪅","🏅","🎵","🎶","❤️","🌺","📦","🛸"];
     const vw=Math.max(320,window.innerWidth||800);
     // Muito mais confetis na vitoria final
     const isMobile=window.matchMedia("(max-width:768px)").matches;

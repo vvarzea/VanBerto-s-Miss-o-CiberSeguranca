@@ -1549,79 +1549,89 @@ function makeItemTextures(scene){
     ctx.restore();
     tex.refresh();
   }
-  // Mini-Robô 🤖 completo (com pernas) — companheiro do VanBerto's
+  // Mini-VanBerto\'s 🤖 — miniatura coleccionável, mesmo estilo visual
+  // do mascote principal (branco/azul-marinho, viseira azul, antena com halo).
   if(!scene.textures.exists("item_robo")){
-    const tex=scene.textures.createCanvas("item_robo",44,50), ctx=tex.getContext();
-    const C="#7a95c0", CL="#c0d8f0", CI="#5878a0", CD="#1a2840";
+    const tex=scene.textures.createCanvas("item_robo",48,56), ctx=tex.getContext();
+    const NAVY="#16233e", NAVY2="#26365a", OUT="#101a30";
+    function white(x0,y0,x1,y1){const g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,"#ffffff");g.addColorStop(0.55,"#e6edf7");g.addColorStop(1,"#b4c4dc");return g;}
+    ctx.lineJoin="round"; ctx.lineCap="round";
+    ctx.save(); ctx.translate(0,4);
+
+    // --- PERNAS ---
+    function leg(cx){
+      ctx.beginPath(); ctx.roundRect(cx-4,37,8,8,3.5); ctx.fillStyle=white(cx-4,37,cx+4,37); ctx.fill();
+      ctx.lineWidth=1.8; ctx.strokeStyle=OUT; ctx.stroke();
+      ctx.beginPath(); ctx.roundRect(cx-5,44,10,6,3); ctx.fillStyle=NAVY; ctx.fill();
+      ctx.lineWidth=1.8; ctx.strokeStyle=OUT; ctx.stroke();
+    }
+    leg(17); leg(31);
+
+    // --- BRAÇOS (pequenos, colados ao corpo) ---
+    function arm(sx,flip){
+      ctx.beginPath(); ctx.roundRect(sx,26,7,10,3.2); ctx.fillStyle=white(sx,26,sx+7,26); ctx.fill();
+      ctx.lineWidth=1.8; ctx.strokeStyle=OUT; ctx.stroke();
+      ctx.beginPath(); ctx.arc(sx+3.5,37,3.6,0,Math.PI*2); ctx.fillStyle=NAVY; ctx.fill();
+      ctx.lineWidth=1.6; ctx.strokeStyle=OUT; ctx.stroke();
+    }
+    arm(3); arm(38);
+
+    // --- TRONCO ---
+    ctx.beginPath(); ctx.roundRect(11,22,26,20,9); ctx.fillStyle=white(12,23,37,23); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.roundRect(11,22,26,20,9); ctx.clip();
+    const wg=ctx.createLinearGradient(0,34,0,42); wg.addColorStop(0,"rgba(22,35,62,0)"); wg.addColorStop(0.4,"#1c2c4c"); wg.addColorStop(1,"#142038");
+    ctx.fillStyle=wg; ctx.fillRect(11,34,26,8);
+    ctx.fillStyle="rgba(255,255,255,0.5)"; ctx.beginPath(); ctx.ellipse(17,27,5,3,-0.5,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    ctx.lineWidth=1.9; ctx.strokeStyle=OUT; ctx.beginPath(); ctx.roundRect(11,22,26,20,9); ctx.stroke();
+
+    // --- PAINEL DO PEITO (dome metálico, "protegido") ---
+    ctx.beginPath(); ctx.arc(24,30,5,0,Math.PI*2); ctx.fillStyle=NAVY; ctx.fill();
+    ctx.lineWidth=1.6; ctx.strokeStyle=OUT; ctx.stroke();
+    const dome=ctx.createRadialGradient(22.5,28.5,0.5,24,30,4.2); dome.addColorStop(0,"#aebccf"); dome.addColorStop(0.6,"#5a6a85"); dome.addColorStop(1,"#2b3a57");
+    ctx.beginPath(); ctx.arc(24,30,3.6,0,Math.PI*2); ctx.fillStyle=dome; ctx.fill();
+    ctx.beginPath(); ctx.arc(22.8,28.7,0.9,0,Math.PI*2); ctx.fillStyle="rgba(255,255,255,0.85)"; ctx.fill();
+
+    // --- EAR PODS ---
+    function pod(cx){
+      ctx.beginPath(); ctx.arc(cx,10,3.6,0,Math.PI*2); ctx.fillStyle=NAVY; ctx.fill();
+      ctx.lineWidth=1.4; ctx.strokeStyle=OUT; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,10,1.7,0,Math.PI*2); ctx.fillStyle=NAVY2; ctx.fill();
+    }
+    pod(11); pod(37);
 
     // --- ANTENA ---
-    ctx.strokeStyle=CI; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(22,5); ctx.lineTo(22,-2); ctx.stroke();
-    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=5;
-    ctx.beginPath(); ctx.arc(22,-3,2.6,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
+    ctx.fillStyle=NAVY;
+    ctx.beginPath(); ctx.moveTo(22,3); ctx.lineTo(26,3); ctx.lineTo(25,-2); ctx.lineTo(23,-2); ctx.closePath(); ctx.fill();
+    const halo=ctx.createRadialGradient(24,-6,0.5,24,-6,7); halo.addColorStop(0,"rgba(90,200,255,0.55)"); halo.addColorStop(1,"rgba(90,200,255,0)");
+    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(24,-6,7,0,Math.PI*2); ctx.fill();
+    const bg=ctx.createRadialGradient(23,-7,0.3,24,-6,3.4); bg.addColorStop(0,"#e6f7ff"); bg.addColorStop(0.4,"#48b4ff"); bg.addColorStop(1,"#1670d8");
+    ctx.beginPath(); ctx.arc(24,-6,3.4,0,Math.PI*2); ctx.fillStyle=bg; ctx.fill();
+    ctx.beginPath(); ctx.arc(23,-7,1,0,Math.PI*2); ctx.fillStyle="#fff"; ctx.fill();
 
-    // --- PERNAS (atrás do corpo) ---
-    ctx.fillStyle=CI;
-    ctx.beginPath(); ctx.roundRect(11,38,7,8,2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(27,38,7,8,2); ctx.fill();
-    // Pés
-    ctx.fillStyle=CD;
-    ctx.beginPath(); ctx.roundRect(9,45,11,3,1.5); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(25,45,11,3,1.5); ctx.fill();
+    // --- CABEÇA (capacete) ---
+    ctx.beginPath(); ctx.roundRect(11,1,26,20,10); ctx.fillStyle=white(12,2,37,2); ctx.fill();
+    ctx.lineWidth=1.9; ctx.strokeStyle=OUT; ctx.stroke();
+    ctx.save(); ctx.beginPath(); ctx.roundRect(11,1,26,20,10); ctx.clip();
+    ctx.fillStyle="rgba(255,255,255,0.6)"; ctx.beginPath(); ctx.ellipse(18,4,6,2.4,-0.5,0,Math.PI*2); ctx.fill(); ctx.restore();
 
-    // --- CORPO ---
-    const bodyGr=ctx.createLinearGradient(9,17,35,41);
-    bodyGr.addColorStop(0,CL); bodyGr.addColorStop(1,C);
-    ctx.beginPath(); ctx.roundRect(9,17,26,24,6); ctx.fillStyle=bodyGr; ctx.fill();
-    // Luz do peito (indicador de "protegido")
-    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=6;
-    ctx.beginPath(); ctx.arc(22,29,4.2,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-    ctx.strokeStyle="rgba(255,255,255,0.6)"; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.arc(22,29,4.2,0,Math.PI*2); ctx.stroke();
-    // Painel de parafusos
-    ctx.fillStyle="rgba(20,30,50,0.35)";
-    ctx.beginPath(); ctx.arc(13,37,1.4,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(31,37,1.4,0,Math.PI*2); ctx.fill();
+    // --- MOLDURA + VISEIRA ---
+    ctx.beginPath(); ctx.roundRect(15,5,18,13,7); ctx.fillStyle=NAVY; ctx.fill();
+    ctx.beginPath(); ctx.roundRect(16.5,6.2,15,10.4,6);
+    const vg=ctx.createLinearGradient(0,6,0,17); vg.addColorStop(0,"#7fd4ff"); vg.addColorStop(0.5,"#2a9bf0"); vg.addColorStop(1,"#1366c6");
+    ctx.fillStyle=vg; ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.roundRect(16.5,6.2,15,10.4,6); ctx.clip();
+    ctx.fillStyle="rgba(255,255,255,0.45)"; ctx.beginPath(); ctx.ellipse(21,8,5,2,-0.4,0,Math.PI*2); ctx.fill(); ctx.restore();
 
-    // --- BRAÇOS ---
-    ctx.fillStyle=C;
-    ctx.beginPath(); ctx.roundRect(2,20,7,14,3); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(35,20,7,14,3); ctx.fill();
-    // Mãozinhas
-    ctx.fillStyle=CI;
-    ctx.beginPath(); ctx.arc(5.5,35,3.2,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(38.5,35,3.2,0,Math.PI*2); ctx.fill();
+    // --- OLHOS ---
+    ctx.fillStyle="#0a0f1c";
+    ctx.beginPath(); ctx.ellipse(20.5,11.5,1.8,2.2,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(27.5,11.5,1.8,2.2,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.beginPath(); ctx.arc(21.2,10.7,0.8,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(28.2,10.7,0.8,0,Math.PI*2); ctx.fill();
 
-    // --- CABEÇA ---
-    const headGr=ctx.createLinearGradient(11,5,33,19);
-    headGr.addColorStop(0,CL); headGr.addColorStop(1,C);
-    ctx.beginPath(); ctx.roundRect(11,5,22,15,7); ctx.fillStyle=headGr; ctx.fill();
-
-    // Visor/ecrã facial (escuro, tipo capacete)
-    ctx.fillStyle="#0e1c30";
-    ctx.beginPath(); ctx.roundRect(14,9,16,8,4); ctx.fill();
-
-    // Olhos-LED brilhantes
-    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=5;
-    ctx.beginPath(); ctx.arc(18.5,13,1.8,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(25.5,13,1.8,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-    ctx.fillStyle="#ffffff";
-    ctx.beginPath(); ctx.arc(19.1,12.4,0.6,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(26.1,12.4,0.6,0,Math.PI*2); ctx.fill();
-
-    // Grelha do altifalante (boca)
-    ctx.strokeStyle="rgba(64,224,255,0.55)"; ctx.lineWidth=0.9;
-    ctx.beginPath(); ctx.moveTo(17,16.5); ctx.lineTo(27,16.5); ctx.stroke();
-
-    // Contornos suaves
-    ctx.strokeStyle=CD; ctx.lineWidth=1.3;
-    ctx.beginPath(); ctx.roundRect(11,5,22,15,7); ctx.stroke();
-    ctx.beginPath(); ctx.roundRect(9,17,26,24,6); ctx.stroke();
-    ctx.beginPath(); ctx.roundRect(11,38,7,8,2); ctx.stroke();
-    ctx.beginPath(); ctx.roundRect(27,38,7,8,2); ctx.stroke();
+    ctx.restore();
     tex.refresh();
   }
   // Escudo — canvas 52×58, forma classica de escudo heraldico
@@ -1754,161 +1764,121 @@ function makeItemTextures(scene){
   makeEmojiItemTexture(scene, "item_lapis",   "✏️", 44, "rgba(255,180,80,0.75)");
   makeEmojiItemTexture(scene, "item_diploma", "🎓", 46, "rgba(160,140,255,0.75)");
   makeEmojiItemTexture(scene, "item_lampada", "💡", 44, "rgba(255,240,120,0.85)");
-  // Borboleta — 48×40, asas coloridas com padrão
-  const BUTTERFLY_COLORS=[
-    {top:"#ff80c0",bot:"#e0209a",pat:"#ffd700",stroke:"#800040"}, // rosa
+  // Pacote de Dados — 48×40, núcleo hexagonal com aletas e brilho pulsante
+  const PACKET_COLORS=[
+    {top:"#ff80c0",bot:"#e0209a",pat:"#ffe680",stroke:"#800040"}, // rosa
     {top:"#80d0ff",bot:"#1a90e0",pat:"#ffffff",stroke:"#004090"}, // azul
-    {top:"#a0ff80",bot:"#20c060",pat:"#ffd700",stroke:"#006030"}, // verde
+    {top:"#a0ff80",bot:"#20c060",pat:"#ffe680",stroke:"#006030"}, // verde
     {top:"#ffd700",bot:"#ff9500",pat:"#ffffff",stroke:"#804000"}, // laranja-dourado
     {top:"#d0a0ff",bot:"#9030e0",pat:"#ffe080",stroke:"#400080"}, // lilás
   ];
-  BUTTERFLY_COLORS.forEach((bc,ci)=>{
-    const key="item_borboleta_"+ci;
+  PACKET_COLORS.forEach((bc,ci)=>{
+    const key="item_pacote_"+ci;
     if(scene.textures.exists(key)) return;
     const tex=scene.textures.createCanvas(key,48,40), ctx=tex.getContext();
-    // Asa superior esquerda
-    const grTL=ctx.createRadialGradient(14,14,2,12,16,14);
-    grTL.addColorStop(0,bc.top); grTL.addColorStop(1,bc.bot);
-    ctx.fillStyle=grTL;
-    ctx.beginPath(); ctx.moveTo(24,20);
-    ctx.bezierCurveTo(20,8,2,4,2,16);
-    ctx.bezierCurveTo(2,24,14,26,24,20);
-    ctx.fill();
-    // Asa superior direita
-    const grTR=ctx.createRadialGradient(34,14,2,36,16,14);
-    grTR.addColorStop(0,bc.top); grTR.addColorStop(1,bc.bot);
-    ctx.fillStyle=grTR;
-    ctx.beginPath(); ctx.moveTo(24,20);
-    ctx.bezierCurveTo(28,8,46,4,46,16);
-    ctx.bezierCurveTo(46,24,34,26,24,20);
-    ctx.fill();
-    // Asa inferior esquerda
+    const cx=24, cy=20;
+
+    // Halo de brilho por trás
+    const halo=ctx.createRadialGradient(cx,cy,2,cx,cy,20);
+    halo.addColorStop(0,bc.top+"55"); halo.addColorStop(1,bc.top+"00");
+    ctx.fillStyle=halo;
+    ctx.beginPath(); ctx.arc(cx,cy,20,0,Math.PI*2); ctx.fill();
+
+    // Aleta esquerda (delta)
     ctx.fillStyle=bc.bot;
-    ctx.beginPath(); ctx.moveTo(24,20);
-    ctx.bezierCurveTo(18,24,4,28,6,36);
-    ctx.bezierCurveTo(8,40,20,36,24,20);
-    ctx.fill();
-    // Asa inferior direita
-    ctx.beginPath(); ctx.moveTo(24,20);
-    ctx.bezierCurveTo(30,24,44,28,42,36);
-    ctx.bezierCurveTo(40,40,28,36,24,20);
-    ctx.fill();
-    // Padrões nas asas (pequenas luzes de sinal)
-    ctx.shadowColor=bc.pat; ctx.shadowBlur=4;
-    ctx.fillStyle=bc.pat; ctx.globalAlpha=0.75;
-    ctx.beginPath(); ctx.arc(13,14,4,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(35,14,4,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(11,28,3,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(37,28,3,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha=1; ctx.shadowBlur=0;
-    // Contornos das asas
-    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.2;
-    ctx.beginPath(); ctx.moveTo(24,20);
-    ctx.bezierCurveTo(20,8,2,4,2,16);
-    ctx.bezierCurveTo(2,24,14,26,24,20); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(24,20);
-    ctx.bezierCurveTo(28,8,46,4,46,16);
-    ctx.bezierCurveTo(46,24,34,26,24,20); ctx.stroke();
-    // Corpo (abdómen) — metálico escuro, tipo drone em miniatura
-    ctx.fillStyle="#20304a";
-    ctx.beginPath(); ctx.ellipse(24,20,3,10,0,0,Math.PI*2); ctx.fill();
-    // Cabeça
-    ctx.fillStyle="#2c405e";
-    ctx.beginPath(); ctx.arc(24,11,3,0,Math.PI*2); ctx.fill();
-    // Antenas
-    ctx.strokeStyle="#20304a"; ctx.lineWidth=1.2;
-    ctx.beginPath(); ctx.moveTo(24,9); ctx.quadraticCurveTo(18,2,14,1); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(24,9); ctx.quadraticCurveTo(30,2,34,1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-6,cy-4); ctx.lineTo(cx-22,cy-2); ctx.lineTo(cx-6,cy+8); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1; ctx.stroke();
+    // Aleta direita (delta)
+    ctx.beginPath(); ctx.moveTo(cx+6,cy-4); ctx.lineTo(cx+22,cy-2); ctx.lineTo(cx+6,cy+8); ctx.closePath(); ctx.fill();
+    ctx.stroke();
+
+    // Núcleo hexagonal
+    const hexGr=ctx.createLinearGradient(cx,cy-11,cx,cy+11);
+    hexGr.addColorStop(0,bc.top); hexGr.addColorStop(1,bc.bot);
+    ctx.fillStyle=hexGr;
+    ctx.beginPath();
+    for(let i=0;i<6;i++){
+      const a=Math.PI/3*i - Math.PI/6;
+      const px=cx+Math.cos(a)*11, py=cy+Math.sin(a)*11;
+      i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.4; ctx.stroke();
+
+    // Linhas de circuito internas
+    ctx.strokeStyle="rgba(255,255,255,0.55)"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx-6,cy-3); ctx.lineTo(cx-1,cy-3); ctx.lineTo(cx-1,cy+2); ctx.lineTo(cx+6,cy+2); ctx.stroke();
+
+    // Núcleo pulsante central
+    ctx.shadowColor=bc.pat; ctx.shadowBlur=6;
     ctx.fillStyle=bc.pat;
-    ctx.beginPath(); ctx.arc(14,1,2.5,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(34,1,2.5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,3.4,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+
+    // Antena curta no topo com ponta luminosa
+    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.3;
+    ctx.beginPath(); ctx.moveTo(cx,cy-11); ctx.lineTo(cx,cy-17); ctx.stroke();
+    ctx.fillStyle=bc.pat; ctx.shadowColor=bc.pat; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.arc(cx,cy-18,2,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+
     tex.refresh();
   });
 
-  // Abelha — 44×40, listras amarelas e pretas, asas transparentes
-  if(!scene.textures.exists("item_abelha")){
-    // Abelha desenhada na horizontal (como emoji 🐝): cabeça à direita, ferrão à esquerda
-    // Canvas 56×36
-    const tex=scene.textures.createCanvas("item_abelha",56,36), ctx=tex.getContext();
+  // Mini-Drone — 56×36, corpo metálico com 4 rotores e lente de câmara
+  if(!scene.textures.exists("item_drone")){
+    const tex=scene.textures.createCanvas("item_drone",56,36), ctx=tex.getContext();
     const bx=28, by=18; // centro
 
-    // --- ASAS (em cima do corpo, semi-transparentes) ---
-    ctx.fillStyle="rgba(210,245,255,0.80)";
-    ctx.strokeStyle="rgba(80,160,220,0.85)"; ctx.lineWidth=1;
-    // Asa superior esquerda (maior)
-    ctx.beginPath(); ctx.ellipse(bx-2, by-11, 11, 6, Math.PI*0.15, 0, Math.PI*2);
-    ctx.fill(); ctx.stroke();
-    // Asa superior direita (maior)
-    ctx.beginPath(); ctx.ellipse(bx+10, by-11, 11, 6, -Math.PI*0.15, 0, Math.PI*2);
-    ctx.fill(); ctx.stroke();
-    // Asa inferior esquerda (menor)
-    ctx.beginPath(); ctx.ellipse(bx-3, by-4, 7, 4, Math.PI*0.2, 0, Math.PI*2);
-    ctx.fill(); ctx.stroke();
-    // Asa inferior direita (menor)
-    ctx.beginPath(); ctx.ellipse(bx+9, by-4, 7, 4, -Math.PI*0.2, 0, Math.PI*2);
-    ctx.fill(); ctx.stroke();
-
-    // --- ABDÓMEN (oval horizontal, listras) ---
-    const abdGr=ctx.createRadialGradient(bx-6,by-2,2,bx-4,by,12);
-    abdGr.addColorStop(0,"#80e8ff"); abdGr.addColorStop(1,"#0a5a80");
-    ctx.fillStyle=abdGr;
-    ctx.beginPath(); ctx.ellipse(bx-6, by, 13, 9, 0, 0, Math.PI*2); ctx.fill();
-    // Listras pretas horizontais (clip ao abdómen)
-    ctx.save();
-    ctx.beginPath(); ctx.ellipse(bx-6, by, 13, 9, 0, 0, Math.PI*2); ctx.clip();
-    ctx.fillStyle="rgba(10,20,45,0.85)";
-    [-4, 1, 6].forEach(dx=>{
-      ctx.fillRect(bx-6+dx-1, by-9, 3, 18);
+    // --- 4 BRAÇOS + ROTORES (desenhados primeiro, ficam atrás do corpo) ---
+    const arms=[[-17,-9],[17,-9],[-17,7],[17,7]];
+    arms.forEach(([dx,dy])=>{
+      const rx=bx+dx, ry=by+dy;
+      ctx.strokeStyle="#4a5a70"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(rx,ry); ctx.stroke();
+      // disco do rotor (efeito de desfoque de rotação)
+      ctx.fillStyle="rgba(180,200,220,0.35)";
+      ctx.beginPath(); ctx.ellipse(rx,ry,8,3.2,dy<0?-0.25:0.25,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="rgba(120,150,180,0.6)"; ctx.lineWidth=0.8;
+      ctx.beginPath(); ctx.ellipse(rx,ry,8,3.2,dy<0?-0.25:0.25,0,Math.PI*2); ctx.stroke();
+      // eixo central do rotor
+      ctx.fillStyle="#2a3a50";
+      ctx.beginPath(); ctx.arc(rx,ry,2,0,Math.PI*2); ctx.fill();
     });
-    ctx.restore();
-    // Contorno abdómen
-    ctx.strokeStyle="#004060"; ctx.lineWidth=1.2;
-    ctx.beginPath(); ctx.ellipse(bx-6, by, 13, 9, 0, 0, Math.PI*2); ctx.stroke();
 
-    // --- ANTENA-SENSOR (ponta à esquerda) ---
-    ctx.fillStyle="#40e0ff";
-    ctx.beginPath();
-    ctx.moveTo(bx-19, by);
-    ctx.lineTo(bx-14, by-3);
-    ctx.lineTo(bx-14, by+3);
-    ctx.closePath(); ctx.fill();
+    // --- CORPO CENTRAL ---
+    const bodyGr=ctx.createLinearGradient(bx,by-8,bx,by+8);
+    bodyGr.addColorStop(0,"#d0e0f0"); bodyGr.addColorStop(1,"#6a85a8");
+    ctx.fillStyle=bodyGr;
+    ctx.beginPath(); ctx.roundRect(bx-11,by-7,22,14,5); ctx.fill();
+    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.3;
+    ctx.beginPath(); ctx.roundRect(bx-11,by-7,22,14,5); ctx.stroke();
 
-    // --- TÓRAX (peludo, ligação entre abdómen e cabeça) ---
-    const torGr=ctx.createRadialGradient(bx+7,by-2,1,bx+8,by,7);
-    torGr.addColorStop(0,"#3a7aa0"); torGr.addColorStop(1,"#0a1830");
-    ctx.fillStyle=torGr;
-    ctx.beginPath(); ctx.ellipse(bx+8, by, 7, 8, 0, 0, Math.PI*2); ctx.fill();
-    // Pelos do tórax
-    ctx.strokeStyle="rgba(120,220,255,0.55)"; ctx.lineWidth=0.9;
-    for(let pi=0;pi<6;pi++){
-      const pa=Math.PI*2*pi/6;
-      ctx.beginPath();
-      ctx.moveTo(bx+8+Math.cos(pa)*5, by+Math.sin(pa)*6);
-      ctx.lineTo(bx+8+Math.cos(pa)*8, by+Math.sin(pa)*9);
-      ctx.stroke();
-    }
+    // Grelha de ventilação
+    ctx.strokeStyle="rgba(40,60,80,0.5)"; ctx.lineWidth=1;
+    for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.moveTo(bx-6,by-3+i*2.5); ctx.lineTo(bx-2,by-3+i*2.5); ctx.stroke(); }
 
-    // --- CABEÇA (à direita, amarela) ---
-    const headGr=ctx.createRadialGradient(bx+17,by-2,1,bx+18,by,7);
-    headGr.addColorStop(0,"#d0f4ff"); headGr.addColorStop(1,"#2090c0");
-    ctx.fillStyle=headGr;
-    ctx.beginPath(); ctx.arc(bx+18, by, 7, 0, Math.PI*2); ctx.fill();
-    ctx.strokeStyle="#004060"; ctx.lineWidth=1.1; ctx.stroke();
-
-    // Olho (único, virado para a direita)
-    ctx.fillStyle="#0a1020";
-    ctx.beginPath(); ctx.arc(bx+21, by-1, 2.8, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle="rgba(255,255,255,0.75)";
-    ctx.beginPath(); ctx.arc(bx+22, by-2, 1.1, 0, Math.PI*2); ctx.fill();
-
-    // Antena (saindo da cabeça para a direita/cima)
-    ctx.strokeStyle="#0a4060"; ctx.lineWidth=1.3;
-    ctx.beginPath(); ctx.moveTo(bx+22, by-6);
-    ctx.quadraticCurveTo(bx+26, by-14, bx+28, by-16); ctx.stroke();
-    ctx.shadowColor="#40e0ff"; ctx.shadowBlur=5;
-    ctx.fillStyle="#40e0ff";
-    ctx.beginPath(); ctx.arc(bx+28, by-16, 2.5, 0, Math.PI*2); ctx.fill();
+    // Luz de estado (a piscar) no topo
+    ctx.fillStyle="#ff4060"; ctx.shadowColor="#ff4060"; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.arc(bx+3,by-8,2,0,Math.PI*2); ctx.fill();
     ctx.shadowBlur=0;
+
+    // --- LENTE DA CÂMARA (parte da frente/baixo) ---
+    ctx.fillStyle="#0a1420";
+    ctx.beginPath(); ctx.arc(bx+7,by+3,4.2,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.arc(bx+7,by+3,2.6,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle="rgba(255,255,255,0.85)";
+    ctx.beginPath(); ctx.arc(bx+6,by+2,0.9,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(bx+7,by+3,4.2,0,Math.PI*2); ctx.stroke();
+
+    // Pequena antena traseira
+    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(bx-11,by-2); ctx.lineTo(bx-16,by-6); ctx.stroke();
+    ctx.fillStyle="#40e0ff";
+    ctx.beginPath(); ctx.arc(bx-16,by-6,1.6,0,Math.PI*2); ctx.fill();
 
     tex.refresh();
   }
