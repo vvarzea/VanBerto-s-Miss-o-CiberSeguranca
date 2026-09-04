@@ -516,6 +516,19 @@ function makeBossTextures(scene){
     // Barriga — roxo mais claro
     ctx.fillStyle = "#cdb4ff";
     ctx.beginPath(); ctx.ellipse(C, C+13, 19, 14, 0, 0, Math.PI*2); ctx.fill();
+    // Crachá de "email falso" na barriga — identifica-o de imediato como o
+    // Monstro do Phishing, em vez de um monstro roxo genérico.
+    ctx.fillStyle="#fffaff";
+    ctx.beginPath(); ctx.roundRect(C-12,C+4,24,16,2.5); ctx.fill();
+    ctx.strokeStyle="#2a1060"; ctx.lineWidth=1.4; ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(C-12,C+4); ctx.lineTo(C,C+13); ctx.lineTo(C+12,C+4);
+    ctx.stroke();
+    ctx.fillStyle="#ff3050";
+    ctx.beginPath(); ctx.arc(C+7,C+16,5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#fffaff"; ctx.font="bold 8px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText("!", C+7, C+16.5);
+    ctx.textBaseline="alphabetic";
     // Pernas pequenas + pés largos — anda aos pequenos saltinhos, nunca flutua
     ctx.strokeStyle = "#2a1060"; ctx.lineWidth = 2;
     [-17,17].forEach(dx=>{
@@ -584,8 +597,8 @@ function makeBossTextures(scene){
     ctx.fillStyle="#fffaff";
     ctx.beginPath(); ctx.moveTo(C+18,C+11); ctx.lineTo(C+23,C+9); ctx.lineTo(C+19,C+16); ctx.closePath(); ctx.fill();
   }
-  if(!scene.textures.exists("boss_monstro_ignorancia")){
-    const tex=scene.textures.createCanvas("boss_monstro_ignorancia",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_monstro_phishing")){
+    const tex=scene.textures.createCanvas("boss_monstro_phishing",S,S), ctx=tex.getContext();
     drawMonstroBody(ctx);
     drawMonstroArms(ctx, "wave");
     drawMonstroFace(ctx, true);
@@ -595,15 +608,15 @@ function makeBossTextures(scene){
   // doBossIdleBlink em dia-crianca.js) — o Monstro deixa de ficar
   // completamente parado fora dos golpes: alterna braços "wave"/"rest" a
   // espaços regulares e pisca os olhos de vez em quando.
-  if(!scene.textures.exists("boss_monstro_ignorancia_armsdown")){
-    const tex=scene.textures.createCanvas("boss_monstro_ignorancia_armsdown",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_monstro_phishing_armsdown")){
+    const tex=scene.textures.createCanvas("boss_monstro_phishing_armsdown",S,S), ctx=tex.getContext();
     drawMonstroBody(ctx);
     drawMonstroArms(ctx, "rest");
     drawMonstroFace(ctx, true);
     tex.refresh();
   }
-  if(!scene.textures.exists("boss_monstro_ignorancia_blink")){
-    const tex=scene.textures.createCanvas("boss_monstro_ignorancia_blink",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_monstro_phishing_blink")){
+    const tex=scene.textures.createCanvas("boss_monstro_phishing_blink",S,S), ctx=tex.getContext();
     drawMonstroBody(ctx);
     drawMonstroArms(ctx, "wave");
     drawMonstroFace(ctx, false);
@@ -613,8 +626,8 @@ function makeBossTextures(scene){
   // cabeça: achatamento exagerado tipo desenho animado, olhos esbugalhados,
   // boca aberta. Volta ao estado normal logo a seguir (não é uma fase — é
   // só a reação a UM golpe, reaproveitada nos 3 saltos).
-  if(!scene.textures.exists("boss_monstro_ignorancia_ouch")){
-    const tex=scene.textures.createCanvas("boss_monstro_ignorancia_ouch",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_monstro_phishing_ouch")){
+    const tex=scene.textures.createCanvas("boss_monstro_phishing_ouch",S,S), ctx=tex.getContext();
     drawMonstroBody(ctx);
     drawMonstroArms(ctx, "rest");
     [-16,16].forEach(dx=>{
@@ -637,8 +650,8 @@ function makeBossTextures(scene){
   // Estado "riso maléfico" — usado na entrada do combate (intro): antes de
   // a luta começar a sério, o boss ri-se de forma trocista, confiante que
   // vai ganhar. Olhos semicerrados de gozo ("^ ^") + boca bem aberta a rir.
-  if(!scene.textures.exists("boss_monstro_ignorancia_laugh")){
-    const tex=scene.textures.createCanvas("boss_monstro_ignorancia_laugh",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_monstro_phishing_laugh")){
+    const tex=scene.textures.createCanvas("boss_monstro_phishing_laugh",S,S), ctx=tex.getContext();
     drawMonstroBody(ctx);
     drawMonstroArms(ctx, "wave");
     ctx.strokeStyle="#2a1060"; ctx.lineWidth=3; ctx.lineCap="round";
@@ -657,8 +670,8 @@ function makeBossTextures(scene){
   // bossEnterRage em dia-crianca.js), a cara fecha-se em fúria: sobrolho em
   // V carregado, olhos estreitos. O motor de jogo aplica também um tint
   // avermelhado por cima deste estado (ver bossEnterRage), daí "vermelho".
-  if(!scene.textures.exists("boss_monstro_ignorancia_angry")){
-    const tex=scene.textures.createCanvas("boss_monstro_ignorancia_angry",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_monstro_phishing_angry")){
+    const tex=scene.textures.createCanvas("boss_monstro_phishing_angry",S,S), ctx=tex.getContext();
     drawMonstroBody(ctx);
     drawMonstroArms(ctx, "wave");
     [-16,16].forEach(dx=>{
@@ -677,8 +690,8 @@ function makeBossTextures(scene){
   // (ver comentário em startBossStompDefeat, dia-crianca.js), o boss fica
   // com pena e foge a correr. Sobrolho preocupado + olhos fechados de
   // tristeza + boca em "n" invertido (franzida para baixo) + uma lágrima.
-  if(!scene.textures.exists("boss_monstro_ignorancia_sad")){
-    const tex=scene.textures.createCanvas("boss_monstro_ignorancia_sad",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_monstro_phishing_sad")){
+    const tex=scene.textures.createCanvas("boss_monstro_phishing_sad",S,S), ctx=tex.getContext();
     drawMonstroBody(ctx);
     drawMonstroArms(ctx, "rest");
     ctx.strokeStyle="#2a1060"; ctx.lineWidth=3; ctx.lineCap="round";
@@ -699,8 +712,8 @@ function makeBossTextures(scene){
   // Estado "sentado" — usado na sequência de derrota: senta-se no chão,
   // lê um livro que aparece à sua frente e dá um polegar para cima. Não
   // morre, não explode — só fica contente e simpático, tal como pedido.
-  if(!scene.textures.exists("boss_monstro_ignorancia_sentado")){
-    const tex=scene.textures.createCanvas("boss_monstro_ignorancia_sentado",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_monstro_phishing_sentado")){
+    const tex=scene.textures.createCanvas("boss_monstro_phishing_sentado",S,S), ctx=tex.getContext();
     bossShadow(ctx);
     const gr = ctx.createRadialGradient(C-12,C-8,6,C,C+6,44);
     gr.addColorStop(0,"#ad82ff"); gr.addColorStop(0.55,"#6a3ad8"); gr.addColorStop(1,"#3a1a80");
@@ -981,25 +994,25 @@ function makeBossTextures(scene){
       ctx.shadowBlur=0;
     }
   }
-  if(!scene.textures.exists("boss_guardiao_sombras")){
-    const tex=scene.textures.createCanvas("boss_guardiao_sombras",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_espiao_sombras")){
+    const tex=scene.textures.createCanvas("boss_espiao_sombras",S,S), ctx=tex.getContext();
     drawGuardiaoBody(ctx); drawGuardiaoArms(ctx,"rest"); drawGuardiaoFace(ctx,true);
     tex.refresh();
   }
-  if(!scene.textures.exists("boss_guardiao_sombras_armsdown")){
-    const tex=scene.textures.createCanvas("boss_guardiao_sombras_armsdown",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_espiao_sombras_armsdown")){
+    const tex=scene.textures.createCanvas("boss_espiao_sombras_armsdown",S,S), ctx=tex.getContext();
     drawGuardiaoBody(ctx); drawGuardiaoArms(ctx,"rest"); drawGuardiaoFace(ctx,true);
     tex.refresh();
   }
-  if(!scene.textures.exists("boss_guardiao_sombras_blink")){
-    const tex=scene.textures.createCanvas("boss_guardiao_sombras_blink",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_espiao_sombras_blink")){
+    const tex=scene.textures.createCanvas("boss_espiao_sombras_blink",S,S), ctx=tex.getContext();
     drawGuardiaoBody(ctx); drawGuardiaoArms(ctx,"rest"); drawGuardiaoFace(ctx,false);
     tex.refresh();
   }
   // "ouch": mangas levantadas em choque + olhos a brilhar com mais força
   // (em vez de expressão facial, que a capa não tem) — reage na mesma.
-  if(!scene.textures.exists("boss_guardiao_sombras_ouch")){
-    const tex=scene.textures.createCanvas("boss_guardiao_sombras_ouch",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_espiao_sombras_ouch")){
+    const tex=scene.textures.createCanvas("boss_espiao_sombras_ouch",S,S), ctx=tex.getContext();
     drawGuardiaoBody(ctx); drawGuardiaoArms(ctx,"wave");
     glowEye(ctx, C-7, C-18, 6, "#ffffff");
     glowEye(ctx, C+7, C-18, 6, "#ffffff");
@@ -1009,8 +1022,8 @@ function makeBossTextures(scene){
   // Estado "riso maléfico" — entrada em combate: olhos semicerrados de
   // gozo, confiante que a escuridão vai vencer. Sem boca (a capa não tem,
   // ver comentário no "ouch" acima) — tudo se exprime só nos olhos.
-  if(!scene.textures.exists("boss_guardiao_sombras_laugh")){
-    const tex=scene.textures.createCanvas("boss_guardiao_sombras_laugh",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_espiao_sombras_laugh")){
+    const tex=scene.textures.createCanvas("boss_espiao_sombras_laugh",S,S), ctx=tex.getContext();
     drawGuardiaoBody(ctx); drawGuardiaoArms(ctx,"rest");
     ctx.strokeStyle="#7fe0ff"; ctx.lineWidth=2.5; ctx.lineCap="round";
     ctx.shadowColor="#7fe0ff"; ctx.shadowBlur=8;
@@ -1023,8 +1036,8 @@ function makeBossTextures(scene){
   // Estado "zangado" (vermelho) — durante a escalada de fúria, o brilho dos
   // olhos muda de ciano para um tom quente/avermelhado; o motor de jogo
   // aplica também um tint por cima deste estado.
-  if(!scene.textures.exists("boss_guardiao_sombras_angry")){
-    const tex=scene.textures.createCanvas("boss_guardiao_sombras_angry",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_espiao_sombras_angry")){
+    const tex=scene.textures.createCanvas("boss_espiao_sombras_angry",S,S), ctx=tex.getContext();
     drawGuardiaoBody(ctx); drawGuardiaoArms(ctx,"wave");
     glowEye(ctx, C-7, C-18, 5.4, "#ff6a5c");
     glowEye(ctx, C+7, C-18, 5.4, "#ff6a5c");
@@ -1034,8 +1047,8 @@ function makeBossTextures(scene){
     tex.refresh();
   }
   // Estado "triste" — derrota: o brilho apaga-se quase todo antes de fugir.
-  if(!scene.textures.exists("boss_guardiao_sombras_sad")){
-    const tex=scene.textures.createCanvas("boss_guardiao_sombras_sad",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_espiao_sombras_sad")){
+    const tex=scene.textures.createCanvas("boss_espiao_sombras_sad",S,S), ctx=tex.getContext();
     drawGuardiaoBody(ctx); drawGuardiaoArms(ctx,"rest");
     glowEye(ctx, C-7, C-14, 2.6, "#5a90a8");
     glowEye(ctx, C+7, C-14, 2.6, "#5a90a8");
@@ -1057,10 +1070,15 @@ function makeBossTextures(scene){
   // como convém a um robô industrial pesado.
   function drawPoluidorBody(ctx){
     bossShadow(ctx);
-    // fumo — penacho maior, várias camadas com opacidade a esbater
-    [[C-2,C-46,8,0.5],[C+4,C-56,10,0.4],[C-5,C-66,8,0.28],[C+1,C-75,6,0.18]].forEach(([x,y,r,a])=>{
-      ctx.fillStyle=`rgba(130,130,120,${a})`;
-      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    // envelopes de spam a sair da chaminé (em vez de fumo industrial) —
+    // identifica-o de imediato como o Robô do Spam.
+    [[C-2,C-46,0.5],[C+5,C-58,0.42],[C-6,C-70,0.32]].forEach(([x,y,a])=>{
+      ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.rotate((x%5)*0.08);
+      ctx.fillStyle="#fffaff";
+      ctx.beginPath(); ctx.roundRect(-7,-5,14,10,1.5); ctx.fill();
+      ctx.strokeStyle="#c04040"; ctx.lineWidth=1; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-7,-5); ctx.lineTo(0,1); ctx.lineTo(7,-5); ctx.stroke();
+      ctx.restore();
     });
     // chaminé com aro no topo
     ctx.fillStyle="#5a5a4a";
@@ -1223,25 +1241,25 @@ function makeBossTextures(scene){
     drawPoluidorEyes(ctx, mood);
     drawPoluidorMouth(ctx, mood);
   }
-  if(!scene.textures.exists("boss_poluidor_mecanico")){
-    const tex=scene.textures.createCanvas("boss_poluidor_mecanico",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_robo_spam")){
+    const tex=scene.textures.createCanvas("boss_robo_spam",S,S), ctx=tex.getContext();
     drawPoluidorBody(ctx); drawPoluidorArms(ctx,"wave"); drawPoluidorFace(ctx,"normal");
     tex.refresh();
   }
-  if(!scene.textures.exists("boss_poluidor_mecanico_armsdown")){
-    const tex=scene.textures.createCanvas("boss_poluidor_mecanico_armsdown",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_robo_spam_armsdown")){
+    const tex=scene.textures.createCanvas("boss_robo_spam_armsdown",S,S), ctx=tex.getContext();
     drawPoluidorBody(ctx); drawPoluidorArms(ctx,"rest"); drawPoluidorFace(ctx,"normal");
     tex.refresh();
   }
-  if(!scene.textures.exists("boss_poluidor_mecanico_blink")){
-    const tex=scene.textures.createCanvas("boss_poluidor_mecanico_blink",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_robo_spam_blink")){
+    const tex=scene.textures.createCanvas("boss_robo_spam_blink",S,S), ctx=tex.getContext();
     drawPoluidorBody(ctx); drawPoluidorArms(ctx,"wave"); drawPoluidorFace(ctx,"blink");
     tex.refresh();
   }
   // "ouch" — sobrancelhas esbugalhadas, olhos brancos de sobrecarga, boca
   // ovalada bem aberta + faíscas dos cantos do visor.
-  if(!scene.textures.exists("boss_poluidor_mecanico_ouch")){
-    const tex=scene.textures.createCanvas("boss_poluidor_mecanico_ouch",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_robo_spam_ouch")){
+    const tex=scene.textures.createCanvas("boss_robo_spam_ouch",S,S), ctx=tex.getContext();
     drawPoluidorBody(ctx); drawPoluidorArms(ctx,"rest"); drawPoluidorFace(ctx,"ouch");
     ctx.strokeStyle="#ffe85c"; ctx.lineWidth=2; ctx.lineCap="round";
     [[C-21,C-12,C-29,C-22],[C+21,C-12,C+29,C-22],[C-17,C+12,C-25,C+20]].forEach(([x1,y1,x2,y2])=>{
@@ -1251,23 +1269,23 @@ function makeBossTextures(scene){
   }
   // "riso maléfico" — entrada em combate: sobrancelhas trocistas erguidas
   // nas pontas, lentes com brilho quente, boca-grelha bem aberta a rir.
-  if(!scene.textures.exists("boss_poluidor_mecanico_laugh")){
-    const tex=scene.textures.createCanvas("boss_poluidor_mecanico_laugh",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_robo_spam_laugh")){
+    const tex=scene.textures.createCanvas("boss_robo_spam_laugh",S,S), ctx=tex.getContext();
     drawPoluidorBody(ctx); drawPoluidorArms(ctx,"wave"); drawPoluidorFace(ctx,"laugh");
     tex.refresh();
   }
   // "zangado" (vermelho) — sobrancelhas em V bem carregado, lentes maiores
   // e mais intensas, boca em grelha cerrada/dentada. O motor de jogo
   // aplica também um tint por cima deste estado.
-  if(!scene.textures.exists("boss_poluidor_mecanico_angry")){
-    const tex=scene.textures.createCanvas("boss_poluidor_mecanico_angry",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_robo_spam_angry")){
+    const tex=scene.textures.createCanvas("boss_robo_spam_angry",S,S), ctx=tex.getContext();
     drawPoluidorBody(ctx); drawPoluidorArms(ctx,"wave"); drawPoluidorFace(ctx,"angry");
     tex.refresh();
   }
   // "triste" — derrota: sobrancelhas preocupadas (caídas para dentro),
   // lentes pequenas e baças, boca-grelha descaída, antes de fugir a coxear.
-  if(!scene.textures.exists("boss_poluidor_mecanico_sad")){
-    const tex=scene.textures.createCanvas("boss_poluidor_mecanico_sad",S,S), ctx=tex.getContext();
+  if(!scene.textures.exists("boss_robo_spam_sad")){
+    const tex=scene.textures.createCanvas("boss_robo_spam_sad",S,S), ctx=tex.getContext();
     drawPoluidorBody(ctx); drawPoluidorArms(ctx,"rest"); drawPoluidorFace(ctx,"sad");
     tex.refresh();
   }
