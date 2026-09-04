@@ -1818,7 +1818,7 @@ window.addEventListener("DOMContentLoaded", () => {
           b.collected=true;
           b.sprite.destroy(); b.sprite=null;
           score+=10; scoreText.setText(`🌟 Pontos: ${score}`);
-          showFloat(sceneRef,px,py-68,"🎈 Balão +10","#ff6b35");
+          showFloat(sceneRef,px,py-68,"🔒 Cadeado +10","#ff6b35");
           if(Math.random()<0.35) showFloat(sceneRef,px,py-100,pickPraise(),"#ffd700");
           ensureAudio(); SFX.coin();
           const tint=[0xff6b35,0xffd700,0xff80c0,0x80d0ff];
@@ -1836,7 +1836,7 @@ window.addEventListener("DOMContentLoaded", () => {
             if(!b.collected) return;
             b.collected=false;
             b.x=80+Math.random()*(worldW-160); b.y=560;
-            const newKey="item_balao_"+Math.floor(Math.random()*6);
+            const newKey="item_cadeado_"+Math.floor(Math.random()*6);
             b.sprite=sceneRef.add.image(b.x,b.y,newKey).setDepth(1).setScale(0.85).setAlpha(0.92);
           });
         }
@@ -1974,7 +1974,7 @@ window.addEventListener("DOMContentLoaded", () => {
     for(let i=0;i<count;i++){
       const x=80+Math.random()*(worldW-160);
       const y=80+Math.random()*380; // espalhados pelo ar
-      const bKey="item_balao_"+(i%6);
+      const bKey="item_cadeado_"+(i%6);
       const sprite=scene.add.image(x,y,bKey).setDepth(1).setScale(0.85).setAlpha(0.92);
       balloons.push({
         sprite, x, y,
@@ -2386,9 +2386,9 @@ window.addEventListener("DOMContentLoaded", () => {
     collectedRoomPipes.clear();
     itemsCollected = 0;
     itemCountText.setText(`⭐ Itens: ${itemsCollected}/${itemsTotal}`);
-    const keyMap = { estrela:"item_estrela", balao:"item_chupachupa", brinquedo:"item_brinquedo",
+    const keyMap = { estrela:"item_estrela", balao:"item_chave", brinquedo:"item_robo",
                      medalha:"item_medalha", heart:"item_heart", duplosalto:"item_duplosalto",
-                     balaofesta:"item_balao_2" };
+                     balaofesta:"item_cadeado_2" };
     LEVELS[currentLevel].items.forEach((it, idx) => {
       const exists = itemsGroup.getChildren().some(o => o.getData("itemIdx") === idx);
       if (exists) return;
@@ -2503,7 +2503,7 @@ window.addEventListener("DOMContentLoaded", () => {
       scene.time.delayedCall(380,()=>burst.destroy());
 
       // ── Item bónus ─────────────────────────────────────────────
-      const keyMap = { estrela:"item_estrela", medalha:"item_medalha", heart:"item_heart", brinquedo:"item_brinquedo", duplosalto:"item_duplosalto", balao:"item_balao_0" };
+      const keyMap = { estrela:"item_estrela", medalha:"item_medalha", heart:"item_heart", brinquedo:"item_robo", duplosalto:"item_duplosalto", balao:"item_cadeado_0" };
       const it = itemsGroup.create(s.x, s.y-40, keyMap[s.kind]||"item_estrela");
       it.setDepth(3);
       it.setData("kind", s.kind);
@@ -2904,10 +2904,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const keyMap={
       estrela:"item_estrela",
-      balao:"item_chupachupa",
-      brinquedo:"item_brinquedo",medalha:"item_medalha",heart:"item_heart",
+      balao:"item_chave",
+      brinquedo:"item_robo",medalha:"item_medalha",heart:"item_heart",
       duplosalto:"item_duplosalto",
-      balaofesta:"item_balao_2"
+      balaofesta:"item_cadeado_2"
     };
     // Velocidade de rotação por tipo de item — removida (itens ficam fixos)
     const rotSpeeds={};
@@ -3420,12 +3420,12 @@ window.addEventListener("DOMContentLoaded", () => {
     // Emoji do rótulo varia consoante a recompensa — pequeno toque de
     // variedade entre salas sem mexer no tema roxo fixo (que se mantém de
     // propósito, para se reconhecer logo "sala secreta" em qualquer nível).
-    const kindEmoji = { estrela:"⭐", balao:"🎈", brinquedo:"🧸", medalha:"🏅",
-      heart:"❤️", duplosalto:"🦘", balaofesta:"🎊" };
+    const kindEmoji = { estrela:"⭐", balao:"🔑", brinquedo:"🤖", medalha:"🏅",
+      heart:"❤️", duplosalto:"🦘", balaofesta:"🔒" };
 
     if (!alreadyCollected) {
-      const keyMap={ estrela:"item_estrela", balao:"item_chupachupa", brinquedo:"item_brinquedo",
-        medalha:"item_medalha", heart:"item_heart", duplosalto:"item_duplosalto", balaofesta:"item_balao_2" };
+      const keyMap={ estrela:"item_estrela", balao:"item_chave", brinquedo:"item_robo",
+        medalha:"item_medalha", heart:"item_heart", duplosalto:"item_duplosalto", balaofesta:"item_cadeado_2" };
       const item = itemsGroup.create(ROOM_ITEM_XY.x, ROOM_ITEM_XY.y, keyMap[kind]||"item_estrela");
       item.setDepth(2);
       item.setData("kind", kind);
@@ -5685,7 +5685,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (bossState.def.contaminatedArena) { clearToxicZones(); clearMiniViruses(); } // arena "cura-se" ao vencer o boss
     itemsGroup.getChildren().slice().forEach(o => { if((o.getData("kind")==="estrela" || o.getData("bossCharge")) && !o.getData("bossCollect")) o.destroy(); });
     const keyMap = { estrela:"item_estrela", heart:"item_heart", medalha:"item_medalha",
-                     brinquedo:"item_brinquedo", balao:"item_chupachupa", livro:"item_livro" };
+                     brinquedo:"item_robo", balao:"item_chave", livro:"item_livro" };
     const key = keyMap[bossState.def.collectKind] || "item_estrela";
     for (let i=0;i<bossState.def.collectCount;i++){
       const collectWorldW = bossState.def.arena?.worldW || 1600;
@@ -6231,7 +6231,7 @@ window.addEventListener("DOMContentLoaded", () => {
   function startConfetti(durationMs=5000){
     const el=document.getElementById("confetti"); if(!el) return;
     el.classList.remove("hidden"); el.innerHTML="";
-    const emojis=["🎈","✨","⭐","🌟","🧸","🎁","🎊","🎉","🏆","🎀","🌈","💫","🥳","🎆","🎇","🪅","🏅","🎵","🎶","❤️","🌺","🦋","🐝"];
+    const emojis=["🎈","✨","⭐","🌟","🤖","🎁","🎊","🎉","🏆","🎀","🌈","💫","🥳","🎆","🎇","🪅","🏅","🎵","🎶","❤️","🌺","🦋","🐝"];
     const vw=Math.max(320,window.innerWidth||800);
     // Muito mais confetis na vitoria final
     const isMobile=window.matchMedia("(max-width:768px)").matches;
@@ -6528,12 +6528,12 @@ window.addEventListener("DOMContentLoaded", () => {
   // ===== Itens =====
   const ITEM_LABELS={
     estrela:    {label:"⭐ STAR POWER! 8s",      color:"#ffd700"},
-    balao:      {label:"🍭 Chupa-chupa +10",    color:"#e0209a"},
-    brinquedo:  {label:"🧸 Brinquedo +10",      color:"#a050ff"},
+    balao:      {label:"🔑 Chave de Acesso +10", color:"#e0209a"},
+    brinquedo:  {label:"🤖 Mini-Robô +10",       color:"#a050ff"},
     medalha:    {label:"🛡️ Escudo! PROTEGIDO",  color:"#ffd700"},
     duplosalto: {label:"🦅 Duplo Salto! 10s",   color:"#80d0ff"},
     heart:      {label:"❤️ +1 Vida!",           color:"#e84d10"},
-    balaofesta: {label:"🎈 Balão da Festa +10", color:"#1a90e0"}
+    balaofesta: {label:"🔒 Cadeado Especial +10", color:"#1a90e0"}
   };
 
   // Cores das partículas por tipo de item
@@ -6699,8 +6699,8 @@ window.addEventListener("DOMContentLoaded", () => {
     itemCountText.setText(`⭐ Itens: ${itemsCollected}/${itemsTotal}`);
     const keyMap={
       estrela:"item_estrela",
-      balao:"item_chupachupa",
-      brinquedo:"item_brinquedo",medalha:"item_medalha",heart:"item_heart",
+      balao:"item_chave",
+      brinquedo:"item_robo",medalha:"item_medalha",heart:"item_heart",
       duplosalto:"item_duplosalto"
     };
     LEVELS[currentLevel].items.forEach((it,idx)=>{

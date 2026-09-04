@@ -32,7 +32,7 @@ export const THEMES = [
 //     é escondido (sem nada ser destruído) e trocado por uma salinha à
 //     parte, pequena e independente, com fundo totalmente redesenhado —
 //     não é uma plataforma algures no mesmo mundo do nível. kind é a
-//     recompensa (🍬 balao / 🎈 balaofesta / ⭐ estrela / ❤️ heart /
+//     recompensa (🔑 balao / 🔒 balaofesta / ⭐ estrela / ❤️ heart /
 //     🛡️ medalha). Por OMISSÃO o regresso é pelo MESMO cano em que se
 //     entrou (returnX/returnY não definidos) — não se desenha nenhum cano
 //     extra, o VanBerto's simplesmente volta a sair pelo cano físico que já
@@ -170,7 +170,7 @@ export const LEVELS = [
       {x:1760,y:154,w:150,h:22}
     ],
     // 1 par, em cima de uma plataforma a meio do nível — atalho clássico
-    // para plataforma alta — recompensa: 🎈 balão da festa.
+    // para plataforma alta — recompensa: 🔒 cadeado especial.
     pipes:[
       {x:1760,y:337,toX:1810,toY:111},
       {x:1810,y:111,toX:1760,toY:337}

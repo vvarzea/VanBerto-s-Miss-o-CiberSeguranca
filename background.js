@@ -542,21 +542,21 @@ export function spawnPlatformDecor(scene, platforms){
   platDecorData.forEach(d=>{if(d.gfx&&d.gfx.active)d.gfx.destroy();});
   platDecorData=[];
   if(!platDecorGfx) return;
-  const flowerColors=[0xff6b35,0xffd700,0xff80c0,0x80d0ff,0xa0ff80,0xffffff,0xc080ff];
+  const nodeColors=[0xff6b35,0xffd700,0xff80c0,0x80d0ff,0xa0ff80,0xffffff,0xc080ff];
   platforms.getChildren().forEach((plat,pi)=>{
     if(!plat.body) return;
     const pw=plat.displayWidth, px=plat.body.left, py=plat.body.top;
-    // Flores: 1 por cada 80px de plataforma
-    const numFlowers=Math.max(1,Math.floor(pw/80));
-    for(let fi=0;fi<numFlowers;fi++){
-      const fx=px+30+fi*(pw-60)/Math.max(1,numFlowers-1);
-      const fc=flowerColors[(pi*3+fi)%flowerColors.length];
-      platDecorData.push({type:"flower", x:fx, y:py-4, color:fc, phase:Math.random()*Math.PI*2, gfx:null});
+    // Nos de sinal (pequenas luzes tipo sensor/LED): 1 por cada 80px de plataforma
+    const numNodes=Math.max(1,Math.floor(pw/80));
+    for(let fi=0;fi<numNodes;fi++){
+      const fx=px+30+fi*(pw-60)/Math.max(1,numNodes-1);
+      const fc=nodeColors[(pi*3+fi)%nodeColors.length];
+      platDecorData.push({type:"node", x:fx, y:py-4, color:fc, phase:Math.random()*Math.PI*2, gfx:null});
     }
-    // Borboleta: 1 por cada 3 plataformas
+    // Sinal de dados a flutuar: 1 por cada 3 plataformas
     if(pi%3===0 && pw>100){
       const bx=px+pw*0.6;
-      platDecorData.push({type:"butterfly", x:bx, y:py-12, color:flowerColors[pi%flowerColors.length], phase:Math.random()*Math.PI*2, gfx:null});
+      platDecorData.push({type:"signal", x:bx, y:py-12, color:nodeColors[pi%nodeColors.length], phase:Math.random()*Math.PI*2, gfx:null});
     }
   });
 }
@@ -566,35 +566,35 @@ export function updatePlatformDecor(scene){
   platDecorGfx.clear();
   const t=scene.time.now*0.001;
   platDecorData.forEach(d=>{
-    const sway=Math.sin(t*1.4+d.phase)*2.5; // balanço suave
-    if(d.type==="flower"){
+    const sway=Math.sin(t*1.4+d.phase)*2.5; // balanco suave
+    if(d.type==="node"){
       const fy=d.y+sway*0.3;
-      // Caule
-      platDecorGfx.lineStyle(1.2,0x228830,0.70);
+      // Pequena antena/haste
+      platDecorGfx.lineStyle(1.2,0x60a0c0,0.65);
       platDecorGfx.beginPath(); platDecorGfx.moveTo(d.x,fy+6); platDecorGfx.lineTo(d.x+sway*0.5,fy-2); platDecorGfx.strokePath();
-      // Pétalas
-      platDecorGfx.fillStyle(d.color,0.75);
-      platDecorGfx.fillCircle(d.x+sway*0.5,fy-5,3.5);
-      platDecorGfx.fillCircle(d.x+sway*0.5+3,fy-2,3.5);
-      platDecorGfx.fillCircle(d.x+sway*0.5-3,fy-2,3.5);
-      platDecorGfx.fillCircle(d.x+sway*0.5,fy+1,3.5);
-      // Centro
-      platDecorGfx.fillStyle(0xffd700,0.9);
-      platDecorGfx.fillCircle(d.x+sway*0.5,fy-2,2);
-    } else if(d.type==="butterfly"){
-      const flutter=Math.sin(t*6+d.phase)*0.5; // bater de asas rápido
+      // Halo pulsante da luz
+      const pulse=0.55+Math.sin(t*3+d.phase)*0.25;
+      platDecorGfx.fillStyle(d.color,0.25*pulse);
+      platDecorGfx.fillCircle(d.x+sway*0.5,fy-4,7);
+      // Luz/no central
+      platDecorGfx.fillStyle(d.color,0.85);
+      platDecorGfx.fillCircle(d.x+sway*0.5,fy-4,3);
+      platDecorGfx.fillStyle(0xffffff,0.9);
+      platDecorGfx.fillCircle(d.x+sway*0.5-0.8,fy-4.8,1.1);
+    } else if(d.type==="signal"){
+      const flutter=Math.sin(t*3+d.phase)*0.5;
       const bx=d.x+Math.sin(t*0.8+d.phase)*18; // deriva horizontal
       const by=d.y+Math.sin(t*0.5+d.phase)*8;
-      const wOpen=5+Math.abs(flutter)*4;
-      // Asas
-      platDecorGfx.fillStyle(d.color,0.65);
-      platDecorGfx.fillEllipse(bx-wOpen,by,wOpen*2,6);
-      platDecorGfx.fillEllipse(bx+wOpen,by,wOpen*2,6);
-      platDecorGfx.fillEllipse(bx-wOpen*0.7,by+4,wOpen*1.4,5);
-      platDecorGfx.fillEllipse(bx+wOpen*0.7,by+4,wOpen*1.4,5);
-      // Corpo
-      platDecorGfx.fillStyle(0x1a1a1a,0.55);
-      platDecorGfx.fillEllipse(bx,by+1,3,10);
+      // Ondas de sinal concentricas (tipo wifi/bluetooth a "ping")
+      platDecorGfx.lineStyle(1.4,d.color,0.55+flutter*0.2);
+      platDecorGfx.beginPath(); platDecorGfx.arc(bx,by,4,Math.PI*1.15,Math.PI*1.85); platDecorGfx.strokePath();
+      platDecorGfx.lineStyle(1.4,d.color,0.40+flutter*0.15);
+      platDecorGfx.beginPath(); platDecorGfx.arc(bx,by,7.5,Math.PI*1.15,Math.PI*1.85); platDecorGfx.strokePath();
+      platDecorGfx.lineStyle(1.2,d.color,0.28+flutter*0.1);
+      platDecorGfx.beginPath(); platDecorGfx.arc(bx,by,11,Math.PI*1.15,Math.PI*1.85); platDecorGfx.strokePath();
+      // Pontinho de origem do sinal
+      platDecorGfx.fillStyle(d.color,0.9);
+      platDecorGfx.fillCircle(bx,by,2.2);
     }
   });
 }

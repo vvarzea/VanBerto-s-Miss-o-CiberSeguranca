@@ -1462,8 +1462,8 @@ function makeItemTextures(scene){
     ctx.fillStyle="rgba(255,255,255,0.5)"; ctx.beginPath(); ctx.arc(13,11,4,0,Math.PI*2); ctx.fill();
     tex.refresh();
   }
-  // Balões 🎈 flutuantes — 6 cores
-  const BALAO_COLORS=[
+  // Cadeados 🔒 flutuantes — 6 cores
+  const LOCK_COLORS=[
     {hi:"#ff9080", lo:"#e84d10", stroke:"#b03000"}, // laranja-vermelho
     {hi:"#ffe080", lo:"#ffd700", stroke:"#b09000"}, // amarelo
     {hi:"#ff90d0", lo:"#e0209a", stroke:"#900060"}, // rosa
@@ -1471,181 +1471,157 @@ function makeItemTextures(scene){
     {hi:"#90ffb0", lo:"#20c060", stroke:"#008030"}, // verde
     {hi:"#d0a0ff", lo:"#9030e0", stroke:"#500090"}, // lilás
   ];
-  BALAO_COLORS.forEach((bc,ci)=>{
-    const key="item_balao_"+ci;
+  LOCK_COLORS.forEach((bc,ci)=>{
+    const key="item_cadeado_"+ci;
     if(scene.textures.exists(key)) return;
-    const tex=scene.textures.createCanvas(key,32,46), ctx=tex.getContext();
-    // Corpo do balão
-    const gr=ctx.createRadialGradient(10,11,2,16,16,14);
+    const tex=scene.textures.createCanvas(key,32,36), ctx=tex.getContext();
+    // Brilho de fundo
+    ctx.shadowColor=bc.lo; ctx.shadowBlur=7;
+    // Argola do cadeado (shackle)
+    ctx.strokeStyle=bc.stroke; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.arc(16,13,7,Math.PI,0,false); ctx.stroke();
+    ctx.shadowBlur=0;
+    // Corpo do cadeado
+    const gr=ctx.createLinearGradient(4,15,4,33);
     gr.addColorStop(0,bc.hi); gr.addColorStop(1,bc.lo);
     ctx.fillStyle=gr;
-    ctx.beginPath(); ctx.ellipse(16,16,13,15,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(4,15,24,18,5); ctx.fill();
     // Contorno
-    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.ellipse(16,16,13,15,0,0,Math.PI*2); ctx.stroke();
+    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.roundRect(4,15,24,18,5); ctx.stroke();
     // Brilho oval
-    ctx.fillStyle="rgba(255,255,255,0.55)";
-    ctx.beginPath(); ctx.ellipse(10,9,4,6,Math.PI/4,0,Math.PI*2); ctx.fill();
-    // Brilho pequeno secundário
-    ctx.fillStyle="rgba(255,255,255,0.25)";
-    ctx.beginPath(); ctx.ellipse(20,11,2.5,3.5,Math.PI/5,0,Math.PI*2); ctx.fill();
-    // Nozinho na base
-    ctx.fillStyle=bc.lo;
-    ctx.beginPath(); ctx.arc(16,31,3,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1; ctx.stroke();
-    // Fio
-    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.2;
-    ctx.beginPath(); ctx.moveTo(16,31);
-    ctx.quadraticCurveTo(18,38,16,44); ctx.stroke();
+    ctx.fillStyle="rgba(255,255,255,0.5)";
+    ctx.beginPath(); ctx.ellipse(10,20,4,3,Math.PI/5,0,Math.PI*2); ctx.fill();
+    // Buraco da fechadura
+    ctx.fillStyle=bc.stroke;
+    ctx.beginPath(); ctx.arc(16,23,2.6,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(14.6,24.5); ctx.lineTo(17.4,24.5); ctx.lineTo(16.6,29); ctx.lineTo(15.4,29); ctx.closePath(); ctx.fill();
     tex.refresh();
   });
-  // Chupa-chupa 🍭 — desenhado em Canvas (consistente com todos os outros itens)
-  if(!scene.textures.exists("item_chupachupa")){
-    const tex=scene.textures.createCanvas("item_chupachupa",52,56), ctx=tex.getContext();
-    const cx=26, cy=20;
+  // Chave 🔑 — desenhado em Canvas (consistente com todos os outros itens)
+  if(!scene.textures.exists("item_chave")){
+    const tex=scene.textures.createCanvas("item_chave",52,56), ctx=tex.getContext();
+    const cx=26, cy=28;
 
-    // Halo exterior colorido (brilho de candy)
-    const haloGr = ctx.createRadialGradient(cx,cy,12,cx,cy,22);
-    haloGr.addColorStop(0,"rgba(255,100,200,0)");
-    haloGr.addColorStop(0.6,"rgba(255,80,180,0.22)");
-    haloGr.addColorStop(1,"rgba(255,200,80,0.0)");
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(-0.5);
+
+    // Halo exterior dourado (brilho de "acesso concedido")
+    const haloGr = ctx.createRadialGradient(0,0,10,0,0,22);
+    haloGr.addColorStop(0,"rgba(255,230,120,0.35)");
+    haloGr.addColorStop(1,"rgba(255,230,120,0)");
     ctx.fillStyle=haloGr;
-    ctx.beginPath(); ctx.arc(cx,cy,22,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0,0,22,0,Math.PI*2); ctx.fill();
 
-    // Cabo — listrado como bastão de Natal (vermelho e branco alternados)
-    for(let ri=0; ri<5; ri++){
-      ctx.fillStyle = ri%2===0 ? "#ff1a44" : "#fff5f8";
-      ctx.beginPath();
-      ctx.roundRect(cx-4, cy+12+ri*5, 8, 6, ri===0?[3,3,0,0]:ri===4?[0,0,3,3]:[0]);
-      ctx.fill();
-    }
-    // Brilho no cabo (lateral esquerda)
-    ctx.fillStyle="rgba(255,255,255,0.45)";
-    ctx.fillRect(cx-3, cy+13, 2, 22);
-    // Contorno do cabo
-    ctx.strokeStyle="#cc0030"; ctx.lineWidth=1.4;
-    ctx.beginPath(); ctx.roundRect(cx-4,cy+12,8,28,3); ctx.stroke();
+    ctx.shadowColor="rgba(255,215,0,0.6)"; ctx.shadowBlur=6;
 
-    // Sombra suave por baixo do berlinde
-    ctx.fillStyle="rgba(180,0,80,0.20)";
-    ctx.beginPath(); ctx.ellipse(cx+3,cy+5,15,5,0,0,Math.PI*2); ctx.fill();
+    // Argola (bow) da chave — anel dourado à esquerda
+    const ringGr=ctx.createLinearGradient(-24,-9,-24,9);
+    ringGr.addColorStop(0,"#ffe680"); ringGr.addColorStop(1,"#c07000");
+    ctx.strokeStyle=ringGr; ctx.lineWidth=5;
+    ctx.beginPath(); ctx.arc(-15,0,8,0,Math.PI*2); ctx.stroke();
 
-    // Berlinde — 6 fatias arco-íris bem saturadas
-    const sliceColors=[
-      "#ff1a44",  // vermelho vivo
-      "#ff8c00",  // laranja
-      "#ffe600",  // amarelo
-      "#00cc44",  // verde
-      "#0088ff",  // azul
-      "#cc00ff",  // violeta
-    ];
-    ctx.save(); ctx.translate(cx,cy);
-    // Clip ao círculo para as fatias não saírem
-    ctx.beginPath(); ctx.arc(0,0,17,0,Math.PI*2); ctx.clip();
-    for(let si=0;si<6;si++){
-      ctx.fillStyle=sliceColors[si];
-      ctx.beginPath();
-      ctx.moveTo(0,0);
-      ctx.arc(0,0,17, si*Math.PI/3 - Math.PI*0.015, (si+1)*Math.PI/3 + Math.PI*0.015);
-      ctx.closePath(); ctx.fill();
-    }
-    // Espiral branca por cima das fatias (dá o aspeto de twist clássico)
-    ctx.strokeStyle="rgba(255,255,255,0.70)";
-    ctx.lineWidth=3.5;
-    ctx.lineCap="round";
-    ctx.beginPath();
-    for(let t=0; t<=Math.PI*1.7; t+=0.06){
-      const r = t / (Math.PI*1.7) * 15;
-      const x2 = Math.cos(t) * r;
-      const y2 = Math.sin(t) * r;
-      t===0 ? ctx.moveTo(x2,y2) : ctx.lineTo(x2,y2);
-    }
-    ctx.stroke();
-    ctx.restore();
+    // Haste da chave
+    const shaftGr=ctx.createLinearGradient(0,-3,0,3);
+    shaftGr.addColorStop(0,"#ffe680"); shaftGr.addColorStop(1,"#c07000");
+    ctx.fillStyle=shaftGr;
+    ctx.beginPath(); ctx.roundRect(-8,-3,24,6,2); ctx.fill();
 
-    // Contorno do berlinde — grosso e escuro para destacar
-    ctx.shadowColor="rgba(180,0,80,0.55)"; ctx.shadowBlur=8;
-    ctx.strokeStyle="#990022"; ctx.lineWidth=2.5;
-    ctx.beginPath(); ctx.arc(cx,cy,17,0,Math.PI*2); ctx.stroke();
+    // Dentes da chave (bit) — dois dentes na ponta direita
+    ctx.beginPath(); ctx.roundRect(9,3,4,7,1); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(15,3,4,10,1); ctx.fill();
+
+    ctx.shadowBlur=0;
+    // Contorno geral
+    ctx.strokeStyle="#8a5200"; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.roundRect(-8,-3,24,6,2); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(9,3,4,7,1); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(15,3,4,10,1); ctx.stroke();
+
+    // Ponto digital a piscar no centro da argola (detalhe "ciber")
+    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.arc(-15,0,2.4,0,Math.PI*2); ctx.fill();
     ctx.shadowBlur=0;
 
-    // Brilho principal (oval branco grande no canto sup. esq.)
-    ctx.fillStyle="rgba(255,255,255,0.62)";
-    ctx.beginPath(); ctx.ellipse(cx-6,cy-7,7,9,Math.PI*0.35,0,Math.PI*2); ctx.fill();
-    // Brilho secundário mais pequeno
-    ctx.fillStyle="rgba(255,255,255,0.38)";
-    ctx.beginPath(); ctx.ellipse(cx-4,cy-12,3.5,4.5,Math.PI*0.3,0,Math.PI*2); ctx.fill();
-    // Ponto de luz vivo no centro do brilho
-    ctx.fillStyle="rgba(255,255,255,0.85)";
-    ctx.beginPath(); ctx.arc(cx-8,cy-9,2.5,0,Math.PI*2); ctx.fill();
+    // Brilho ao longo da haste
+    ctx.strokeStyle="rgba(255,255,255,0.55)"; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.moveTo(-6,-1.5); ctx.lineTo(8,-1.5); ctx.stroke();
 
+    ctx.restore();
     tex.refresh();
   }
-  // Brinquedo — ursinho de peluche 🧸 completo (com pernas)
-  if(!scene.textures.exists("item_brinquedo")){
-    const tex=scene.textures.createCanvas("item_brinquedo",44,48), ctx=tex.getContext();
-    const C="#c07030", CL="#e8a860", CI="#e8905a", CD="#8b4a00";
+  // Mini-Robô 🤖 completo (com pernas) — companheiro do VanBerto's
+  if(!scene.textures.exists("item_robo")){
+    const tex=scene.textures.createCanvas("item_robo",44,50), ctx=tex.getContext();
+    const C="#7a95c0", CL="#c0d8f0", CI="#5878a0", CD="#1a2840";
+
+    // --- ANTENA ---
+    ctx.strokeStyle=CI; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(22,5); ctx.lineTo(22,-2); ctx.stroke();
+    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.arc(22,-3,2.6,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
 
     // --- PERNAS (atrás do corpo) ---
-    ctx.fillStyle=C;
-    ctx.beginPath(); ctx.ellipse(14,41,5,6,Math.PI*0.08,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(30,41,5,6,-Math.PI*0.08,0,Math.PI*2); ctx.fill();
-    // Patinhas
     ctx.fillStyle=CI;
-    ctx.beginPath(); ctx.ellipse(14,46,5,3,0,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(30,46,5,3,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(11,38,7,8,2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(27,38,7,8,2); ctx.fill();
+    // Pés
+    ctx.fillStyle=CD;
+    ctx.beginPath(); ctx.roundRect(9,45,11,3,1.5); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(25,45,11,3,1.5); ctx.fill();
 
     // --- CORPO ---
-    const bodyGr=ctx.createRadialGradient(19,28,2,22,28,14);
+    const bodyGr=ctx.createLinearGradient(9,17,35,41);
     bodyGr.addColorStop(0,CL); bodyGr.addColorStop(1,C);
-    ctx.beginPath(); ctx.ellipse(22,29,13,12,0,0,Math.PI*2); ctx.fillStyle=bodyGr; ctx.fill();
-    // Barriga clara
-    ctx.beginPath(); ctx.ellipse(22,31,7,6,0,0,Math.PI*2); ctx.fillStyle="rgba(255,220,160,0.75)"; ctx.fill();
+    ctx.beginPath(); ctx.roundRect(9,17,26,24,6); ctx.fillStyle=bodyGr; ctx.fill();
+    // Luz do peito (indicador de "protegido")
+    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.arc(22,29,4.2,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle="rgba(255,255,255,0.6)"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(22,29,4.2,0,Math.PI*2); ctx.stroke();
+    // Painel de parafusos
+    ctx.fillStyle="rgba(20,30,50,0.35)";
+    ctx.beginPath(); ctx.arc(13,37,1.4,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(31,37,1.4,0,Math.PI*2); ctx.fill();
 
     // --- BRAÇOS ---
     ctx.fillStyle=C;
-    ctx.beginPath(); ctx.ellipse(10,27,4,6,Math.PI*0.2,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(34,27,4,6,-Math.PI*0.2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(2,20,7,14,3); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(35,20,7,14,3); ctx.fill();
     // Mãozinhas
     ctx.fillStyle=CI;
-    ctx.beginPath(); ctx.arc(8,31,3.5,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(36,31,3.5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(5.5,35,3.2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(38.5,35,3.2,0,Math.PI*2); ctx.fill();
 
     // --- CABEÇA ---
-    const headGr=ctx.createRadialGradient(19,15,2,22,16,11);
+    const headGr=ctx.createLinearGradient(11,5,33,19);
     headGr.addColorStop(0,CL); headGr.addColorStop(1,C);
-    ctx.beginPath(); ctx.arc(22,16,11,0,Math.PI*2); ctx.fillStyle=headGr; ctx.fill();
+    ctx.beginPath(); ctx.roundRect(11,5,22,15,7); ctx.fillStyle=headGr; ctx.fill();
 
-    // Orelhas
-    ctx.fillStyle=C;
-    ctx.beginPath(); ctx.arc(13,8,5.5,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(31,8,5.5,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle=CI;
-    ctx.beginPath(); ctx.arc(13,8,3,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(31,8,3,0,Math.PI*2); ctx.fill();
+    // Visor/ecrã facial (escuro, tipo capacete)
+    ctx.fillStyle="#0e1c30";
+    ctx.beginPath(); ctx.roundRect(14,9,16,8,4); ctx.fill();
 
-    // Focinho
-    ctx.beginPath(); ctx.ellipse(22,20,5.5,4,0,0,Math.PI*2); ctx.fillStyle="#d08050"; ctx.fill();
-    // Nariz
-    ctx.beginPath(); ctx.arc(22,17.5,2.5,0,Math.PI*2); ctx.fillStyle="#2a1000"; ctx.fill();
-    // Boca
-    ctx.strokeStyle="#2a1000"; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(19,21); ctx.quadraticCurveTo(22,24,25,21); ctx.stroke();
-
-    // Olhos brilhantes
-    ctx.fillStyle="#2a1000";
-    ctx.beginPath(); ctx.arc(17,14,2.8,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(27,14,2.8,0,Math.PI*2); ctx.fill();
+    // Olhos-LED brilhantes
+    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.arc(18.5,13,1.8,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(25.5,13,1.8,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
     ctx.fillStyle="#ffffff";
-    ctx.beginPath(); ctx.arc(18,13,1.1,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(28,13,1.1,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(19.1,12.4,0.6,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(26.1,12.4,0.6,0,Math.PI*2); ctx.fill();
+
+    // Grelha do altifalante (boca)
+    ctx.strokeStyle="rgba(64,224,255,0.55)"; ctx.lineWidth=0.9;
+    ctx.beginPath(); ctx.moveTo(17,16.5); ctx.lineTo(27,16.5); ctx.stroke();
 
     // Contornos suaves
     ctx.strokeStyle=CD; ctx.lineWidth=1.3;
-    ctx.beginPath(); ctx.arc(22,16,11,0,Math.PI*2); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(22,29,13,12,0,0,Math.PI*2); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(14,41,5,6,Math.PI*0.08,0,Math.PI*2); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(30,41,5,6,-Math.PI*0.08,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(11,5,22,15,7); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(9,17,26,24,6); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(11,38,7,8,2); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(27,38,7,8,2); ctx.stroke();
     tex.refresh();
   }
   // Escudo — canvas 52×58, forma classica de escudo heraldico
@@ -1817,13 +1793,14 @@ function makeItemTextures(scene){
     ctx.bezierCurveTo(30,24,44,28,42,36);
     ctx.bezierCurveTo(40,40,28,36,24,20);
     ctx.fill();
-    // Padrões nas asas (círculos)
-    ctx.fillStyle=bc.pat; ctx.globalAlpha=0.6;
+    // Padrões nas asas (pequenas luzes de sinal)
+    ctx.shadowColor=bc.pat; ctx.shadowBlur=4;
+    ctx.fillStyle=bc.pat; ctx.globalAlpha=0.75;
     ctx.beginPath(); ctx.arc(13,14,4,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(35,14,4,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(11,28,3,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(37,28,3,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha=1;
+    ctx.globalAlpha=1; ctx.shadowBlur=0;
     // Contornos das asas
     ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.2;
     ctx.beginPath(); ctx.moveTo(24,20);
@@ -1832,14 +1809,14 @@ function makeItemTextures(scene){
     ctx.beginPath(); ctx.moveTo(24,20);
     ctx.bezierCurveTo(28,8,46,4,46,16);
     ctx.bezierCurveTo(46,24,34,26,24,20); ctx.stroke();
-    // Corpo (abdómen)
-    ctx.fillStyle="#1a1a1a";
+    // Corpo (abdómen) — metálico escuro, tipo drone em miniatura
+    ctx.fillStyle="#20304a";
     ctx.beginPath(); ctx.ellipse(24,20,3,10,0,0,Math.PI*2); ctx.fill();
     // Cabeça
-    ctx.fillStyle="#2a2a2a";
+    ctx.fillStyle="#2c405e";
     ctx.beginPath(); ctx.arc(24,11,3,0,Math.PI*2); ctx.fill();
     // Antenas
-    ctx.strokeStyle="#1a1a1a"; ctx.lineWidth=1.2;
+    ctx.strokeStyle="#20304a"; ctx.lineWidth=1.2;
     ctx.beginPath(); ctx.moveTo(24,9); ctx.quadraticCurveTo(18,2,14,1); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(24,9); ctx.quadraticCurveTo(30,2,34,1); ctx.stroke();
     ctx.fillStyle=bc.pat;
@@ -1873,23 +1850,23 @@ function makeItemTextures(scene){
 
     // --- ABDÓMEN (oval horizontal, listras) ---
     const abdGr=ctx.createRadialGradient(bx-6,by-2,2,bx-4,by,12);
-    abdGr.addColorStop(0,"#ffe566"); abdGr.addColorStop(1,"#d49000");
+    abdGr.addColorStop(0,"#80e8ff"); abdGr.addColorStop(1,"#0a5a80");
     ctx.fillStyle=abdGr;
     ctx.beginPath(); ctx.ellipse(bx-6, by, 13, 9, 0, 0, Math.PI*2); ctx.fill();
     // Listras pretas horizontais (clip ao abdómen)
     ctx.save();
     ctx.beginPath(); ctx.ellipse(bx-6, by, 13, 9, 0, 0, Math.PI*2); ctx.clip();
-    ctx.fillStyle="rgba(15,15,15,0.80)";
+    ctx.fillStyle="rgba(10,20,45,0.85)";
     [-4, 1, 6].forEach(dx=>{
       ctx.fillRect(bx-6+dx-1, by-9, 3, 18);
     });
     ctx.restore();
     // Contorno abdómen
-    ctx.strokeStyle="#8a5500"; ctx.lineWidth=1.2;
+    ctx.strokeStyle="#004060"; ctx.lineWidth=1.2;
     ctx.beginPath(); ctx.ellipse(bx-6, by, 13, 9, 0, 0, Math.PI*2); ctx.stroke();
 
-    // --- FERRÃO (ponta à esquerda) ---
-    ctx.fillStyle="#b07800";
+    // --- ANTENA-SENSOR (ponta à esquerda) ---
+    ctx.fillStyle="#40e0ff";
     ctx.beginPath();
     ctx.moveTo(bx-19, by);
     ctx.lineTo(bx-14, by-3);
@@ -1898,11 +1875,11 @@ function makeItemTextures(scene){
 
     // --- TÓRAX (peludo, ligação entre abdómen e cabeça) ---
     const torGr=ctx.createRadialGradient(bx+7,by-2,1,bx+8,by,7);
-    torGr.addColorStop(0,"#a07020"); torGr.addColorStop(1,"#4a2800");
+    torGr.addColorStop(0,"#3a7aa0"); torGr.addColorStop(1,"#0a1830");
     ctx.fillStyle=torGr;
     ctx.beginPath(); ctx.ellipse(bx+8, by, 7, 8, 0, 0, Math.PI*2); ctx.fill();
     // Pelos do tórax
-    ctx.strokeStyle="rgba(220,180,0,0.55)"; ctx.lineWidth=0.9;
+    ctx.strokeStyle="rgba(120,220,255,0.55)"; ctx.lineWidth=0.9;
     for(let pi=0;pi<6;pi++){
       const pa=Math.PI*2*pi/6;
       ctx.beginPath();
@@ -1913,23 +1890,25 @@ function makeItemTextures(scene){
 
     // --- CABEÇA (à direita, amarela) ---
     const headGr=ctx.createRadialGradient(bx+17,by-2,1,bx+18,by,7);
-    headGr.addColorStop(0,"#fff0a0"); headGr.addColorStop(1,"#e8a800");
+    headGr.addColorStop(0,"#d0f4ff"); headGr.addColorStop(1,"#2090c0");
     ctx.fillStyle=headGr;
     ctx.beginPath(); ctx.arc(bx+18, by, 7, 0, Math.PI*2); ctx.fill();
-    ctx.strokeStyle="#8a5500"; ctx.lineWidth=1.1; ctx.stroke();
+    ctx.strokeStyle="#004060"; ctx.lineWidth=1.1; ctx.stroke();
 
     // Olho (único, virado para a direita)
-    ctx.fillStyle="#1a1000";
+    ctx.fillStyle="#0a1020";
     ctx.beginPath(); ctx.arc(bx+21, by-1, 2.8, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle="rgba(255,255,255,0.75)";
     ctx.beginPath(); ctx.arc(bx+22, by-2, 1.1, 0, Math.PI*2); ctx.fill();
 
     // Antena (saindo da cabeça para a direita/cima)
-    ctx.strokeStyle="#5a3000"; ctx.lineWidth=1.3;
+    ctx.strokeStyle="#0a4060"; ctx.lineWidth=1.3;
     ctx.beginPath(); ctx.moveTo(bx+22, by-6);
     ctx.quadraticCurveTo(bx+26, by-14, bx+28, by-16); ctx.stroke();
-    ctx.fillStyle="#ffd700";
+    ctx.shadowColor="#40e0ff"; ctx.shadowBlur=5;
+    ctx.fillStyle="#40e0ff";
     ctx.beginPath(); ctx.arc(bx+28, by-16, 2.5, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
 
     tex.refresh();
   }
