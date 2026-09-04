@@ -2386,7 +2386,7 @@ window.addEventListener("DOMContentLoaded", () => {
     collectedRoomPipes.clear();
     itemsCollected = 0;
     itemCountText.setText(`⭐ Itens: ${itemsCollected}/${itemsTotal}`);
-    const keyMap = { estrela:"item_estrela", balao:"item_chave", brinquedo:"item_robo",
+    const keyMap = { estrela:"item_estrela", balao:"item_chave", brinquedo:"item_impressao",
                      medalha:"item_medalha", heart:"item_heart", duplosalto:"item_duplosalto",
                      balaofesta:"item_cadeado_2" };
     LEVELS[currentLevel].items.forEach((it, idx) => {
@@ -2503,7 +2503,7 @@ window.addEventListener("DOMContentLoaded", () => {
       scene.time.delayedCall(380,()=>burst.destroy());
 
       // ── Item bónus ─────────────────────────────────────────────
-      const keyMap = { estrela:"item_estrela", medalha:"item_medalha", heart:"item_heart", brinquedo:"item_robo", duplosalto:"item_duplosalto", balao:"item_cadeado_0" };
+      const keyMap = { estrela:"item_estrela", medalha:"item_medalha", heart:"item_heart", brinquedo:"item_impressao", duplosalto:"item_duplosalto", balao:"item_cadeado_0" };
       const it = itemsGroup.create(s.x, s.y-40, keyMap[s.kind]||"item_estrela");
       it.setDepth(3);
       it.setData("kind", s.kind);
@@ -2905,7 +2905,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const keyMap={
       estrela:"item_estrela",
       balao:"item_chave",
-      brinquedo:"item_robo",medalha:"item_medalha",heart:"item_heart",
+      brinquedo:"item_impressao",medalha:"item_medalha",heart:"item_heart",
       duplosalto:"item_duplosalto",
       balaofesta:"item_cadeado_2"
     };
@@ -3420,11 +3420,11 @@ window.addEventListener("DOMContentLoaded", () => {
     // Emoji do rótulo varia consoante a recompensa — pequeno toque de
     // variedade entre salas sem mexer no tema roxo fixo (que se mantém de
     // propósito, para se reconhecer logo "sala secreta" em qualquer nível).
-    const kindEmoji = { estrela:"⭐", balao:"🔑", brinquedo:"🤖", medalha:"🏅",
+    const kindEmoji = { estrela:"⭐", balao:"🔑", brinquedo:"🆔", medalha:"🏅",
       heart:"❤️", duplosalto:"🦘", balaofesta:"🔒" };
 
     if (!alreadyCollected) {
-      const keyMap={ estrela:"item_estrela", balao:"item_chave", brinquedo:"item_robo",
+      const keyMap={ estrela:"item_estrela", balao:"item_chave", brinquedo:"item_impressao",
         medalha:"item_medalha", heart:"item_heart", duplosalto:"item_duplosalto", balaofesta:"item_cadeado_2" };
       const item = itemsGroup.create(ROOM_ITEM_XY.x, ROOM_ITEM_XY.y, keyMap[kind]||"item_estrela");
       item.setDepth(2);
@@ -5685,7 +5685,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (bossState.def.contaminatedArena) { clearToxicZones(); clearMiniViruses(); } // arena "cura-se" ao vencer o boss
     itemsGroup.getChildren().slice().forEach(o => { if((o.getData("kind")==="estrela" || o.getData("bossCharge")) && !o.getData("bossCollect")) o.destroy(); });
     const keyMap = { estrela:"item_estrela", heart:"item_heart", medalha:"item_medalha",
-                     brinquedo:"item_robo", balao:"item_chave", livro:"item_livro" };
+                     brinquedo:"item_impressao", balao:"item_chave", livro:"item_livro" };
     const key = keyMap[bossState.def.collectKind] || "item_estrela";
     for (let i=0;i<bossState.def.collectCount;i++){
       const collectWorldW = bossState.def.arena?.worldW || 1600;
@@ -6529,7 +6529,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const ITEM_LABELS={
     estrela:    {label:"⭐ STAR POWER! 8s",      color:"#ffd700"},
     balao:      {label:"🔑 Chave de Acesso +10", color:"#e0209a"},
-    brinquedo:  {label:"🤖 Mini-Robô +10",       color:"#a050ff"},
+    brinquedo:  {label:"🆔 Impressão Digital +10", color:"#a050ff"},
     medalha:    {label:"🛡️ Escudo! PROTEGIDO",  color:"#ffd700"},
     duplosalto: {label:"🦅 Duplo Salto! 10s",   color:"#80d0ff"},
     heart:      {label:"❤️ +1 Vida!",           color:"#e84d10"},
@@ -6700,7 +6700,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const keyMap={
       estrela:"item_estrela",
       balao:"item_chave",
-      brinquedo:"item_robo",medalha:"item_medalha",heart:"item_heart",
+      brinquedo:"item_impressao",medalha:"item_medalha",heart:"item_heart",
       duplosalto:"item_duplosalto"
     };
     LEVELS[currentLevel].items.forEach((it,idx)=>{

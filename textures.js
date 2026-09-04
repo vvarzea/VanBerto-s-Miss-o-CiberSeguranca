@@ -1549,89 +1549,75 @@ function makeItemTextures(scene){
     ctx.restore();
     tex.refresh();
   }
-  // Mini-VanBerto\'s 🤖 — miniatura coleccionável, mesmo estilo visual
-  // do mascote principal (branco/azul-marinho, viseira azul, antena com halo).
-  if(!scene.textures.exists("item_robo")){
-    const tex=scene.textures.createCanvas("item_robo",48,56), ctx=tex.getContext();
-    const NAVY="#16233e", NAVY2="#26365a", OUT="#101a30";
-    function white(x0,y0,x1,y1){const g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,"#ffffff");g.addColorStop(0.55,"#e6edf7");g.addColorStop(1,"#b4c4dc");return g;}
-    ctx.lineJoin="round"; ctx.lineCap="round";
-    ctx.save(); ctx.translate(0,4);
+  // Impressão Digital 🆔 — sensor biométrico com padrão de digital e
+  // anel de "leitura" a brilhar, cor a condizer com a marca do jogo.
+  if(!scene.textures.exists("item_impressao")){
+    const tex=scene.textures.createCanvas("item_impressao",48,52), ctx=tex.getContext();
+    const cx=24, cy=26;
 
-    // --- PERNAS ---
-    function leg(cx){
-      ctx.beginPath(); ctx.roundRect(cx-4,37,8,8,3.5); ctx.fillStyle=white(cx-4,37,cx+4,37); ctx.fill();
-      ctx.lineWidth=1.8; ctx.strokeStyle=OUT; ctx.stroke();
-      ctx.beginPath(); ctx.roundRect(cx-5,44,10,6,3); ctx.fillStyle=NAVY; ctx.fill();
-      ctx.lineWidth=1.8; ctx.strokeStyle=OUT; ctx.stroke();
-    }
-    leg(17); leg(31);
+    // Halo de brilho por trás do sensor
+    const halo=ctx.createRadialGradient(cx,cy,4,cx,cy,23);
+    halo.addColorStop(0,"rgba(64,224,255,0.28)"); halo.addColorStop(1,"rgba(64,224,255,0)");
+    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(cx,cy,23,0,Math.PI*2); ctx.fill();
 
-    // --- BRAÇOS (pequenos, colados ao corpo) ---
-    function arm(sx,flip){
-      ctx.beginPath(); ctx.roundRect(sx,26,7,10,3.2); ctx.fillStyle=white(sx,26,sx+7,26); ctx.fill();
-      ctx.lineWidth=1.8; ctx.strokeStyle=OUT; ctx.stroke();
-      ctx.beginPath(); ctx.arc(sx+3.5,37,3.6,0,Math.PI*2); ctx.fillStyle=NAVY; ctx.fill();
-      ctx.lineWidth=1.6; ctx.strokeStyle=OUT; ctx.stroke();
-    }
-    arm(3); arm(38);
+    // Base do sensor (almofada arredondada)
+    const padGr=ctx.createLinearGradient(cx,cy-20,cx,cy+20);
+    padGr.addColorStop(0,"#243654"); padGr.addColorStop(1,"#101a30");
+    ctx.fillStyle=padGr;
+    ctx.beginPath(); ctx.roundRect(cx-19,cy-20,38,40,14); ctx.fill();
+    ctx.strokeStyle="#40e0ff"; ctx.lineWidth=1.6; ctx.globalAlpha=0.8;
+    ctx.beginPath(); ctx.roundRect(cx-19,cy-20,38,40,14); ctx.stroke();
+    ctx.globalAlpha=1;
 
-    // --- TRONCO ---
-    ctx.beginPath(); ctx.roundRect(11,22,26,20,9); ctx.fillStyle=white(12,23,37,23); ctx.fill();
-    ctx.save(); ctx.beginPath(); ctx.roundRect(11,22,26,20,9); ctx.clip();
-    const wg=ctx.createLinearGradient(0,34,0,42); wg.addColorStop(0,"rgba(22,35,62,0)"); wg.addColorStop(0.4,"#1c2c4c"); wg.addColorStop(1,"#142038");
-    ctx.fillStyle=wg; ctx.fillRect(11,34,26,8);
-    ctx.fillStyle="rgba(255,255,255,0.5)"; ctx.beginPath(); ctx.ellipse(17,27,5,3,-0.5,0,Math.PI*2); ctx.fill();
-    ctx.restore();
-    ctx.lineWidth=1.9; ctx.strokeStyle=OUT; ctx.beginPath(); ctx.roundRect(11,22,26,20,9); ctx.stroke();
+    // Cantos "de mira" (estilo scanner biométrico)
+    ctx.strokeStyle="#40e0ff"; ctx.lineWidth=2; ctx.lineCap="round";
+    const cl=6, m=3;
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sy])=>{
+      const px=cx+sx*19, py=cy+sy*20;
+      ctx.beginPath();
+      ctx.moveTo(px - sx*m, py - sy*(m+cl));
+      ctx.lineTo(px - sx*m, py - sy*m);
+      ctx.lineTo(px - sx*(m+cl), py - sy*m);
+      ctx.stroke();
+    });
 
-    // --- PAINEL DO PEITO (dome metálico, "protegido") ---
-    ctx.beginPath(); ctx.arc(24,30,5,0,Math.PI*2); ctx.fillStyle=NAVY; ctx.fill();
-    ctx.lineWidth=1.6; ctx.strokeStyle=OUT; ctx.stroke();
-    const dome=ctx.createRadialGradient(22.5,28.5,0.5,24,30,4.2); dome.addColorStop(0,"#aebccf"); dome.addColorStop(0.6,"#5a6a85"); dome.addColorStop(1,"#2b3a57");
-    ctx.beginPath(); ctx.arc(24,30,3.6,0,Math.PI*2); ctx.fillStyle=dome; ctx.fill();
-    ctx.beginPath(); ctx.arc(22.8,28.7,0.9,0,Math.PI*2); ctx.fillStyle="rgba(255,255,255,0.85)"; ctx.fill();
+    // --- PADRÃO DA IMPRESSÃO DIGITAL (arcos concêntricos irregulares) ---
+    ctx.strokeStyle="rgba(255,255,255,0.9)"; ctx.lineWidth=1.6; ctx.lineCap="round";
+    const arcs=[
+      {r:13, a0:0.15, a1:0.85},
+      {r:10.5, a0:0.05, a1:0.95},
+      {r:8, a0:0.20, a1:0.80},
+      {r:5.5, a0:0.10, a1:0.90},
+      {r:3, a0:0.25, a1:0.75},
+    ];
+    arcs.forEach(({r,a0,a1})=>{
+      ctx.beginPath();
+      ctx.arc(cx, cy+3, r, Math.PI*a0, Math.PI*a1);
+      ctx.stroke();
+    });
+    // pequenas linhas transversais para dar textura de "sulco"
+    ctx.strokeStyle="rgba(255,255,255,0.55)"; ctx.lineWidth=1.1;
+    ctx.beginPath(); ctx.moveTo(cx-6,cy-2); ctx.lineTo(cx-6,cy+8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+7,cy-3); ctx.lineTo(cx+7,cy+9); ctx.stroke();
 
-    // --- EAR PODS ---
-    function pod(cx){
-      ctx.beginPath(); ctx.arc(cx,10,3.6,0,Math.PI*2); ctx.fillStyle=NAVY; ctx.fill();
-      ctx.lineWidth=1.4; ctx.strokeStyle=OUT; ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx,10,1.7,0,Math.PI*2); ctx.fillStyle=NAVY2; ctx.fill();
-    }
-    pod(11); pod(37);
+    // Ponto de verificação luminoso no centro
+    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.arc(cx,cy+3,2,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
 
-    // --- ANTENA ---
-    ctx.fillStyle=NAVY;
-    ctx.beginPath(); ctx.moveTo(22,3); ctx.lineTo(26,3); ctx.lineTo(25,-2); ctx.lineTo(23,-2); ctx.closePath(); ctx.fill();
-    const halo=ctx.createRadialGradient(24,-6,0.5,24,-6,7); halo.addColorStop(0,"rgba(90,200,255,0.55)"); halo.addColorStop(1,"rgba(90,200,255,0)");
-    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(24,-6,7,0,Math.PI*2); ctx.fill();
-    const bg=ctx.createRadialGradient(23,-7,0.3,24,-6,3.4); bg.addColorStop(0,"#e6f7ff"); bg.addColorStop(0.4,"#48b4ff"); bg.addColorStop(1,"#1670d8");
-    ctx.beginPath(); ctx.arc(24,-6,3.4,0,Math.PI*2); ctx.fillStyle=bg; ctx.fill();
-    ctx.beginPath(); ctx.arc(23,-7,1,0,Math.PI*2); ctx.fillStyle="#fff"; ctx.fill();
+    // Linha de "scan" a atravessar o sensor (efeito de leitura)
+    const scanGr=ctx.createLinearGradient(cx-19,cy-9,cx+19,cy-9);
+    scanGr.addColorStop(0,"rgba(64,224,255,0)"); scanGr.addColorStop(0.5,"rgba(64,224,255,0.85)"); scanGr.addColorStop(1,"rgba(64,224,255,0)");
+    ctx.fillStyle=scanGr;
+    ctx.fillRect(cx-19,cy-10,38,2.4);
 
-    // --- CABEÇA (capacete) ---
-    ctx.beginPath(); ctx.roundRect(11,1,26,20,10); ctx.fillStyle=white(12,2,37,2); ctx.fill();
-    ctx.lineWidth=1.9; ctx.strokeStyle=OUT; ctx.stroke();
-    ctx.save(); ctx.beginPath(); ctx.roundRect(11,1,26,20,10); ctx.clip();
-    ctx.fillStyle="rgba(255,255,255,0.6)"; ctx.beginPath(); ctx.ellipse(18,4,6,2.4,-0.5,0,Math.PI*2); ctx.fill(); ctx.restore();
+    // Selo de "verificado" (check) no canto inferior direito
+    ctx.fillStyle="#ff6b35"; ctx.shadowColor="#ff6b35"; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.arc(cx+13,cy+16,5,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle="#fff"; ctx.lineWidth=1.6; ctx.lineCap="round"; ctx.lineJoin="round";
+    ctx.beginPath(); ctx.moveTo(cx+10.5,cy+16); ctx.lineTo(cx+12.2,cy+18); ctx.lineTo(cx+16,cy+13.5); ctx.stroke();
 
-    // --- MOLDURA + VISEIRA ---
-    ctx.beginPath(); ctx.roundRect(15,5,18,13,7); ctx.fillStyle=NAVY; ctx.fill();
-    ctx.beginPath(); ctx.roundRect(16.5,6.2,15,10.4,6);
-    const vg=ctx.createLinearGradient(0,6,0,17); vg.addColorStop(0,"#7fd4ff"); vg.addColorStop(0.5,"#2a9bf0"); vg.addColorStop(1,"#1366c6");
-    ctx.fillStyle=vg; ctx.fill();
-    ctx.save(); ctx.beginPath(); ctx.roundRect(16.5,6.2,15,10.4,6); ctx.clip();
-    ctx.fillStyle="rgba(255,255,255,0.45)"; ctx.beginPath(); ctx.ellipse(21,8,5,2,-0.4,0,Math.PI*2); ctx.fill(); ctx.restore();
-
-    // --- OLHOS ---
-    ctx.fillStyle="#0a0f1c";
-    ctx.beginPath(); ctx.ellipse(20.5,11.5,1.8,2.2,0,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(27.5,11.5,1.8,2.2,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#fff";
-    ctx.beginPath(); ctx.arc(21.2,10.7,0.8,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(28.2,10.7,0.8,0,Math.PI*2); ctx.fill();
-
-    ctx.restore();
     tex.refresh();
   }
   // Escudo — canvas 52×58, forma classica de escudo heraldico
@@ -1825,60 +1811,78 @@ function makeItemTextures(scene){
     tex.refresh();
   });
 
-  // Mini-Drone — 56×36, corpo metálico com 4 rotores e lente de câmara
+  // Mini-Drone amigável — 60×48, corpo arredondado tipo "chibi" com um
+  // grande olho-câmara central e 4 rotores com hélices bem visíveis.
   if(!scene.textures.exists("item_drone")){
-    const tex=scene.textures.createCanvas("item_drone",56,36), ctx=tex.getContext();
-    const bx=28, by=18; // centro
+    const tex=scene.textures.createCanvas("item_drone",60,48), ctx=tex.getContext();
+    const bx=30, by=26; // centro do corpo
 
-    // --- 4 BRAÇOS + ROTORES (desenhados primeiro, ficam atrás do corpo) ---
-    const arms=[[-17,-9],[17,-9],[-17,7],[17,7]];
+    // --- 4 BRAÇOS + ROTORES (atrás do corpo) ---
+    const arms=[[-19,-10],[19,-10],[-19,9],[19,9]];
     arms.forEach(([dx,dy])=>{
       const rx=bx+dx, ry=by+dy;
-      ctx.strokeStyle="#4a5a70"; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(rx,ry); ctx.stroke();
-      // disco do rotor (efeito de desfoque de rotação)
-      ctx.fillStyle="rgba(180,200,220,0.35)";
-      ctx.beginPath(); ctx.ellipse(rx,ry,8,3.2,dy<0?-0.25:0.25,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle="rgba(120,150,180,0.6)"; ctx.lineWidth=0.8;
-      ctx.beginPath(); ctx.ellipse(rx,ry,8,3.2,dy<0?-0.25:0.25,0,Math.PI*2); ctx.stroke();
-      // eixo central do rotor
+      ctx.strokeStyle="#3a4a60"; ctx.lineWidth=2.2;
+      ctx.beginPath(); ctx.moveTo(bx+dx*0.35,by+dy*0.35); ctx.lineTo(rx,ry); ctx.stroke();
+      // desfoque circular de rotação
+      ctx.fillStyle="rgba(190,215,235,0.30)";
+      ctx.beginPath(); ctx.arc(rx,ry,7.5,0,Math.PI*2); ctx.fill();
+      // hélices em X (bem visíveis, para dar sensação de movimento)
+      ctx.strokeStyle="rgba(90,120,150,0.75)"; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.moveTo(rx-7,ry-3); ctx.lineTo(rx+7,ry+3); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx-7,ry+3); ctx.lineTo(rx+7,ry-3); ctx.stroke();
+      // eixo do rotor
       ctx.fillStyle="#2a3a50";
-      ctx.beginPath(); ctx.arc(rx,ry,2,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(rx,ry,2.2,0,Math.PI*2); ctx.fill();
     });
 
-    // --- CORPO CENTRAL ---
-    const bodyGr=ctx.createLinearGradient(bx,by-8,bx,by+8);
-    bodyGr.addColorStop(0,"#d0e0f0"); bodyGr.addColorStop(1,"#6a85a8");
+    // --- ANTENA (estilo VanBerto's: haste + halo brilhante) ---
+    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(bx,by-13); ctx.lineTo(bx,by-19); ctx.stroke();
+    const halo=ctx.createRadialGradient(bx,by-21,0.5,bx,by-21,6);
+    halo.addColorStop(0,"rgba(90,200,255,0.55)"); halo.addColorStop(1,"rgba(90,200,255,0)");
+    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(bx,by-21,6,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.arc(bx,by-21,2.2,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+
+    // --- CORPO (blob arredondado, chibi) ---
+    const bodyGr=ctx.createLinearGradient(bx,by-13,bx,by+13);
+    bodyGr.addColorStop(0,"#eaf4ff"); bodyGr.addColorStop(0.55,"#bcd2ea"); bodyGr.addColorStop(1,"#6a85a8");
     ctx.fillStyle=bodyGr;
-    ctx.beginPath(); ctx.roundRect(bx-11,by-7,22,14,5); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(bx-14,by-13,28,26,12); ctx.fill();
+    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.roundRect(bx-14,by-13,28,26,12); ctx.stroke();
+    // brilho superior
+    ctx.save(); ctx.beginPath(); ctx.roundRect(bx-14,by-13,28,26,12); ctx.clip();
+    ctx.fillStyle="rgba(255,255,255,0.55)";
+    ctx.beginPath(); ctx.ellipse(bx-5,by-8,9,4,-0.4,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // Luz de estado (pequena, cor de destaque da marca)
+    ctx.fillStyle="#ff6b35"; ctx.shadowColor="#ff6b35"; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.arc(bx+9,by-8,1.8,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+
+    // --- GRANDE OLHO-CÂMARA CENTRAL (traço "amigável") ---
+    ctx.fillStyle="#0e2036";
+    ctx.beginPath(); ctx.arc(bx,by+2,8.6,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#ffffff";
+    ctx.beginPath(); ctx.arc(bx,by+2,6.8,0,Math.PI*2); ctx.fill();
+    const iris=ctx.createRadialGradient(bx-1.5,by+0.5,0.5,bx,by+2,5.4);
+    iris.addColorStop(0,"#7fe0ff"); iris.addColorStop(0.6,"#2a9bf0"); iris.addColorStop(1,"#1366c6");
+    ctx.fillStyle=iris;
+    ctx.beginPath(); ctx.arc(bx,by+2,5.4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#0a0f1c";
+    ctx.beginPath(); ctx.arc(bx,by+2,2.6,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="rgba(255,255,255,0.9)";
+    ctx.beginPath(); ctx.arc(bx-1.5,by+0.4,1.3,0,Math.PI*2); ctx.fill();
     ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.3;
-    ctx.beginPath(); ctx.roundRect(bx-11,by-7,22,14,5); ctx.stroke();
+    ctx.beginPath(); ctx.arc(bx,by+2,8.6,0,Math.PI*2); ctx.stroke();
 
-    // Grelha de ventilação
-    ctx.strokeStyle="rgba(40,60,80,0.5)"; ctx.lineWidth=1;
-    for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.moveTo(bx-6,by-3+i*2.5); ctx.lineTo(bx-2,by-3+i*2.5); ctx.stroke(); }
-
-    // Luz de estado (a piscar) no topo
-    ctx.fillStyle="#ff4060"; ctx.shadowColor="#ff4060"; ctx.shadowBlur=5;
-    ctx.beginPath(); ctx.arc(bx+3,by-8,2,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-
-    // --- LENTE DA CÂMARA (parte da frente/baixo) ---
-    ctx.fillStyle="#0a1420";
-    ctx.beginPath(); ctx.arc(bx+7,by+3,4.2,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=6;
-    ctx.beginPath(); ctx.arc(bx+7,by+3,2.6,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-    ctx.fillStyle="rgba(255,255,255,0.85)";
-    ctx.beginPath(); ctx.arc(bx+6,by+2,0.9,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.arc(bx+7,by+3,4.2,0,Math.PI*2); ctx.stroke();
-
-    // Pequena antena traseira
-    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.2;
-    ctx.beginPath(); ctx.moveTo(bx-11,by-2); ctx.lineTo(bx-16,by-6); ctx.stroke();
-    ctx.fillStyle="#40e0ff";
-    ctx.beginPath(); ctx.arc(bx-16,by-6,1.6,0,Math.PI*2); ctx.fill();
+    // --- PEQUENOS PÉS DE POUSO ---
+    ctx.strokeStyle="#3a4a60"; ctx.lineWidth=2; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(bx-8,by+13); ctx.lineTo(bx-9,by+18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx+8,by+13); ctx.lineTo(bx+9,by+18); ctx.stroke();
 
     tex.refresh();
   }
