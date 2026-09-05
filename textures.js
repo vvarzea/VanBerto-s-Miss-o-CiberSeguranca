@@ -1768,62 +1768,63 @@ function makeItemTextures(scene){
   makeEmojiItemTexture(scene, "item_lapis",   "✏️", 44, "rgba(255,180,80,0.75)");
   makeEmojiItemTexture(scene, "item_diploma", "🎓", 46, "rgba(160,140,255,0.75)");
   makeEmojiItemTexture(scene, "item_lampada", "💡", 44, "rgba(255,240,120,0.85)");
-  // Pacote de Dados — 48×40, núcleo hexagonal com aletas e brilho pulsante
+  // Pacote de Dados — agora um "avião de papel" digital (ícone universal
+  // de "enviar mensagem/dados"), muito mais legível do que a forma
+  // hexagonal anterior, que lia como um enfeite/gema em vez de "dados".
   const PACKET_COLORS=[
-    {top:"#ff80c0",bot:"#e0209a",pat:"#ffe680",stroke:"#800040"}, // rosa
-    {top:"#80d0ff",bot:"#1a90e0",pat:"#ffffff",stroke:"#004090"}, // azul
-    {top:"#a0ff80",bot:"#20c060",pat:"#ffe680",stroke:"#006030"}, // verde
-    {top:"#ffd700",bot:"#ff9500",pat:"#ffffff",stroke:"#804000"}, // laranja-dourado
-    {top:"#d0a0ff",bot:"#9030e0",pat:"#ffe080",stroke:"#400080"}, // lilás
+    {top:"#ff9ad0",bot:"#c8158a",pat:"#ffe680",stroke:"#7a0050"}, // rosa
+    {top:"#9adcff",bot:"#1470c8",pat:"#ffffff",stroke:"#003a70"}, // azul
+    {top:"#b0ffa0",bot:"#1ca858",pat:"#ffe680",stroke:"#004818"}, // verde
+    {top:"#ffe680",bot:"#ff9500",pat:"#ffffff",stroke:"#7a3800"}, // laranja-dourado
+    {top:"#dcb0ff",bot:"#7e20d0",pat:"#ffe080",stroke:"#380068"}, // lilás
   ];
   PACKET_COLORS.forEach((bc,ci)=>{
     const key="item_pacote_"+ci;
     if(scene.textures.exists(key)) return;
-    const tex=scene.textures.createCanvas(key,48,40), ctx=tex.getContext();
-    const cx=24, cy=20;
+    const tex=scene.textures.createCanvas(key,48,36), ctx=tex.getContext();
+    const cx=22, cy=18;
 
     // Halo de brilho por trás
     const halo=ctx.createRadialGradient(cx,cy,2,cx,cy,20);
-    halo.addColorStop(0,bc.top+"55"); halo.addColorStop(1,bc.top+"00");
+    halo.addColorStop(0,bc.top+"50"); halo.addColorStop(1,bc.top+"00");
     ctx.fillStyle=halo;
     ctx.beginPath(); ctx.arc(cx,cy,20,0,Math.PI*2); ctx.fill();
 
-    // Aleta esquerda (delta)
+    // Rasto de movimento (traços a esbater atrás da cauda)
+    ctx.strokeStyle=bc.top; ctx.lineCap="round";
+    [[0,0.55,10],[3,0.38,7],[6,0.24,5]].forEach(([dy,alpha,len])=>{
+      ctx.globalAlpha=alpha; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(cx-20,cy-4+dy); ctx.lineTo(cx-20+len,cy-4+dy); ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+
+    // Pontos N/T/M/B do "avião de papel" clássico (bico à direita)
+    const N=[cx+18,cy-1], T=[cx-16,cy-11], M=[cx-3,cy-1], B=[cx-13,cy+9];
+
+    // Asa de cima (painel claro)
+    const grTop=ctx.createLinearGradient(T[0],T[1],N[0],N[1]);
+    grTop.addColorStop(0,bc.top); grTop.addColorStop(1,bc.pat);
+    ctx.fillStyle=grTop;
+    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...T); ctx.lineTo(...M); ctx.closePath(); ctx.fill();
+
+    // Asa de baixo (painel sombreado — dá o efeito de "dobra" do papel)
     ctx.fillStyle=bc.bot;
-    ctx.beginPath(); ctx.moveTo(cx-6,cy-4); ctx.lineTo(cx-22,cy-2); ctx.lineTo(cx-6,cy+8); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1; ctx.stroke();
-    // Aleta direita (delta)
-    ctx.beginPath(); ctx.moveTo(cx+6,cy-4); ctx.lineTo(cx+22,cy-2); ctx.lineTo(cx+6,cy+8); ctx.closePath(); ctx.fill();
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...M); ctx.lineTo(...B); ctx.closePath(); ctx.fill();
 
-    // Núcleo hexagonal
-    const hexGr=ctx.createLinearGradient(cx,cy-11,cx,cy+11);
-    hexGr.addColorStop(0,bc.top); hexGr.addColorStop(1,bc.bot);
-    ctx.fillStyle=hexGr;
-    ctx.beginPath();
-    for(let i=0;i<6;i++){
-      const a=Math.PI/3*i - Math.PI/6;
-      const px=cx+Math.cos(a)*11, py=cy+Math.sin(a)*11;
-      i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
-    }
-    ctx.closePath(); ctx.fill();
-    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.4; ctx.stroke();
+    // Contornos
+    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.4; ctx.lineJoin="round";
+    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...T); ctx.lineTo(...M); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...M); ctx.lineTo(...B); ctx.closePath(); ctx.stroke();
+    // linha da dobra central
+    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...M); ctx.stroke();
 
-    // Linhas de circuito internas
-    ctx.strokeStyle="rgba(255,255,255,0.55)"; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(cx-6,cy-3); ctx.lineTo(cx-1,cy-3); ctx.lineTo(cx-1,cy+2); ctx.lineTo(cx+6,cy+2); ctx.stroke();
+    // Brilho na asa de cima
+    ctx.fillStyle="rgba(255,255,255,0.5)";
+    ctx.beginPath(); ctx.moveTo(cx+6,cy-4); ctx.lineTo(cx-8,cy-7); ctx.lineTo(cx-2,cy-2); ctx.closePath(); ctx.fill();
 
-    // Núcleo pulsante central
-    ctx.shadowColor=bc.pat; ctx.shadowBlur=6;
-    ctx.fillStyle=bc.pat;
-    ctx.beginPath(); ctx.arc(cx,cy,3.4,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-
-    // Antena curta no topo com ponta luminosa
-    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.3;
-    ctx.beginPath(); ctx.moveTo(cx,cy-11); ctx.lineTo(cx,cy-17); ctx.stroke();
-    ctx.fillStyle=bc.pat; ctx.shadowColor=bc.pat; ctx.shadowBlur=4;
-    ctx.beginPath(); ctx.arc(cx,cy-18,2,0,Math.PI*2); ctx.fill();
+    // Luz de "transmissão" no bico
+    ctx.fillStyle=bc.pat; ctx.shadowColor=bc.pat; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.arc(N[0],N[1],2,0,Math.PI*2); ctx.fill();
     ctx.shadowBlur=0;
 
     tex.refresh();
@@ -1841,11 +1842,13 @@ function makeItemTextures(scene){
       const rx=bx+dx, ry=by+dy;
       ctx.strokeStyle="#3a4a60"; ctx.lineWidth=2.2;
       ctx.beginPath(); ctx.moveTo(bx+dx*0.35,by+dy*0.35); ctx.lineTo(rx,ry); ctx.stroke();
-      // desfoque circular de rotação
-      ctx.fillStyle="rgba(190,215,235,0.30)";
+      // desfoque circular de rotação (mais visível e com aro para contraste)
+      ctx.fillStyle="rgba(210,230,245,0.55)";
       ctx.beginPath(); ctx.arc(rx,ry,7.5,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="rgba(40,55,75,0.6)"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(rx,ry,7.5,0,Math.PI*2); ctx.stroke();
       // hélices em X (bem visíveis, para dar sensação de movimento)
-      ctx.strokeStyle="rgba(90,120,150,0.75)"; ctx.lineWidth=1.4;
+      ctx.strokeStyle="rgba(50,70,95,0.9)"; ctx.lineWidth=1.6;
       ctx.beginPath(); ctx.moveTo(rx-7,ry-3); ctx.lineTo(rx+7,ry+3); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(rx-7,ry+3); ctx.lineTo(rx+7,ry-3); ctx.stroke();
       // eixo do rotor
@@ -1896,11 +1899,6 @@ function makeItemTextures(scene){
     ctx.beginPath(); ctx.arc(bx-1.5,by+0.4,1.3,0,Math.PI*2); ctx.fill();
     ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.3;
     ctx.beginPath(); ctx.arc(bx,by+2,8.6,0,Math.PI*2); ctx.stroke();
-
-    // --- PEQUENOS PÉS DE POUSO ---
-    ctx.strokeStyle="#3a4a60"; ctx.lineWidth=2; ctx.lineCap="round";
-    ctx.beginPath(); ctx.moveTo(bx-8,by+13); ctx.lineTo(bx-9,by+18); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bx+8,by+13); ctx.lineTo(bx+9,by+18); ctx.stroke();
 
     tex.refresh();
   }
