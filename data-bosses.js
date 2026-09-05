@@ -177,7 +177,7 @@ export const BOSSES = [
     defeatLine: "Argh! O antivírus... venceu-me!",
     quizTheme: "virus_malware",
     hp: 3,                     // 4→3: agora são sempre 3 saltos na cabeça, como os outros bosses "stomp"
-    themeIdx: 13,              // teal escuro noturno — combina com o verde-água do boss
+    themeIdx: 13,              // teal escuro noturno — contrasta com o âmbar/preto do boss
     rightRecovered: { emoji: "🛡️", name: "Dispositivo Protegido" },
     // Arena do tamanho do ecrã (960x540, sem scroll) — chão principal +
     // 2 plataformas baixas, tal como o Monstro do Phishing.

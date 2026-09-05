@@ -741,7 +741,12 @@ function makeBossTextures(scene){
     tex.refresh();
   }
 
-  // ── 2) Vírus Gigante — esfera com espigões, estilo coronavírus ──────
+  // ── 2) Vírus Gigante — "vírus digital corrompido", não biológico ────
+  // Redesenhado a pedido: a versão anterior (esfera rosa/magenta com
+  // espigões estilo coronavírus) lia-se demasiado como um vírus humano.
+  // Agora é um "bug de malware": base escura com fissuras cor de âmbar
+  // tipo circuito, espigões angulares (pixels/fragmentos de código em
+  // vez de proteínas orgânicas) e barras de "glitch" em vez de manchas.
   // Corpo/braços/cara separados em helpers (mesmo padrão do Monstro da
   // Ignorância) para gerar as variantes "_armsdown"/"_blink"/"_ouch" sem
   // duplicar o desenho todo — dá-lhe a mesma vivacidade (braços/olhos) que
@@ -749,36 +754,50 @@ function makeBossTextures(scene){
   function drawVirusBody(ctx){
     bossShadow(ctx);
     const bodyR=28;
-    // brilho exterior dourado — o nível dele é todo em tons de verde-água,
-    // por isso o corpo passou de verde para magenta/rosa (ver abaixo), e este
+    // brilho exterior âmbar — o nível dele é todo em tons de verde-água
+    // escuro, por isso o corpo é âmbar/preto (forte contraste), e este
     // anel garante que se destaca também de qualquer outro fundo escuro.
-    ctx.shadowColor="rgba(255,224,140,0.55)"; ctx.shadowBlur=14;
-    ctx.strokeStyle="rgba(255,232,160,0.65)"; ctx.lineWidth=3;
+    ctx.shadowColor="rgba(255,190,80,0.55)"; ctx.shadowBlur=14;
+    ctx.strokeStyle="rgba(255,205,100,0.65)"; ctx.lineWidth=3;
     ctx.beginPath(); ctx.arc(C,C,bodyR+15,0,Math.PI*2); ctx.stroke();
     ctx.shadowBlur=0;
     // espigões
-    ctx.strokeStyle="#7a1450"; ctx.lineWidth=3.5; ctx.lineCap="round";
+    ctx.strokeStyle="#5c3000"; ctx.lineWidth=3.5; ctx.lineCap="round";
     const spikes=12;
     for(let i=0;i<spikes;i++){
       const a=(Math.PI*2*i)/spikes;
       const x1=C+Math.cos(a)*bodyR, y1=C+Math.sin(a)*bodyR;
       const x2=C+Math.cos(a)*(bodyR+13), y2=C+Math.sin(a)*(bodyR+13);
       ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-      ctx.fillStyle= i%2===0 ? "#ffe85c" : "#ff6b5c";
-      ctx.beginPath(); ctx.arc(x2,y2,4.2,0,Math.PI*2); ctx.fill();
+      // ponta angular tipo "pixel/fragmento de código" em vez de bolinha orgânica
+      ctx.save(); ctx.translate(x2,y2); ctx.rotate(a+Math.PI/4);
+      ctx.fillStyle= i%2===0 ? "#ffd23f" : "#40e0ff";
+      ctx.fillRect(-3.4,-3.4,6.8,6.8);
+      ctx.restore();
     }
-    // corpo — magenta/rosa vivo (contraste com o fundo verde-água do nível)
+    // corpo — âmbar/preto tipo "dado corrompido" (contraste com o fundo verde-água do nível)
     const gr=ctx.createRadialGradient(C-8,C-8,3,C,C,bodyR);
-    gr.addColorStop(0,"#ffd6f0"); gr.addColorStop(0.45,"#e0409a"); gr.addColorStop(1,"#5c1050");
+    gr.addColorStop(0,"#ffe8b0"); gr.addColorStop(0.45,"#a85a00"); gr.addColorStop(1,"#1c0d00");
     ctx.fillStyle=gr;
     ctx.beginPath(); ctx.arc(C,C,bodyR,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle="#3a0a30"; ctx.lineWidth=2;
+    ctx.strokeStyle="#0a0400"; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(C,C,bodyR,0,Math.PI*2); ctx.stroke();
-    // padrão interior (manchas)
-    ctx.fillStyle="rgba(90,10,60,0.35)";
+    // padrão interior — pixels de corrupção (em vez de manchas orgânicas)
+    ctx.save();
+    ctx.beginPath(); ctx.arc(C,C,bodyR,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle="rgba(140,70,0,0.35)";
     [[-10,-6,6],[9,-11,4],[6,9,5],[-8,10,4]].forEach(([dx,dy,r])=>{
       ctx.beginPath(); ctx.arc(C+dx,C+dy,r,0,Math.PI*2); ctx.fill();
     });
+    // linhas de "glitch" (efeito de corrupção digital tipo VHS)
+    ctx.globalAlpha=0.55;
+    [[-13,-9,10,3],[-16,4,14,2.4],[-11,15,11,2]].forEach(([dx,dy,w,h])=>{
+      const x=C+dx, y=C+dy;
+      ctx.fillStyle="#ffd23f"; ctx.fillRect(x,y-0.6,w,h*0.35);
+      ctx.fillStyle="#40e0ff"; ctx.fillRect(x+2,y+1.2,w,h*0.35);
+    });
+    ctx.globalAlpha=1;
+    ctx.restore();
   }
   // Dois pseudópodes finos (tentáculos) que saem do corpo — "wave" esticados
   // para cima/fora como se acenassem, "rest" a pender ao longo do corpo.
@@ -789,21 +808,21 @@ function makeBossTextures(scene){
       [-1,1].forEach(side=>{
         const bx=C+side*bodyR*0.7, by=C+bodyR*0.5;
         const tx=C+side*(bodyR+21), ty=C-bodyR*0.25;
-        ctx.strokeStyle="#e0409a"; ctx.lineWidth=7;
+        ctx.strokeStyle="#a85a00"; ctx.lineWidth=7;
         ctx.beginPath(); ctx.moveTo(bx,by); ctx.quadraticCurveTo(C+side*(bodyR+9), C+bodyR*0.05, tx, ty); ctx.stroke();
-        ctx.fillStyle="#e0409a";
+        ctx.fillStyle="#a85a00";
         ctx.beginPath(); ctx.arc(tx,ty,6.5,0,Math.PI*2); ctx.fill();
-        ctx.strokeStyle="#7a1450"; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.strokeStyle="#5c3000"; ctx.lineWidth=1.5; ctx.stroke();
       });
     } else {
       [-1,1].forEach(side=>{
         const bx=C+side*bodyR*0.72, by=C+bodyR*0.35;
         const tx=C+side*bodyR*0.92, ty=C+bodyR*1.05;
-        ctx.strokeStyle="#e0409a"; ctx.lineWidth=6;
+        ctx.strokeStyle="#a85a00"; ctx.lineWidth=6;
         ctx.beginPath(); ctx.moveTo(bx,by); ctx.quadraticCurveTo(C+side*bodyR*1.05, C+bodyR*0.7, tx, ty); ctx.stroke();
-        ctx.fillStyle="#e0409a";
+        ctx.fillStyle="#a85a00";
         ctx.beginPath(); ctx.arc(tx,ty,5.5,0,Math.PI*2); ctx.fill();
-        ctx.strokeStyle="#7a1450"; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.strokeStyle="#5c3000"; ctx.lineWidth=1.5; ctx.stroke();
       });
     }
   }
@@ -814,16 +833,16 @@ function makeBossTextures(scene){
       ctx.fillStyle="#fff";
       ctx.beginPath(); ctx.ellipse(C-8,C-2,5,6,0,0,Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.ellipse(C+8,C-2,5,6,0,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="#2a0a1a";
+      ctx.fillStyle="#1c0d00";
       ctx.beginPath(); ctx.arc(C-8,C,2.4,0,Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.arc(C+8,C,2.4,0,Math.PI*2); ctx.fill();
     } else {
-      ctx.strokeStyle="#2a0a1a"; ctx.lineWidth=2.5; ctx.lineCap="round";
+      ctx.strokeStyle="#1c0d00"; ctx.lineWidth=2.5; ctx.lineCap="round";
       [-8,8].forEach(dx=>{
         ctx.beginPath(); ctx.moveTo(C+dx-5,C-1); ctx.quadraticCurveTo(C+dx,C+3,C+dx+5,C-1); ctx.stroke();
       });
     }
-    ctx.strokeStyle="#2a0a1a"; ctx.lineWidth=2;
+    ctx.strokeStyle="#1c0d00"; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(C,C+11,7,0.1*Math.PI,0.9*Math.PI); ctx.stroke();
   }
   if(!scene.textures.exists("boss_virus_gigante")){
@@ -846,7 +865,7 @@ function makeBossTextures(scene){
   if(!scene.textures.exists("boss_virus_gigante_ouch")){
     const tex=scene.textures.createCanvas("boss_virus_gigante_ouch",S,S), ctx=tex.getContext();
     drawVirusBody(ctx); drawVirusArms(ctx,"rest");
-    ctx.strokeStyle="#2a0a1a"; ctx.lineWidth=2;
+    ctx.strokeStyle="#1c0d00"; ctx.lineWidth=2;
     [-8,8].forEach(dx=>{
       ctx.beginPath();
       for(let a=0;a<=Math.PI*2.4;a+=0.4){
@@ -855,9 +874,9 @@ function makeBossTextures(scene){
       }
       ctx.stroke();
     });
-    ctx.fillStyle="#2a0a1a";
+    ctx.fillStyle="#1c0d00";
     ctx.beginPath(); ctx.ellipse(C,C+13,6,8,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#ff9fc0";
+    ctx.fillStyle="#ffd23f";
     ctx.beginPath(); ctx.ellipse(C,C+16,3,4,0,0,Math.PI*2); ctx.fill();
     tex.refresh();
   }
@@ -867,13 +886,13 @@ function makeBossTextures(scene){
   if(!scene.textures.exists("boss_virus_gigante_laugh")){
     const tex=scene.textures.createCanvas("boss_virus_gigante_laugh",S,S), ctx=tex.getContext();
     drawVirusBody(ctx); drawVirusArms(ctx,"wave");
-    ctx.strokeStyle="#2a0a1a"; ctx.lineWidth=2.5; ctx.lineCap="round";
+    ctx.strokeStyle="#1c0d00"; ctx.lineWidth=2.5; ctx.lineCap="round";
     [-8,8].forEach(dx=>{
       ctx.beginPath(); ctx.arc(C+dx, C-3, 5, Math.PI*1.1, Math.PI*1.9); ctx.stroke();
     });
-    ctx.fillStyle="#2a0a1a";
+    ctx.fillStyle="#1c0d00";
     ctx.beginPath(); ctx.ellipse(C,C+13,9,7,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#ff9fc0";
+    ctx.fillStyle="#ffd23f";
     ctx.beginPath(); ctx.ellipse(C,C+9,6,2.4,0,0,Math.PI); ctx.fill();
     tex.refresh();
   }
@@ -882,10 +901,10 @@ function makeBossTextures(scene){
   if(!scene.textures.exists("boss_virus_gigante_angry")){
     const tex=scene.textures.createCanvas("boss_virus_gigante_angry",S,S), ctx=tex.getContext();
     drawVirusBody(ctx); drawVirusArms(ctx,"wave");
-    ctx.fillStyle="#2a0a1a";
+    ctx.fillStyle="#1c0d00";
     ctx.beginPath(); ctx.ellipse(C-8,C-2,4.5,3,0,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.ellipse(C+8,C-2,4.5,3,0,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle="#2a0a1a"; ctx.lineWidth=3; ctx.lineCap="round";
+    ctx.strokeStyle="#1c0d00"; ctx.lineWidth=3; ctx.lineCap="round";
     ctx.beginPath(); ctx.moveTo(C-14,C-10); ctx.lineTo(C-3,C-5); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(C+3,C-5); ctx.lineTo(C+14,C-10); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(C-9,C+12); ctx.lineTo(C-4,C+9); ctx.lineTo(C,C+13); ctx.lineTo(C+4,C+9); ctx.lineTo(C+9,C+12); ctx.stroke();
@@ -896,13 +915,13 @@ function makeBossTextures(scene){
   if(!scene.textures.exists("boss_virus_gigante_sad")){
     const tex=scene.textures.createCanvas("boss_virus_gigante_sad",S,S), ctx=tex.getContext();
     drawVirusBody(ctx); drawVirusArms(ctx,"rest");
-    ctx.strokeStyle="#2a0a1a"; ctx.lineWidth=2.5; ctx.lineCap="round";
+    ctx.strokeStyle="#1c0d00"; ctx.lineWidth=2.5; ctx.lineCap="round";
     [-8,8].forEach(dx=>{
       ctx.beginPath(); ctx.arc(C+dx, C+1, 5, Math.PI*0.15, Math.PI*0.85); ctx.stroke();
     });
     ctx.fillStyle="#7fc8ff";
     ctx.beginPath(); ctx.ellipse(C-8,C+5,2.4,4,0,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle="#2a0a1a"; ctx.lineWidth=2;
+    ctx.strokeStyle="#1c0d00"; ctx.lineWidth=2;
     ctx.beginPath(); ctx.moveTo(C-6,C+16); ctx.quadraticCurveTo(C,C+10,C+6,C+15); ctx.stroke();
     tex.refresh();
   }
@@ -1352,21 +1371,21 @@ function makeBossTextures(scene){
   if(!scene.textures.exists("boss_proj_germ")){
     const w=30,h=30,tex=scene.textures.createCanvas("boss_proj_germ",w,h), ctx=tex.getContext();
     const cx=w/2, cy=h/2, r=10;
-    // espigões curtos à volta (visual de vírus/micróbio, não de "perigo")
-    ctx.strokeStyle="#e8e0ff"; ctx.lineWidth=2.2;
+    // espigões curtos angulares à volta (fragmento de malware, não organismo)
+    ctx.strokeStyle="#ffd23f"; ctx.lineWidth=2.2;
     for(let i=0;i<8;i++){
       const a=(Math.PI*2*i)/8;
       const x1=cx+Math.cos(a)*r, y1=cy+Math.sin(a)*r;
       const x2=cx+Math.cos(a)*(r+4.5), y2=cy+Math.sin(a)*(r+4.5);
       ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-      ctx.beginPath(); ctx.arc(x2,y2,1.6,0,Math.PI*2); ctx.fillStyle="#e8e0ff"; ctx.fill();
+      ctx.beginPath(); ctx.arc(x2,y2,1.6,0,Math.PI*2); ctx.fillStyle="#ffd23f"; ctx.fill();
     }
     const gr=ctx.createRadialGradient(cx-3,cy-3,1,cx,cy,r);
-    gr.addColorStop(0,"#ffffff"); gr.addColorStop(0.6,"#e8e0ff"); gr.addColorStop(1,"#b8a8e0");
+    gr.addColorStop(0,"#ffe8b0"); gr.addColorStop(0.6,"#a85a00"); gr.addColorStop(1,"#1c0d00");
     ctx.fillStyle=gr;
     ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
-    // pequenas manchas internas, tipo organelos
-    ctx.fillStyle="rgba(150,120,200,0.5)";
+    // pequenos pixels de corrupção internos
+    ctx.fillStyle="rgba(64,224,255,0.55)";
     ctx.beginPath(); ctx.arc(cx-3,cy+2,2.4,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(cx+3,cy-3,1.8,0,Math.PI*2); ctx.fill();
     tex.refresh();
@@ -1567,74 +1586,55 @@ function makeItemTextures(scene){
     ctx.restore();
     tex.refresh();
   }
-  // Impressão Digital 🆔 — sensor biométrico com padrão de digital e
-  // anel de "leitura" a brilhar, cor a condizer com a marca do jogo.
-  if(!scene.textures.exists("item_impressao")){
-    const tex=scene.textures.createCanvas("item_impressao",48,52), ctx=tex.getContext();
-    const cx=24, cy=26;
+  // Chip de Segurança 🔐 — chip dourado tipo cartão/SIM com um cadeado ao
+  // centro. Silhueta simples e muito reconhecível mesmo em ecrã pequeno
+  // (substitui uma tentativa anterior de "impressão digital" pouco clara).
+  if(!scene.textures.exists("item_chip")){
+    const tex=scene.textures.createCanvas("item_chip",44,44), ctx=tex.getContext();
+    const cx=22, cy=22;
 
-    // Halo de brilho por trás do sensor
-    const halo=ctx.createRadialGradient(cx,cy,4,cx,cy,23);
-    halo.addColorStop(0,"rgba(64,224,255,0.28)"); halo.addColorStop(1,"rgba(64,224,255,0)");
-    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(cx,cy,23,0,Math.PI*2); ctx.fill();
+    // Halo de brilho por trás do chip
+    const halo=ctx.createRadialGradient(cx,cy,4,cx,cy,20);
+    halo.addColorStop(0,"rgba(255,215,0,0.30)"); halo.addColorStop(1,"rgba(255,215,0,0)");
+    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(cx,cy,20,0,Math.PI*2); ctx.fill();
 
-    // Base do sensor (almofada arredondada)
-    const padGr=ctx.createLinearGradient(cx,cy-20,cx,cy+20);
-    padGr.addColorStop(0,"#243654"); padGr.addColorStop(1,"#101a30");
-    ctx.fillStyle=padGr;
-    ctx.beginPath(); ctx.roundRect(cx-19,cy-20,38,40,14); ctx.fill();
-    ctx.strokeStyle="#40e0ff"; ctx.lineWidth=1.6; ctx.globalAlpha=0.8;
-    ctx.beginPath(); ctx.roundRect(cx-19,cy-20,38,40,14); ctx.stroke();
-    ctx.globalAlpha=1;
+    // Corpo dourado do chip (como o contacto metálico de um cartão/SIM)
+    const chipGr=ctx.createLinearGradient(cx-16,cy-13,cx+16,cy+13);
+    chipGr.addColorStop(0,"#fff3c0"); chipGr.addColorStop(0.5,"#ffd23f"); chipGr.addColorStop(1,"#c08800");
+    ctx.fillStyle=chipGr;
+    ctx.beginPath(); ctx.roundRect(cx-16,cy-13,32,26,5); ctx.fill();
+    ctx.strokeStyle="#8a5f00"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.roundRect(cx-16,cy-13,32,26,5); ctx.stroke();
 
-    // Cantos "de mira" (estilo scanner biométrico)
-    ctx.strokeStyle="#40e0ff"; ctx.lineWidth=2; ctx.lineCap="round";
-    const cl=6, m=3;
-    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sy])=>{
-      const px=cx+sx*19, py=cy+sy*20;
-      ctx.beginPath();
-      ctx.moveTo(px - sx*m, py - sy*(m+cl));
-      ctx.lineTo(px - sx*m, py - sy*m);
-      ctx.lineTo(px - sx*(m+cl), py - sy*m);
-      ctx.stroke();
-    });
+    // Linhas de contacto (padrão típico de chip de cartão)
+    ctx.strokeStyle="rgba(138,95,0,0.6)"; ctx.lineWidth=1.1;
+    [-8,0,8].forEach(dx=>{ ctx.beginPath(); ctx.moveTo(cx+dx,cy-13); ctx.lineTo(cx+dx,cy+13); ctx.stroke(); });
+    ctx.beginPath(); ctx.moveTo(cx-16,cy); ctx.lineTo(cx-4,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+4,cy); ctx.lineTo(cx+16,cy); ctx.stroke();
+    // cantos "cortados" (como nos chips reais)
+    ctx.strokeStyle="rgba(138,95,0,0.6)"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx-16,cy-7); ctx.lineTo(cx-9,cy-7); ctx.lineTo(cx-9,cy-13); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+16,cy+7); ctx.lineTo(cx+9,cy+7); ctx.lineTo(cx+9,cy+13); ctx.stroke();
 
-    // --- PADRÃO DA IMPRESSÃO DIGITAL (arcos concêntricos irregulares) ---
-    ctx.strokeStyle="rgba(255,255,255,0.9)"; ctx.lineWidth=1.6; ctx.lineCap="round";
-    const arcs=[
-      {r:13, a0:0.15, a1:0.85},
-      {r:10.5, a0:0.05, a1:0.95},
-      {r:8, a0:0.20, a1:0.80},
-      {r:5.5, a0:0.10, a1:0.90},
-      {r:3, a0:0.25, a1:0.75},
-    ];
-    arcs.forEach(({r,a0,a1})=>{
-      ctx.beginPath();
-      ctx.arc(cx, cy+3, r, Math.PI*a0, Math.PI*a1);
-      ctx.stroke();
-    });
-    // pequenas linhas transversais para dar textura de "sulco"
-    ctx.strokeStyle="rgba(255,255,255,0.55)"; ctx.lineWidth=1.1;
-    ctx.beginPath(); ctx.moveTo(cx-6,cy-2); ctx.lineTo(cx-6,cy+8); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx+7,cy-3); ctx.lineTo(cx+7,cy+9); ctx.stroke();
+    // Brilho diagonal
+    ctx.fillStyle="rgba(255,255,255,0.45)";
+    ctx.beginPath(); ctx.ellipse(cx-8,cy-7,7,3,-0.5,0,Math.PI*2); ctx.fill();
 
-    // Ponto de verificação luminoso no centro
-    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=6;
-    ctx.beginPath(); ctx.arc(cx,cy+3,2,0,Math.PI*2); ctx.fill();
+    // Selo central escuro com cadeado — deixa claro que é um chip "seguro"
+    ctx.fillStyle="#1c1408"; ctx.shadowColor="rgba(0,0,0,0.4)"; ctx.shadowBlur=3;
+    ctx.beginPath(); ctx.arc(cx,cy,7.4,0,Math.PI*2); ctx.fill();
     ctx.shadowBlur=0;
-
-    // Linha de "scan" a atravessar o sensor (efeito de leitura)
-    const scanGr=ctx.createLinearGradient(cx-19,cy-9,cx+19,cy-9);
-    scanGr.addColorStop(0,"rgba(64,224,255,0)"); scanGr.addColorStop(0.5,"rgba(64,224,255,0.85)"); scanGr.addColorStop(1,"rgba(64,224,255,0)");
-    ctx.fillStyle=scanGr;
-    ctx.fillRect(cx-19,cy-10,38,2.4);
-
-    // Selo de "verificado" (check) no canto inferior direito
-    ctx.fillStyle="#ff6b35"; ctx.shadowColor="#ff6b35"; ctx.shadowBlur=4;
-    ctx.beginPath(); ctx.arc(cx+13,cy+16,5,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-    ctx.strokeStyle="#fff"; ctx.lineWidth=1.6; ctx.lineCap="round"; ctx.lineJoin="round";
-    ctx.beginPath(); ctx.moveTo(cx+10.5,cy+16); ctx.lineTo(cx+12.2,cy+18); ctx.lineTo(cx+16,cy+13.5); ctx.stroke();
+    ctx.strokeStyle="#ffd23f"; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.arc(cx,cy,7.4,0,Math.PI*2); ctx.stroke();
+    // corpo do cadeado
+    ctx.fillStyle="#40e0ff";
+    ctx.beginPath(); ctx.roundRect(cx-3.4,cy-0.5,6.8,5.5,1.4); ctx.fill();
+    // argola do cadeado
+    ctx.strokeStyle="#40e0ff"; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.arc(cx,cy-2,2.6,Math.PI,0,false); ctx.stroke();
+    // buraco da fechadura
+    ctx.fillStyle="#1c1408";
+    ctx.beginPath(); ctx.arc(cx,cy+2,0.9,0,Math.PI*2); ctx.fill();
 
     tex.refresh();
   }
