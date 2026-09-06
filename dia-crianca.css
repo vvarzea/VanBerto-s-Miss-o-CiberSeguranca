@@ -1431,6 +1431,147 @@ body.hc-mode .map-region-name { color: #ffff00 !important; }
 body.hc-mode .map-region-sub { color: #fff !important; }
 body.hc-mode .map-progress-fill { background: #ffff00 !important; }
 
+/* Miniatura do mundo por trás de cada cartão da lista — o mesmo fundo
+   ilustrado usado no mapa detalhado (worldMapOverlay), só que aqui em
+   ponto pequeno e escurecido para o texto continuar legível. */
+.map-region { background-size: cover; background-position: center; }
+.map-region::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(100deg, rgba(20,5,30,0.85) 0%, rgba(20,5,30,0.6) 55%, rgba(20,5,30,0.35) 100%);
+  z-index: 0;
+}
+.map-region-icon, .map-region-body, .map-region-badge { position: relative; z-index: 1; }
+
+/* =====================================================
+   ===== MAPA ILUSTRADO POR MUNDO (worldMapOverlay) =====
+   Fundo pintado (uma imagem por mundo) com os níveis desse mundo como
+   botões redondos por cima, posicionados ao longo do caminho visível
+   na própria imagem (ver nodePos em MAP_REGIONS, data-progression.js).
+   ===================================================== */
+#worldMapOverlay { padding: 16px; }
+.world-map-panel {
+  position: relative;
+  width: min(1000px, 96vw);
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-color: #2a0a4e; /* enquanto a imagem carrega */
+  box-shadow:
+    0 0 0 3px #e0209a,
+    0 0 0 6px #ffd700,
+    0 20px 50px rgba(0,0,0,0.55);
+}
+.world-map-panel::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(10,5,20,0.55) 0%, rgba(10,5,20,0) 18%, rgba(10,5,20,0) 78%, rgba(10,5,20,0.5) 100%);
+  pointer-events: none;
+}
+
+.world-map-back {
+  position: absolute; top: 12px; left: 12px; z-index: 4;
+  font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: clamp(11px,2.4vw,13px);
+  color: #fff6e8; background: rgba(20,5,46,0.85);
+  border: 2px solid #ffd700; border-radius: 999px;
+  padding: 6px 14px; cursor: pointer;
+}
+.world-map-back:hover { background: rgba(58,10,110,0.95); }
+
+.world-map-title {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  max-width: 78%;
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(145deg, rgba(58,10,110,0.92) 0%, rgba(20,5,46,0.92) 100%);
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 0 2px #e0209a;
+  border-radius: 999px;
+  padding: 6px 16px 6px 8px;
+  z-index: 3;
+}
+.world-map-icon {
+  width: clamp(24px,5vw,34px); height: clamp(24px,5vw,34px); border-radius: 50%; flex-shrink: 0;
+  background: radial-gradient(circle at 35% 30%, #ffe680, #e0209a);
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(13px,3vw,18px);
+}
+.world-map-text { min-width: 0; }
+.world-map-text h2 {
+  margin: 0; font-size: clamp(12px,2.6vw,17px); font-weight: 800;
+  font-family: 'Baloo 2', sans-serif;
+  color: #fff6e8; -webkit-text-stroke: 1px #b5148a; paint-order: stroke fill;
+  text-shadow: 0 2px 0 #7a0a5c;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.world-map-text p {
+  margin: 0; font-size: clamp(9px,1.8vw,11px); color: #ffd9f0; font-weight: 400;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.world-map-progress {
+  position: absolute; top: 12px; right: 12px; z-index: 3;
+  font-family: 'Baloo 2', sans-serif;
+  background: rgba(20,5,46,0.85);
+  border: 2px solid #ffd700;
+  border-radius: 999px;
+  padding: 5px 12px;
+  color: #ffe680; font-size: clamp(11px,2.4vw,13px); font-weight: 800;
+  white-space: nowrap;
+}
+
+.world-map-nodes { position: absolute; inset: 0; z-index: 2; }
+
+.level-node {
+  position: absolute;
+  width: clamp(34px,7.5vw,54px); height: clamp(34px,7.5vw,54px);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(13px,2.8vw,20px); font-weight: 800;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  border: 3px solid #fff6e8;
+  transition: transform 0.15s ease;
+  font-family: 'Baloo 2', sans-serif;
+  padding: 0;
+}
+.level-node:hover:not(.level-node--locked) { transform: translate(-50%, -50%) scale(1.08); }
+
+.level-node--done {
+  background: radial-gradient(circle at 35% 30%, #7fe89a, #1ca858);
+  color: #04321a;
+  box-shadow: 0 0 0 3px rgba(28,168,88,0.35), 0 4px 10px rgba(0,0,0,0.4);
+}
+.level-node--current {
+  background: radial-gradient(circle at 35% 30%, #ffe680, #ff9d00);
+  color: #4a2400;
+  box-shadow: 0 0 0 4px rgba(255,215,0,0.45), 0 0 22px rgba(255,180,0,0.65), 0 4px 10px rgba(0,0,0,0.4);
+  animation: levelNodePulse 1.8s ease-in-out infinite;
+}
+.level-node--locked {
+  background: radial-gradient(circle at 35% 30%, #9098a8, #4a5060);
+  color: #d8dde8;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  cursor: default;
+  filter: grayscale(0.3);
+}
+@keyframes levelNodePulse {
+  0%,100% { box-shadow: 0 0 0 4px rgba(255,215,0,0.45), 0 0 22px rgba(255,180,0,0.65), 0 4px 10px rgba(0,0,0,0.4); }
+  50% { box-shadow: 0 0 0 7px rgba(255,215,0,0.25), 0 0 34px rgba(255,180,0,0.85), 0 4px 10px rgba(0,0,0,0.4); }
+}
+
+.level-node-stars {
+  position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
+  font-size: clamp(6px,1.4vw,9px); white-space: nowrap; color: #ffd700;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.6);
+}
+
+body.hc-mode .world-map-panel { background-image: none !important; background: #000 !important; }
+body.hc-mode .level-node--current { border-color: #ffff00 !important; }
+body.hc-mode .world-map-text h2 { color: #ffff00 !important; -webkit-text-stroke: 0 !important; }
+
 /* =====================================================
    "DIREITO RECUPERADO!" — popup curto entre níveis (FASE 1)
    ===================================================== */

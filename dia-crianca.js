@@ -423,15 +423,21 @@ window.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="map-region-badge">${badge}</div>
       `;
+      if (region.mapBg) btn.style.backgroundImage = `url("${region.mapBg}")`;
       if (status === "locked") {
         btn.disabled = true;
       } else {
         btn.onclick = () => {
           ensureAudio(); SFX.coin();
-          // Determina o primeiro nível por concluir nesta região (ou o último, se já tudo feito)
-          let targetLevel = region.levels.find(i => !mapProgress.levelsCompleted.includes(i));
-          if (targetLevel === undefined) targetLevel = region.levels[region.levels.length - 1] ?? 0;
-          startLevelFromMap(targetLevel);
+          if (region.levels.length && region.mapBg) {
+            openWorldMap(region);
+          } else {
+            // Regiões sem mapa ilustrado próprio (ex.: "Base") mantêm o
+            // comportamento antigo — avançam direto para o nível.
+            let targetLevel = region.levels.find(i => !mapProgress.levelsCompleted.includes(i));
+            if (targetLevel === undefined) targetLevel = region.levels[region.levels.length - 1] ?? 0;
+            startLevelFromMap(targetLevel);
+          }
         };
       }
       grid.appendChild(btn);
@@ -444,6 +450,68 @@ window.addEventListener("DOMContentLoaded", () => {
     if (pctEl) pctEl.textContent = `${pct}%`;
     if (fillEl) fillEl.style.width = `${pct}%`;
     if (starsEl) starsEl.textContent = String(score || 0);
+  }
+
+  // Abre o mapa ilustrado de um mundo específico (fundo pintado + níveis
+  // como nós clicáveis por cima, posicionados em region.nodePos).
+  function openWorldMap(region) {
+    openOverlay("worldMapOverlay", () => renderWorldMap(region));
+  }
+
+  function renderWorldMap(region) {
+    const panel = document.getElementById("worldMapPanel");
+    const iconEl = document.getElementById("worldMapIcon");
+    const nameEl = document.getElementById("worldMapName");
+    const subEl = document.getElementById("worldMapSub");
+    const progressEl = document.getElementById("worldMapProgress");
+    const nodesLayer = document.getElementById("worldMapNodes");
+    if (!panel || !nodesLayer) return;
+
+    panel.style.backgroundImage = region.mapBg ? `url("${region.mapBg}")` : "";
+    if (iconEl) iconEl.textContent = region.icon;
+    if (nameEl) nameEl.textContent = region.name;
+    if (subEl) subEl.textContent = region.sub;
+
+    const total = region.levels.length;
+    const doneCount = region.levels.filter(i => mapProgress.levelsCompleted.includes(i)).length;
+    if (progressEl) {
+      progressEl.textContent = (total > 0 && doneCount === total) ? `${total}/${total} ✅` : `${doneCount}/${total}`;
+    }
+
+    nodesLayer.innerHTML = "";
+    region.levels.forEach((idx, i) => {
+      const pos = (region.nodePos && region.nodePos[i]) || { x: 50, y: 50 };
+      const unlocked = idx <= mapProgress.highestLevelReached;
+      const done = mapProgress.levelsCompleted.includes(idx);
+      const status = !unlocked ? "locked" : (done ? "done" : "current");
+      const levelNum = idx + 1;
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `level-node level-node--${status}`;
+      btn.style.left = pos.x + "%";
+      btn.style.top = pos.y + "%";
+
+      if (status === "locked") {
+        btn.innerHTML = "🔒";
+        btn.disabled = true;
+        btn.setAttribute("aria-label", `Nível ${levelNum} — bloqueado`);
+      } else {
+        if (status === "done") {
+          const stars = starsForLevel(idx);
+          btn.innerHTML = `✓<span class="level-node-stars">${"★".repeat(stars)}${"☆".repeat(3 - stars)}</span>`;
+          btn.setAttribute("aria-label", `Nível ${levelNum} — concluído, ${stars} estrelas. Toca para repetir.`);
+        } else {
+          btn.innerHTML = String(levelNum);
+          btn.setAttribute("aria-label", `Nível ${levelNum} — a jogar a seguir`);
+        }
+        btn.onclick = () => {
+          ensureAudio(); SFX.coin();
+          startLevelFromMap(idx);
+        };
+      }
+      nodesLayer.appendChild(btn);
+    });
   }
 
   // Mostra o cartão de entrada de região (ícone + nome + 2 falas do VanBerto's)
@@ -7250,6 +7318,10 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnCloseMap")?.addEventListener("click", () => {
     closeOverlay("mapOverlay");
   });
+  document.getElementById("btnBackToMap")?.addEventListener("click", () => {
+    ensureAudio(); SFX.coin();
+    openOverlay("mapOverlay", renderMap);
+  });
 
   // =====================================================
   // ===== ESTATÍSTICAS GLOBAIS — rastreio persistente =====
@@ -7306,7 +7378,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // IDs dos overlays secundários (não o jogo nem o quiz/história que têm fluxo próprio)
   const SECONDARY_OVERLAYS = [
-    "mapOverlay", "achievementsOverlay", "albumOverlay",
+    "mapOverlay", "worldMapOverlay", "achievementsOverlay", "albumOverlay",
     "statsOverlay", "optionsOverlay", "howOverlay",
     "reviewOverlay", "artefactGalleryOverlay",
   ];

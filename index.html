@@ -110,6 +110,21 @@
     </div>
   </div>
 
+  <div id="worldMapOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Mapa do Mundo">
+    <div class="world-map-panel" id="worldMapPanel">
+      <button type="button" id="btnBackToMap" class="world-map-back" aria-label="Voltar ao mapa">← Mundos</button>
+      <div class="world-map-title">
+        <div class="world-map-icon" id="worldMapIcon" aria-hidden="true"></div>
+        <div class="world-map-text">
+          <h2 id="worldMapName"></h2>
+          <p id="worldMapSub"></p>
+        </div>
+      </div>
+      <div class="world-map-progress" id="worldMapProgress"></div>
+      <div id="worldMapNodes" class="world-map-nodes"><!-- preenchido via JS --></div>
+    </div>
+  </div>
+
   <!-- ═══════════════════════════════════════════
        CONQUISTAS
   ═══════════════════════════════════════════ -->
