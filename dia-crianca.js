@@ -538,6 +538,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // Arranca (ou continua) o jogo Phaser diretamente num nível escolhido no mapa
   function startLevelFromMap(idx) {
     document.getElementById("mapOverlay")?.classList.add("hidden");
+    document.getElementById("worldMapOverlay")?.classList.add("hidden");
     startOverlay.classList.add("hidden");
     // Sem isto, _overlayPaused ficava preso a "true" (só closeOverlay() o repõe),
     // e o update() do jogo trava a velocidade do robot a 0 para sempre a partir
