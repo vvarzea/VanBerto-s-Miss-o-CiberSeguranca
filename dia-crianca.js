@@ -362,6 +362,14 @@ window.addEventListener("DOMContentLoaded", () => {
     return MAP_REGIONS.find(r => r.levels.includes(idx)) || null;
   }
 
+  // Chave da textura Phaser (pré-carregada em preload()) com a ilustração
+  // do mundo a que este nível pertence — null se o nível não tiver mundo
+  // ilustrado associado (ex.: salas secretas/boss não mapeadas).
+  function bgKeyForLevel(idx) {
+    const region = regionForLevel(idx);
+    return region && region.mapBg ? "bg_" + region.id : null;
+  }
+
   // O jogo só avança automaticamente DENTRO do mesmo mundo. Ao terminar o
   // último nível de um mundo (com ou sem boss), o jogador volta sempre ao
   // mapa — só entra no mundo seguinte por escolha própria.
@@ -1090,6 +1098,14 @@ window.addEventListener("DOMContentLoaded", () => {
     // Por isso usamos sempre o robô desenhado em Canvas ("vanberto_open"), que é
     // o que aparece corretamente tanto localmente como online.
     // this.load.image("vanberto_png", "vanberto_voar.png");
+
+    // Ilustrações dos 4 mundos (as mesmas usadas no mapa) — servem de fundo
+    // fixo (não faz scroll) durante o próprio nível, para o jogo "estar"
+    // visualmente dentro do mundo em que o jogador está a jogar.
+    this.load.image("bg_origens", "map-mundo1.jpg");
+    this.load.image("bg_desenvolvimento", "map-mundo2.jpg");
+    this.load.image("bg_protecao", "map-mundo3.jpg");
+    this.load.image("bg_participacao", "map-mundo4.jpg");
   }
 
   function initPhaser() {
@@ -2863,7 +2879,7 @@ window.addEventListener("DOMContentLoaded", () => {
     extraShieldCounted=false;
     collectedItemIndices=new Set();
     collectedRoomPipes=new Set();
-    _hudDirty=true; updateHUD(L); applyBackground(scene,L.theme%THEMES.length,L.worldW,L.hazards||[]);
+    _hudDirty=true; updateHUD(L); applyBackground(scene,L.theme%THEMES.length,L.worldW,L.hazards||[],bgKeyForLevel(idx));
 
     L.platforms.forEach(p=>{
       const themeIdx = L.theme % THEMES.length;
@@ -3622,7 +3638,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const L = LEVELS[currentLevel];
         scene.physics.world.setBounds(0,0,L.worldW,514);
         scene.cameras.main.setBounds(0,0,L.worldW,540);
-        applyBackground(scene, L.theme%THEMES.length, L.worldW, L.hazards||[]);
+        applyBackground(scene, L.theme%THEMES.length, L.worldW, L.hazards||[], bgKeyForLevel(currentLevel));
         showMainLevelAfterRoom();
         inSecretRoom = false;
         secretRoomReturn = null;
@@ -4138,7 +4154,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // Fundo dedicado à arena do boss — antes disto o ecrã ficava com o fundo do
     // nível anterior (desenhado para outro worldW), daí parecer "preso" e desalinhado.
     const themeIdx = (def.themeIdx != null) ? def.themeIdx : (LEVELS[currentLevel] ? LEVELS[currentLevel].theme % THEMES.length : 0);
-    applyBackground(scene, themeIdx, worldW, []);
+    applyBackground(scene, themeIdx, worldW, [], bgKeyForLevel(currentLevel));
 
     const platKey = "platform_t"+themeIdx;
     if(!scene.textures.exists(platKey)) makePlatformTextureThemed(scene, platKey, themeIdx);

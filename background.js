@@ -615,20 +615,44 @@ export function updatePlatformDecor(scene){
 // fica de propósito fora da família noturna do seu mundo.
 export const NIGHT_THEMES = new Set([6,7,10,11,12,13,14,15,17,18]);
 
-export function applyBackground(scene,themeIdx,worldW,hazardDefs=[]){
+let worldBgImage = null; // imagem fixa (não faz scroll) do mundo atual, por trás de tudo
+
+export function applyBackground(scene,themeIdx,worldW,hazardDefs=[],bgImageKey=null){
   const T=THEMES[themeIdx]||THEMES[0];
   const isNight = NIGHT_THEMES.has(themeIdx);
 
+  // ── ILUSTRAÇÃO DO MUNDO — camada fixa mais ao fundo de todas ──
+  // É a mesma arte usada no mapa; aqui funciona como o "céu/vista distante"
+  // do nível — as colinas/árvores/casas processuais continuam por cima,
+  // exatamente como antes, a dar textura de jogo ao primeiro plano.
+  if (bgImageKey && scene.textures.exists(bgImageKey)) {
+    if (!worldBgImage || worldBgImage.scene !== scene) {
+      if (worldBgImage) worldBgImage.destroy();
+      worldBgImage = scene.add.image(480, 270, bgImageKey)
+        .setDepth(-61).setScrollFactor(0);
+    }
+    if (worldBgImage.texture.key !== bgImageKey) worldBgImage.setTexture(bgImageKey);
+    // "cover" 960×540 mantendo a proporção da imagem (1280×720 = mesma 16:9,
+    // mas o setDisplaySize cobre bem qualquer ligeira diferença de rácio)
+    worldBgImage.setDisplaySize(960, 540);
+    worldBgImage.setVisible(true);
+  } else if (worldBgImage) {
+    worldBgImage.setVisible(false);
+  }
+
   // ── CÉU com gradiente triplo mais rico ────────────────────────
   bgGraphics.clear();
-  // Camada base — gradiente superior/inferior
-  bgGraphics.fillGradientStyle(T.skyTop,T.skyTop,T.skyBot,T.skyBot,1);
-  bgGraphics.fillRect(0,0,worldW,540);
+  // Camada base — gradiente superior/inferior (some quando há ilustração
+  // do mundo por trás; os raios de luz / aurora acima dela mantêm-se)
+  if (!worldBgImage || !worldBgImage.visible) {
+    bgGraphics.fillGradientStyle(T.skyTop,T.skyTop,T.skyBot,T.skyBot,1);
+    bgGraphics.fillRect(0,0,worldW,540);
 
-  // Faixa de horizonte — tom mais quente/suave no meio
-  const horizColor = isNight ? 0x1a0840 : 0xfff0a0;
-  bgGraphics.fillStyle(horizColor, isNight ? 0.26 : 0.30);
-  bgGraphics.fillRect(0, 300, worldW, 150);
+    // Faixa de horizonte — tom mais quente/suave no meio
+    const horizColor = isNight ? 0x1a0840 : 0xfff0a0;
+    bgGraphics.fillStyle(horizColor, isNight ? 0.26 : 0.30);
+    bgGraphics.fillRect(0, 300, worldW, 150);
+  }
 
   if (!isNight) {
     // ── RAIOS DE LUZ (god rays) — só temas diurnos ──────────────
