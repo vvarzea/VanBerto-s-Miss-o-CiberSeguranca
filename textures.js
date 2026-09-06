@@ -1768,137 +1768,153 @@ function makeItemTextures(scene){
   makeEmojiItemTexture(scene, "item_lapis",   "✏️", 44, "rgba(255,180,80,0.75)");
   makeEmojiItemTexture(scene, "item_diploma", "🎓", 46, "rgba(160,140,255,0.75)");
   makeEmojiItemTexture(scene, "item_lampada", "💡", 44, "rgba(255,240,120,0.85)");
-  // Pacote de Dados — agora um "avião de papel" digital (ícone universal
-  // de "enviar mensagem/dados"), muito mais legível do que a forma
-  // hexagonal anterior, que lia como um enfeite/gema em vez de "dados".
+  // Pacote de Dados — envelope digital selado com cadeado dourado no lacre.
+  // Substitui o "avião de papel" anterior: este lê-se de imediato como
+  // "mensagem/dado protegido", em vez de um símbolo genérico de correio.
   const PACKET_COLORS=[
-    {top:"#ff9ad0",bot:"#c8158a",pat:"#ffe680",stroke:"#7a0050"}, // rosa
-    {top:"#9adcff",bot:"#1470c8",pat:"#ffffff",stroke:"#003a70"}, // azul
-    {top:"#b0ffa0",bot:"#1ca858",pat:"#ffe680",stroke:"#004818"}, // verde
-    {top:"#ffe680",bot:"#ff9500",pat:"#ffffff",stroke:"#7a3800"}, // laranja-dourado
-    {top:"#dcb0ff",bot:"#7e20d0",pat:"#ffe080",stroke:"#380068"}, // lilás
+    {top:"#ff9ad0",bot:"#c8158a"}, // rosa
+    {top:"#9adcff",bot:"#1470c8"}, // azul
+    {top:"#b0ffa0",bot:"#1ca858"}, // verde
+    {top:"#ffe680",bot:"#ff9500"}, // laranja-dourado
+    {top:"#dcb0ff",bot:"#7e20d0"}, // lilás
   ];
   PACKET_COLORS.forEach((bc,ci)=>{
     const key="item_pacote_"+ci;
     if(scene.textures.exists(key)) return;
     const tex=scene.textures.createCanvas(key,48,36), ctx=tex.getContext();
-    const cx=22, cy=18;
+    const cx=24, cy=18, ew=32, eh=22;
 
     // Halo de brilho por trás
-    const halo=ctx.createRadialGradient(cx,cy,2,cx,cy,20);
+    const halo=ctx.createRadialGradient(cx,cy,2,cx,cy,22);
     halo.addColorStop(0,bc.top+"50"); halo.addColorStop(1,bc.top+"00");
     ctx.fillStyle=halo;
-    ctx.beginPath(); ctx.arc(cx,cy,20,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,22,0,Math.PI*2); ctx.fill();
 
-    // Rasto de movimento (traços a esbater atrás da cauda)
+    // Rasto de movimento (mantido do design anterior — ainda faz sentido
+    // para uma mensagem "em trânsito" na rede)
     ctx.strokeStyle=bc.top; ctx.lineCap="round";
-    [[0,0.55,10],[3,0.38,7],[6,0.24,5]].forEach(([dy,alpha,len])=>{
+    [[0,0.5,9],[3,0.34,6],[6,0.2,4]].forEach(([dy,alpha,len])=>{
       ctx.globalAlpha=alpha; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.moveTo(cx-20,cy-4+dy); ctx.lineTo(cx-20+len,cy-4+dy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx-ew/2-6,cy-2+dy); ctx.lineTo(cx-ew/2-6+len,cy-2+dy); ctx.stroke();
     });
     ctx.globalAlpha=1;
 
-    // Pontos N/T/M/B do "avião de papel" clássico (bico à direita)
-    const N=[cx+18,cy-1], T=[cx-16,cy-11], M=[cx-3,cy-1], B=[cx-13,cy+9];
+    // Corpo do envelope
+    const bodyGr=ctx.createLinearGradient(cx,cy-eh/2,cx,cy+eh/2);
+    bodyGr.addColorStop(0,bc.top); bodyGr.addColorStop(1,bc.bot);
+    ctx.fillStyle=bodyGr;
+    ctx.beginPath(); ctx.roundRect(cx-ew/2,cy-eh/2,ew,eh,4); ctx.fill();
+    ctx.strokeStyle="#3a1030"; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.roundRect(cx-ew/2,cy-eh/2,ew,eh,4); ctx.stroke();
 
-    // Asa de cima (painel claro)
-    const grTop=ctx.createLinearGradient(T[0],T[1],N[0],N[1]);
-    grTop.addColorStop(0,bc.top); grTop.addColorStop(1,bc.pat);
-    ctx.fillStyle=grTop;
-    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...T); ctx.lineTo(...M); ctx.closePath(); ctx.fill();
+    // Aba triangular (dobra do envelope)
+    ctx.fillStyle="rgba(255,255,255,0.28)";
+    ctx.beginPath();
+    ctx.moveTo(cx-ew/2+1,cy-eh/2+1);
+    ctx.lineTo(cx,cy+2);
+    ctx.lineTo(cx+ew/2-1,cy-eh/2+1);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle="rgba(60,16,48,0.5)"; ctx.lineWidth=1;
+    ctx.stroke();
 
-    // Asa de baixo (painel sombreado — dá o efeito de "dobra" do papel)
-    ctx.fillStyle=bc.bot;
-    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...M); ctx.lineTo(...B); ctx.closePath(); ctx.fill();
-
-    // Contornos
-    ctx.strokeStyle=bc.stroke; ctx.lineWidth=1.4; ctx.lineJoin="round";
-    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...T); ctx.lineTo(...M); ctx.closePath(); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...M); ctx.lineTo(...B); ctx.closePath(); ctx.stroke();
-    // linha da dobra central
-    ctx.beginPath(); ctx.moveTo(...N); ctx.lineTo(...M); ctx.stroke();
-
-    // Brilho na asa de cima
-    ctx.fillStyle="rgba(255,255,255,0.5)";
-    ctx.beginPath(); ctx.moveTo(cx+6,cy-4); ctx.lineTo(cx-8,cy-7); ctx.lineTo(cx-2,cy-2); ctx.closePath(); ctx.fill();
-
-    // Luz de "transmissão" no bico
-    ctx.fillStyle=bc.pat; ctx.shadowColor=bc.pat; ctx.shadowBlur=5;
-    ctx.beginPath(); ctx.arc(N[0],N[1],2,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
+    // Cadeado dourado no lacre — o elemento que liga isto ao tema de
+    // cibersegurança (mensagem fechada = dado protegido).
+    const lockY=cy+1;
+    ctx.fillStyle="#3a2200";
+    ctx.beginPath(); ctx.roundRect(cx-4.5,lockY-1,9,7,2); ctx.fill();
+    ctx.strokeStyle="#3a2200"; ctx.lineWidth=1.6; ctx.lineCap="round";
+    ctx.beginPath(); ctx.arc(cx,lockY-1,3,Math.PI,0); ctx.stroke();
+    const lockGr=ctx.createLinearGradient(cx,lockY-1,cx,lockY+6);
+    lockGr.addColorStop(0,"#ffe680"); lockGr.addColorStop(1,"#ffb020");
+    ctx.fillStyle=lockGr;
+    ctx.beginPath(); ctx.roundRect(cx-4,lockY-0.3,8,6,1.6); ctx.fill();
+    ctx.fillStyle="#7a3a00";
+    ctx.beginPath(); ctx.arc(cx,lockY+2.6,1,0,Math.PI*2); ctx.fill();
 
     tex.refresh();
   });
 
-  // Mini-Drone amigável — 60×48, corpo arredondado tipo "chibi" com um
-  // grande olho-câmara central e 4 rotores com hélices bem visíveis.
+  // Mini-Drone amigável — 64×52. Silhueta de quadricóptero a sério: chassis
+  // achatado (não uma "cabeça" redonda), 4 discos de hélice bem afastados
+  // do corpo, pernas de aterragem e uma câmara em gimbal pendurada por
+  // baixo — em vez de um olho gigante a ocupar a cara toda.
   if(!scene.textures.exists("item_drone")){
-    const tex=scene.textures.createCanvas("item_drone",60,48), ctx=tex.getContext();
-    const bx=30, by=26; // centro do corpo
+    const tex=scene.textures.createCanvas("item_drone",64,52), ctx=tex.getContext();
+    const bx=32, by=22; // centro do corpo (mais alto, para dar espaço ao gimbal)
 
-    // --- 4 BRAÇOS + ROTORES (atrás do corpo) ---
-    const arms=[[-19,-10],[19,-10],[-19,9],[19,9]];
+    // --- 4 BRAÇOS + DISCOS DE HÉLICE (atrás do corpo) ---
+    const arms=[[-21,-8],[21,-8],[-21,8],[21,8]];
     arms.forEach(([dx,dy])=>{
       const rx=bx+dx, ry=by+dy;
-      ctx.strokeStyle="#3a4a60"; ctx.lineWidth=2.2;
-      ctx.beginPath(); ctx.moveTo(bx+dx*0.35,by+dy*0.35); ctx.lineTo(rx,ry); ctx.stroke();
-      // desfoque circular de rotação (mais visível e com aro para contraste)
-      ctx.fillStyle="rgba(210,230,245,0.55)";
-      ctx.beginPath(); ctx.arc(rx,ry,7.5,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle="rgba(40,55,75,0.6)"; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.arc(rx,ry,7.5,0,Math.PI*2); ctx.stroke();
-      // hélices em X (bem visíveis, para dar sensação de movimento)
-      ctx.strokeStyle="rgba(50,70,95,0.9)"; ctx.lineWidth=1.6;
-      ctx.beginPath(); ctx.moveTo(rx-7,ry-3); ctx.lineTo(rx+7,ry+3); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(rx-7,ry+3); ctx.lineTo(rx+7,ry-3); ctx.stroke();
-      // eixo do rotor
-      ctx.fillStyle="#2a3a50";
-      ctx.beginPath(); ctx.arc(rx,ry,2.2,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="#2c3648"; ctx.lineWidth=3.4; ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(bx+dx*0.25,by+dy*0.25); ctx.lineTo(rx,ry); ctx.stroke();
+      // motor na ponta do braço
+      ctx.fillStyle="#3a4658";
+      ctx.beginPath(); ctx.roundRect(rx-4,ry-2.5,8,5,2); ctx.fill();
+      // disco da hélice, achatado (elipse) para sugerir rotação vista de lado
+      ctx.save();
+      ctx.translate(rx,ry-1); ctx.scale(1,0.38);
+      const propGr=ctx.createRadialGradient(0,0,1,0,0,11);
+      propGr.addColorStop(0,"rgba(220,235,248,0.75)"); propGr.addColorStop(1,"rgba(220,235,248,0.08)");
+      ctx.fillStyle=propGr;
+      ctx.beginPath(); ctx.arc(0,0,11,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,0.55)"; ctx.lineWidth=0.8;
+      ctx.beginPath(); ctx.arc(0,0,11,0,Math.PI*2); ctx.stroke();
+      ctx.restore();
     });
 
-    // --- ANTENA (estilo VanBerto's: haste + halo brilhante) ---
-    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.6;
-    ctx.beginPath(); ctx.moveTo(bx,by-13); ctx.lineTo(bx,by-19); ctx.stroke();
-    const halo=ctx.createRadialGradient(bx,by-21,0.5,bx,by-21,6);
-    halo.addColorStop(0,"rgba(90,200,255,0.55)"); halo.addColorStop(1,"rgba(90,200,255,0)");
-    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(bx,by-21,6,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#40e0ff"; ctx.shadowColor="#40e0ff"; ctx.shadowBlur=4;
-    ctx.beginPath(); ctx.arc(bx,by-21,2.2,0,Math.PI*2); ctx.fill();
+    // --- PERNAS DE ATERRAGEM ---
+    ctx.strokeStyle="#2c3648"; ctx.lineWidth=2;
+    [[-10,1],[10,1]].forEach(([dx])=>{
+      ctx.beginPath(); ctx.moveTo(bx+dx,by+9); ctx.lineTo(bx+dx*1.35,by+16); ctx.stroke();
+    });
+    ctx.lineWidth=2.6; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(bx-15,by+16); ctx.lineTo(bx-9,by+16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx+9,by+16); ctx.lineTo(bx+15,by+16); ctx.stroke();
+
+    // --- ANTENA (estilo VanBerto's: haste + halo dourado da marca) ---
+    ctx.strokeStyle="#2c3648"; ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.moveTo(bx,by-9); ctx.lineTo(bx,by-15); ctx.stroke();
+    const halo=ctx.createRadialGradient(bx,by-17,0.5,bx,by-17,5.5);
+    halo.addColorStop(0,"rgba(255,210,74,0.65)"); halo.addColorStop(1,"rgba(255,210,74,0)");
+    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(bx,by-17,5.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#ffd24a"; ctx.shadowColor="#ffd24a"; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.arc(bx,by-17,2,0,Math.PI*2); ctx.fill();
     ctx.shadowBlur=0;
 
-    // --- CORPO (blob arredondado, chibi) ---
-    const bodyGr=ctx.createLinearGradient(bx,by-13,bx,by+13);
-    bodyGr.addColorStop(0,"#eaf4ff"); bodyGr.addColorStop(0.55,"#bcd2ea"); bodyGr.addColorStop(1,"#6a85a8");
+    // --- CORPO (chassis achatado, tipo veículo) ---
+    const bodyGr=ctx.createLinearGradient(bx,by-8,bx,by+9);
+    bodyGr.addColorStop(0,"#f0f6ff"); bodyGr.addColorStop(0.6,"#c4d6ec"); bodyGr.addColorStop(1,"#7f96b4");
     ctx.fillStyle=bodyGr;
-    ctx.beginPath(); ctx.roundRect(bx-14,by-13,28,26,12); ctx.fill();
-    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.6;
-    ctx.beginPath(); ctx.roundRect(bx-14,by-13,28,26,12); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(bx-13,by-8,26,17,7); ctx.fill();
+    ctx.strokeStyle="#2c3648"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.roundRect(bx-13,by-8,26,17,7); ctx.stroke();
     // brilho superior
-    ctx.save(); ctx.beginPath(); ctx.roundRect(bx-14,by-13,28,26,12); ctx.clip();
+    ctx.save(); ctx.beginPath(); ctx.roundRect(bx-13,by-8,26,17,7); ctx.clip();
     ctx.fillStyle="rgba(255,255,255,0.55)";
-    ctx.beginPath(); ctx.ellipse(bx-5,by-8,9,4,-0.4,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(bx-4,by-5,8,3,-0.3,0,Math.PI*2); ctx.fill();
     ctx.restore();
 
-    // Luz de estado (pequena, cor de destaque da marca)
-    ctx.fillStyle="#ff6b35"; ctx.shadowColor="#ff6b35"; ctx.shadowBlur=4;
-    ctx.beginPath(); ctx.arc(bx+9,by-8,1.8,0,Math.PI*2); ctx.fill();
+    // Luzes de estado verde/vermelho (detalhe clássico de drone a sério)
+    ctx.fillStyle="#3ef07a"; ctx.shadowColor="#3ef07a"; ctx.shadowBlur=3;
+    ctx.beginPath(); ctx.arc(bx-9,by-3,1.4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#ff4a4a"; ctx.shadowColor="#ff4a4a";
+    ctx.beginPath(); ctx.arc(bx+9,by-3,1.4,0,Math.PI*2); ctx.fill();
     ctx.shadowBlur=0;
 
-    // --- GRANDE OLHO-CÂMARA CENTRAL (traço "amigável") ---
-    ctx.fillStyle="#0e2036";
-    ctx.beginPath(); ctx.arc(bx,by+2,8.6,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#ffffff";
-    ctx.beginPath(); ctx.arc(bx,by+2,6.8,0,Math.PI*2); ctx.fill();
-    const iris=ctx.createRadialGradient(bx-1.5,by+0.5,0.5,bx,by+2,5.4);
-    iris.addColorStop(0,"#7fe0ff"); iris.addColorStop(0.6,"#2a9bf0"); iris.addColorStop(1,"#1366c6");
-    ctx.fillStyle=iris;
-    ctx.beginPath(); ctx.arc(bx,by+2,5.4,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#0a0f1c";
-    ctx.beginPath(); ctx.arc(bx,by+2,2.6,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="rgba(255,255,255,0.9)";
-    ctx.beginPath(); ctx.arc(bx-1.5,by+0.4,1.3,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle="#2a3a50"; ctx.lineWidth=1.3;
-    ctx.beginPath(); ctx.arc(bx,by+2,8.6,0,Math.PI*2); ctx.stroke();
+    // --- GIMBAL/CÂMARA PENDURADA POR BAIXO (não ocupa a "cara" toda) ---
+    ctx.strokeStyle="#2c3648"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(bx,by+9); ctx.lineTo(bx,by+12); ctx.stroke();
+    ctx.fillStyle="#232c3a";
+    ctx.beginPath(); ctx.roundRect(bx-6,by+11,12,8,3); ctx.fill();
+    ctx.strokeStyle="#0e1420"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.roundRect(bx-6,by+11,12,8,3); ctx.stroke();
+    const lensIris=ctx.createRadialGradient(bx-0.6,by+14.4,0.3,bx,by+15,3.4);
+    lensIris.addColorStop(0,"#7fe0ff"); lensIris.addColorStop(0.6,"#2a9bf0"); lensIris.addColorStop(1,"#1366c6");
+    ctx.fillStyle=lensIris;
+    ctx.beginPath(); ctx.arc(bx,by+15,3.4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="rgba(255,255,255,0.85)";
+    ctx.beginPath(); ctx.arc(bx-0.9,by+13.9,0.9,0,Math.PI*2); ctx.fill();
 
     tex.refresh();
   }

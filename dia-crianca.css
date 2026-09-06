@@ -130,16 +130,13 @@ canvas { width: 100% !important; height: 100% !important; display: block; touch-
   text-align: center; letter-spacing: 0.3px;
   border-bottom: 2px solid #ff6b35;
   padding-bottom: 8px;
-  /* Título estilo "cartaz" — gradiente rosa/magenta com contorno branco,
-     como a arte da campanha de Ciberseguranca. */
-  color: #e0209a;
-  background: linear-gradient(180deg, #ffb0e0 0%, #ff5ec0 45%, #d0158a 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 1.6px #fff8ff;
+  /* Título estilo "bolha pop" — creme sólido + contorno magenta grosso.
+     Mais legível do que o gradiente pastel anterior (que tinha pouco
+     contraste contra o próprio contorno branco). */
+  color: #fff6e8;
+  -webkit-text-stroke: 1.8px #b5148a;
   paint-order: stroke fill;
-  text-shadow: 0 3px 0 rgba(122,10,74,0.55), 0 4px 12px rgba(224,32,154,0.35);
+  text-shadow: 0 2px 0 #7a0a5c, 0 5px 10px rgba(0,0,0,0.45);
 }
 .card h2 {
   font-family: 'Baloo 2', sans-serif;
