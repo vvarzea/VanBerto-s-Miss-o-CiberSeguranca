@@ -2,27 +2,31 @@
 // THEMES, LEVELS
 
 export const THEMES = [
-  // ── 20 paletas únicas — uma por nível ──────────────────────────
+  // ── 20 paletas, agora agrupadas em 4 "famílias" — uma por mundo do mapa —
+  // para o visual dos níveis acompanhar a arte dos mundos (dia, cidade-tech,
+  // fortaleza noturna, cidade neon). Dentro de cada família mantém-se
+  // variação nível a nível, só a família (dia/noite, gama de cor) é comum.
+  // Reino dos Fundamentos (níveis 1,2,3,6,10) — dia, prado alegre 🌍
   { skyTop:0x1a6ab5, skyBot:0x8ed6f8, hillColor:0x2e9e52, grassTop:0x44cc6a }, //  0 · Nível  1 — azul rico de manhã
-  { skyTop:0x3d1466, skyBot:0xff8c40, hillColor:0xbf3c0f, grassTop:0xd95210 }, //  1 · Nível  2 — crepúsculo roxo-laranja
-  { skyTop:0x006680, skyBot:0x50e8e0, hillColor:0x0a7a6a, grassTop:0x18c0b0 }, //  2 · Nível  3 — aqua tropical
-  { skyTop:0xc02880, skyBot:0xffb8d8, hillColor:0xd0408a, grassTop:0xf060aa }, //  3 · Nível  4 — rosa vibrante
-  { skyTop:0x1a0060, skyBot:0xb060ff, hillColor:0x5010a0, grassTop:0x7830d8 }, //  4 · Nível  5 — lilás noturno 🌙
-  { skyTop:0x7a2000, skyBot:0xffb060, hillColor:0xd05010, grassTop:0xf07030 }, //  5 · Nível  6 — laranja quente pôr-do-sol
-  { skyTop:0x001a5a, skyBot:0x2090e8, hillColor:0x0050a0, grassTop:0x1878d0 }, //  6 · Nível  7 — azul noturno profundo 🌙
-  { skyTop:0x5a0030, skyBot:0xff80b8, hillColor:0xb02070, grassTop:0xd83090 }, //  7 · Nível  8 — magenta rico 🌙
-  { skyTop:0x0a2010, skyBot:0x40b858, hillColor:0x1a5e2a, grassTop:0x28904a }, //  8 · Nível  9 — floresta verde profunda
-  { skyTop:0x5a1a00, skyBot:0xffcc60, hillColor:0xc06010, grassTop:0xe08020 }, //  9 · Nível 10 — âmbar dourado
-  { skyTop:0x1a3a00, skyBot:0x90e840, hillColor:0x2e7a10, grassTop:0x4ab020 }, // 10 · Nível 11 — verde lima primavera
-  { skyTop:0x001a3a, skyBot:0x4090d0, hillColor:0x004a80, grassTop:0x1060a8 }, // 11 · Nível 12 — azul oceano 🌙
-  { skyTop:0x2a0050, skyBot:0xe060ff, hillColor:0x6010b0, grassTop:0x8030d0 }, // 12 · Nível 13 — violeta mágico 🌙
-  { skyTop:0x004040, skyBot:0x20d8c0, hillColor:0x006858, grassTop:0x10a898 }, // 13 · Nível 14 — teal escuro 🌙
-  { skyTop:0x002850, skyBot:0x60c0ff, hillColor:0x005090, grassTop:0x1080c0 }, // 14 · Nível 15 — azul celeste
-  { skyTop:0x603000, skyBot:0xffd060, hillColor:0xb05800, grassTop:0xe07800 }, // 15 · Nível 16 — castanho-ouro (terra)
-  { skyTop:0x1a0828, skyBot:0xa040e8, hillColor:0x4a1090, grassTop:0x6820b8 }, // 16 · Nível 17 — índigo cósmico 🌙
-  { skyTop:0x003820, skyBot:0x40e870, hillColor:0x106030, grassTop:0x20a050 }, // 17 · Nível 18 — verde floresta 🌙
-  { skyTop:0x600010, skyBot:0xff5040, hillColor:0xa02020, grassTop:0xd03030 }, // 18 · Nível 19 — vermelho escarlate 🌙
-  { skyTop:0xff6a1a, skyBot:0xffe39a, hillColor:0xe0871a, grassTop:0x5ec85a }, // 19 · Nível 20 — FINAL festivo pôr-do-sol dourado
+  { skyTop:0x2a7fd0, skyBot:0xffe0a0, hillColor:0x3aa860, grassTop:0x58cc78 }, //  1 · Nível  2 — manhã dourada quente
+  { skyTop:0x0088a0, skyBot:0x70e8e0, hillColor:0x0a8a78, grassTop:0x20c8b0 }, //  2 · Nível  3 — aqua tropical
+  { skyTop:0x0a70a8, skyBot:0x9ee4ff, hillColor:0x155a90, grassTop:0x2e7fb8 }, //  3 · Nível  4 — azul-ciano tech (Comunicação Segura)
+  { skyTop:0x1470c0, skyBot:0xa8e0ff, hillColor:0x2050a0, grassTop:0x3878c8 }, //  4 · Nível  5 — azul tech claro (Comunicação Segura)
+  { skyTop:0x2a90d8, skyBot:0xb8f0ff, hillColor:0x3ab850, grassTop:0x5cd868 }, //  5 · Nível  6 — verde-primavera brilhante (Fundamentos)
+  { skyTop:0x0a1040, skyBot:0x3a2a78, hillColor:0x1a1050, grassTop:0x2a1868 }, //  6 · Nível  7 — índigo noturno (Fortaleza) 🌙
+  { skyTop:0x5a0030, skyBot:0xff80b8, hillColor:0xb02070, grassTop:0xd83090 }, //  7 · Nível  8 — magenta neon (Cidade da Identidade) 🌙
+  { skyTop:0x0888c0, skyBot:0x90e8f8, hillColor:0x106898, grassTop:0x2088b8 }, //  8 · Nível  9 — azul tech (Comunicação Segura)
+  { skyTop:0x3a7fc0, skyBot:0xffd890, hillColor:0xc07010, grassTop:0xe0a020 }, //  9 · Nível 10 — âmbar dourado (Fundamentos)
+  { skyTop:0x1a0838, skyBot:0xd040c8, hillColor:0x3a1868, grassTop:0x581e88 }, // 10 · Nível 11 — magenta-roxo neon (Cidade da Identidade) 🌙
+  { skyTop:0x120a48, skyBot:0x4a2c88, hillColor:0x201060, grassTop:0x321878 }, // 11 · Nível 12 — índigo profundo (Fortaleza) 🌙
+  { skyTop:0x2a0050, skyBot:0xa860f0, hillColor:0x5010a0, grassTop:0x7030c0 }, // 12 · Nível 13 — violeta mágico (Fortaleza) 🌙
+  { skyTop:0x160a4a, skyBot:0x5a3898, hillColor:0x281270, grassTop:0x3a2088 }, // 13 · Nível 14 — roxo profundo (Fortaleza) 🌙
+  { skyTop:0x0a1050, skyBot:0x40c8ff, hillColor:0x1a2878, grassTop:0x2848a0 }, // 14 · Nível 15 — ciano neon sobre céu escuro (Cidade da Identidade) 🌙
+  { skyTop:0x1a0838, skyBot:0xff60d0, hillColor:0x381860, grassTop:0x502080 }, // 15 · Nível 16 — rosa-neon noturno (Cidade da Identidade) 🌙
+  { skyTop:0x1858a8, skyBot:0x90d0ff, hillColor:0x204888, grassTop:0x3068a8 }, // 16 · Nível 17 — azul tech (Comunicação Segura)
+  { skyTop:0x1a0a50, skyBot:0x6040a0, hillColor:0x2c1878, grassTop:0x402090 }, // 17 · Nível 18 — roxo-fortaleza (Fortaleza) 🌙
+  { skyTop:0x100848, skyBot:0x4c2c90, hillColor:0x241468, grassTop:0x361c80 }, // 18 · Nível 19 — roxo-ameixa (Fortaleza) 🌙
+  { skyTop:0xff6a1a, skyBot:0xffe39a, hillColor:0xe0871a, grassTop:0x5ec85a }, // 19 · Nível 20 — FINAL festivo pôr-do-sol dourado (mantido — é o grande final, fica fora da família do seu mundo de propósito)
 ];
 
 // ── Canos (pedido: posições variadas, nem todos entráveis — "tipo Mario"). ──

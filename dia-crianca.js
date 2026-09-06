@@ -549,7 +549,12 @@ window.addEventListener("DOMContentLoaded", () => {
       currentLevel = idx;
       const startTransition = () => playLevelTransition(sceneRef, idx,
         () => { loadLevel(sceneRef, idx); saveGame(); },
-        () => { showHistory(idx, () => { if (!pausedByTeacher) sceneRef.physics.resume(); }); }
+        () => { showHistory(idx, () => {
+          if (!pausedByTeacher) sceneRef.physics.resume();
+          // Fala de boas-vindas do VanBerto's — antes só disparava no
+          // arranque direto do jogo; agora todo o Nível 1 passa por aqui.
+          if (idx === 0) setTimeout(() => vbSay(VB_LEVEL_INTRO[0], "intro", 4000), 800);
+        }); }
       );
       // Vindo do mapa, entrar numa região mostra sempre o seu cartão de título —
       // é literalmente o jogador a escolher "entrar" naquele mundo.
@@ -7264,38 +7269,17 @@ window.addEventListener("DOMContentLoaded", () => {
     resetAllProgress();
     startOverlay.classList.add("hidden");
 
+    // A aventura passa sempre primeiro pelo mapa ilustrado — nunca salta
+    // direto para o Nível 1. O jogador entra no Mundo 1 (o único
+    // desbloqueado logo após um recomeço) e escolhe o Nível 1 ele próprio,
+    // exatamente como a partir do botão "🗺️ Mapa" a meio do jogo.
+    // initPhaser()/o resto do arranque fica todo a cargo de
+    // startLevelFromMap(), chamado quando o nó do nível é tocado.
     const beginAdventure = () => {
-      document.body.classList.add("game-started");
-      if (!window.__dc_game) {
-        initPhaser();
-        const waitScene = setInterval(() => {
-          if (sceneRef) {
-            clearInterval(waitScene);
-            if(playerNameHUD){
-              playerNameHUD.textContent = playerName ? `⭐ ${playerName}` : "";
-              playerNameHUD.style.display = playerName ? "block" : "none";
-            }
-            playLevelTransition(sceneRef, 0,
-              () => { loadLevel(sceneRef, 0); saveGame(); },
-              () => { showHistory(0, () => {
-                if(!pausedByTeacher) sceneRef.physics.resume();
-                setTimeout(()=>vbSay(VB_LEVEL_INTRO[0],"intro",4000),800);
-              }); }
-            );
-          }
-        }, 50);
-      } else if (sceneRef) {
-        playLevelTransition(sceneRef, 0,
-          () => { loadLevel(sceneRef, 0); saveGame(); },
-          () => { showHistory(0, () => {
-            if(!pausedByTeacher) sceneRef.physics.resume();
-            setTimeout(()=>vbSay(VB_LEVEL_INTRO[0],"intro",4000),800);
-          }); }
-        );
-      }
+      openOverlay("mapOverlay", renderMap);
     };
 
-    // Mostrar a história principal (narrativa de introdução) antes do nível 1
+    // Mostrar a história principal (narrativa de introdução) antes do mapa
     const mainStoryOverlay = document.getElementById("mainStoryOverlay");
     const btnMainStoryContinue = document.getElementById("btnMainStoryContinue");
     if (mainStoryOverlay && btnMainStoryContinue) {

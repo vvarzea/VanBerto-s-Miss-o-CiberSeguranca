@@ -609,7 +609,11 @@ export function updatePlatformDecor(scene){
 // tema 16 → Nível 17 (índigo cósmico)
 // tema 17 → Nível 18 (verde floresta)
 // tema 18 → Nível 19 (vermelho escarlate)
-export const NIGHT_THEMES = new Set([4, 6, 7, 11, 12, 13, 16, 17, 18]);
+// Temas noturnos (luar/estrelas) — agora alinhados com os mundos que na
+// arte do mapa já são noturnos: Fortaleza da Proteção Digital e Cidade da
+// Identidade Digital. Exceção: o nível 20 (tema 19) é o final festivo e
+// fica de propósito fora da família noturna do seu mundo.
+export const NIGHT_THEMES = new Set([6,7,10,11,12,13,14,15,17,18]);
 
 export function applyBackground(scene,themeIdx,worldW,hazardDefs=[]){
   const T=THEMES[themeIdx]||THEMES[0];
