@@ -561,6 +561,8 @@ window.addEventListener("DOMContentLoaded", () => {
     const newRegion = regionForLevel(nextIdx);
     const crossingRegion = newRegion && (!prevRegion || prevRegion.id !== newRegion.id) && newRegion.levels[0] === nextIdx;
     if (crossingRegion) {
+      const Lc = LEVELS[nextIdx];
+      if (Lc) applyBackground(scene, Lc.theme % THEMES.length, Lc.worldW, Lc.hazards || [], bgKeyForLevel(nextIdx));
       playRegionTitleCard(newRegion, () => playLevelTransition(scene, nextIdx, onMidpoint, onComplete));
     } else {
       playLevelTransition(scene, nextIdx, onMidpoint, onComplete);
@@ -589,6 +591,12 @@ window.addEventListener("DOMContentLoaded", () => {
           if (idx === 0) setTimeout(() => vbSay(VB_LEVEL_INTRO[0], "intro", 4000), 800);
         }); }
       );
+      // Aplicar já o fundo do nível ANTES do cartão de título da região —
+      // sem isto, o cartão aparecia com o fundo antigo/genérico por trás
+      // (o de antes de loadLevel correr), o que ficava sem sentido nenhum
+      // quando o mundo já tem ilustração própria.
+      const L0 = LEVELS[idx];
+      if (L0) applyBackground(sceneRef, L0.theme % THEMES.length, L0.worldW, L0.hazards || [], bgKeyForLevel(idx));
       // Vindo do mapa, entrar numa região mostra sempre o seu cartão de título —
       // é literalmente o jogador a escolher "entrar" naquele mundo.
       playRegionTitleCard(regionForLevel(idx), startTransition);

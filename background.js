@@ -704,11 +704,12 @@ export function applyBackground(scene,themeIdx,worldW,hazardDefs=[],bgImageKey=n
   }
   } // fim if (!showImage) — raios/aurora
 
-  // ── CAMADA PARALLAX PROFUNDA (montanhas/edifícios) ────────────
-  // Escondida quando há ilustração do mundo — já tem a sua própria
-  // paisagem distante (cidade/montanhas/torres), um skyline processual
-  // por cima ficava a duplicar e a destoar.
-  if (!showImage) drawFarLayer(themeIdx, worldW);
+  // ── CAMADA PARALLAX PROFUNDA (edifícios) ──────────────────────
+  // Removida por pedido — um "horizonte de prédios" genérico aparecia
+  // sempre, mesmo em níveis/mundos onde não fazia sentido nenhum
+  // (ex.: o campo do Reino dos Fundamentos). farGraphics fica sempre
+  // limpa; drawFarLayer() continua definida caso volte a fazer falta.
+  if (farGraphics) farGraphics.clear();
 
   // ── LUA (temas noturnos) — idem, a ilustração já tem a sua própria
   if (!showImage) drawMoon(scene, themeIdx);
