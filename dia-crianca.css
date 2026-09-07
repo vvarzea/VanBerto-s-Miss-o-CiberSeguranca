@@ -1568,6 +1568,22 @@ body.hc-mode .map-progress-fill { background: #ffff00 !important; }
   text-shadow: 0 1px 1px rgba(0,0,0,0.6);
 }
 
+/* VanBerto's a "pousar" no nível atual — reforça a sensação de aventura:
+   é o próprio jogador (representado pelo robô) que está ali parado. */
+.world-map-mascot {
+  position: absolute;
+  height: clamp(46px,10vw,74px); width: auto;
+  transform: translate(-50%, -100%);
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  animation: worldMapMascotBob 2.2s ease-in-out infinite;
+}
+@keyframes worldMapMascotBob {
+  0%,100% { transform: translate(-50%, -100%) translateY(0); }
+  50%     { transform: translate(-50%, -100%) translateY(-6px); }
+}
+
 body.hc-mode .world-map-panel { background-image: none !important; background: #000 !important; }
 body.hc-mode .level-node--current { border-color: #ffff00 !important; }
 body.hc-mode .world-map-text h2 { color: #ffff00 !important; -webkit-text-stroke: 0 !important; }

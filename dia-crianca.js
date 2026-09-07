@@ -362,10 +362,22 @@ window.addEventListener("DOMContentLoaded", () => {
     return MAP_REGIONS.find(r => r.levels.includes(idx)) || null;
   }
 
+  // Fundos por NÍVEL, mais detalhados que o do mapa — vão sendo
+  // acrescentados mundo a mundo. Um nível sem entrada aqui usa o fundo
+  // único do seu mundo (mapBg / regionForLevel), como até agora.
+  const LEVEL_BG_OVERRIDE = {
+    0: "bg_mundo1_n1e2", // Nível 1
+    1: "bg_mundo1_n1e2", // Nível 2
+    2: "bg_mundo1_n3e4", // Nível 3
+    3: "bg_mundo1_n3e4", // Nível 4
+    4: "bg_mundo1_n5",   // Nível 5
+  };
+
   // Chave da textura Phaser (pré-carregada em preload()) com a ilustração
   // do mundo a que este nível pertence — null se o nível não tiver mundo
   // ilustrado associado (ex.: salas secretas/boss não mapeadas).
   function bgKeyForLevel(idx) {
+    if (LEVEL_BG_OVERRIDE[idx]) return LEVEL_BG_OVERRIDE[idx];
     const region = regionForLevel(idx);
     return region && region.mapBg ? "bg_" + region.id : null;
   }
@@ -487,12 +499,14 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     nodesLayer.innerHTML = "";
+    let currentNodePos = null;
     region.levels.forEach((idx, i) => {
       const pos = (region.nodePos && region.nodePos[i]) || { x: 50, y: 50 };
       const unlocked = idx <= mapProgress.highestLevelReached;
       const done = mapProgress.levelsCompleted.includes(idx);
       const status = !unlocked ? "locked" : (done ? "done" : "current");
       const levelNum = idx + 1;
+      if (status === "current") currentNodePos = pos;
 
       const btn = document.createElement("button");
       btn.type = "button";
@@ -520,6 +534,16 @@ window.addEventListener("DOMContentLoaded", () => {
       }
       nodesLayer.appendChild(btn);
     });
+
+    if (currentNodePos) {
+      const mascot = document.createElement("img");
+      mascot.src = "vanberto_voar.png";
+      mascot.alt = "";
+      mascot.className = "world-map-mascot";
+      mascot.style.left = currentNodePos.x + "%";
+      mascot.style.top = currentNodePos.y + "%";
+      nodesLayer.appendChild(mascot);
+    }
   }
 
   // Mostra o cartão de entrada de região (ícone + nome + 2 falas do VanBerto's)
@@ -1106,6 +1130,14 @@ window.addEventListener("DOMContentLoaded", () => {
     this.load.image("bg_desenvolvimento", "map-mundo2.jpg");
     this.load.image("bg_protecao", "map-mundo3.jpg");
     this.load.image("bg_participacao", "map-mundo4.jpg");
+
+    // Fundos por NÍVEL (mais detalhados que os do mapa) — por agora só o
+    // Mundo 1; os outros mundos continuam a usar a imagem única do mapa
+    // (bg_origens/desenvolvimento/protecao/participacao) até termos as suas
+    // versões por nível.
+    this.load.image("bg_mundo1_n1e2", "mundo1_n1e2.jpg");
+    this.load.image("bg_mundo1_n3e4", "mundo1_n3e4.jpg");
+    this.load.image("bg_mundo1_n5", "mundo1_n5.jpg");
   }
 
   function initPhaser() {
@@ -6285,6 +6317,16 @@ window.addEventListener("DOMContentLoaded", () => {
             openOverlay("mapOverlay", renderMap);
             awaitingQuiz = false; awaitingStory = false;
           });
+          return;
+        }
+        // Entre níveis do MESMO mundo: o jogo volta sempre ao mapa ilustrado
+        // desse mundo (o nível concluído aparece verde, o seguinte fica a
+        // brilhar) em vez de avançar sozinho — o jogador é sempre quem toca
+        // para continuar, tal como ao entrar de novo depois de "Nova Aventura".
+        const nextRegion = regionForLevel(next);
+        if (nextRegion && nextRegion.mapBg) {
+          openOverlay("worldMapOverlay", () => renderWorldMap(nextRegion));
+          awaitingQuiz = false; awaitingStory = false;
           return;
         }
         enterLevelWithStory(scene,next,

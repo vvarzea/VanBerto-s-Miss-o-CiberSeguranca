@@ -640,11 +640,13 @@ export function applyBackground(scene,themeIdx,worldW,hazardDefs=[],bgImageKey=n
     worldBgImage.setVisible(false);
   }
 
+  const showImage = !!(worldBgImage && worldBgImage.visible);
+
   // ── CÉU com gradiente triplo mais rico ────────────────────────
   bgGraphics.clear();
   // Camada base — gradiente superior/inferior (some quando há ilustração
   // do mundo por trás; os raios de luz / aurora acima dela mantêm-se)
-  if (!worldBgImage || !worldBgImage.visible) {
+  if (!showImage) {
     bgGraphics.fillGradientStyle(T.skyTop,T.skyTop,T.skyBot,T.skyBot,1);
     bgGraphics.fillRect(0,0,worldW,540);
 
@@ -654,6 +656,10 @@ export function applyBackground(scene,themeIdx,worldW,hazardDefs=[],bgImageKey=n
     bgGraphics.fillRect(0, 300, worldW, 150);
   }
 
+  // Raios de luz / aurora — escondidos quando há ilustração do mundo: a
+  // imagem já tem o seu próprio sol/lua pintado numa posição diferente da
+  // constante SUN_X/SUN_Y, por isso os raios ficavam a sair do "nada".
+  if (!showImage) {
   if (!isNight) {
     // ── RAIOS DE LUZ (god rays) — só temas diurnos ──────────────
     const rayColors = [0xffffff, 0xffe8a0, 0xffd070];
@@ -696,23 +702,33 @@ export function applyBackground(scene,themeIdx,worldW,hazardDefs=[],bgImageKey=n
       bgGraphics.fillEllipse(ax + aw * 0.15, 160 + ai * 15, aw * 0.25, ah * 0.7);
     }
   }
+  } // fim if (!showImage) — raios/aurora
 
   // ── CAMADA PARALLAX PROFUNDA (montanhas/edifícios) ────────────
-  drawFarLayer(themeIdx, worldW);
+  // Escondida quando há ilustração do mundo — já tem a sua própria
+  // paisagem distante (cidade/montanhas/torres), um skyline processual
+  // por cima ficava a duplicar e a destoar.
+  if (!showImage) drawFarLayer(themeIdx, worldW);
 
-  // ── LUA (temas noturnos) ──────────────────────────────────────
-  drawMoon(scene, themeIdx);
+  // ── LUA (temas noturnos) — idem, a ilustração já tem a sua própria
+  if (!showImage) drawMoon(scene, themeIdx);
 
   // ── SOL — desenhado em sunGraphics (animado no update) ────────
-  // Esconder o sol em temas noturnos
-  if(sunGraphics) sunGraphics.setAlpha(NIGHT_THEMES.has(themeIdx) ? 0 : 1);
+  // Escondido em temas noturnos E sempre que há ilustração do mundo
+  // (que já traz o seu próprio sol/lua pintado).
+  if(sunGraphics) sunGraphics.setAlpha((showImage || NIGHT_THEMES.has(themeIdx)) ? 0 : 1);
 
   // ── ESTRELAS (temas noturnos, redesenhadas no update) ─────────
   starSeed=[]; // forçar reseed
   drawStars(themeIdx, worldW);
 
-  // ── COLINAS ────────────────────────────────────────────────────
+  // ── COLINAS, ÁRVORES E CASINHAS ────────────────────────────────
+  // Escondidas quando há ilustração do mundo — já vêm com colinas, árvores
+  // e casas bem mais detalhadas do que estas siluetas processuais, que só
+  // ficavam a "amarrotar" por cima da imagem (testado: fica com um véu
+  // esverdeado turvo em cima da relva já pintada).
   hillsGraphics.clear();
+  if (!showImage) {
   // Colinas traseiras — tom derivado do tema (não sempre verde)
   const backHillColor = isNight
     ? Phaser.Display.Color.IntegerToColor(T.skyTop).darken(10).color
@@ -857,6 +873,7 @@ export function applyBackground(scene,themeIdx,worldW,hazardDefs=[],bgImageKey=n
     hillsGraphics.fillStyle(0xffd700,1);
     hillsGraphics.fillCircle(doorX+doorW-3,doorY+doorH/2,2);
   });
+  } // fim if (!showImage) — colinas/árvores/casinhas
 
   // ── CHÃO com relva temática ────────────────────────────────────
   groundGraphics.clear();
