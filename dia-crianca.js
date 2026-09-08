@@ -730,6 +730,84 @@ window.addEventListener("DOMContentLoaded", () => {
   // Substitui o showRightRecovered simples por uma
   // animação de 3.2s com artefacto, nome e fala do VanBerto.
   // =====================================================
+  // Celebração de "nível concluído" — mostra-se ANTES da revelação do
+  // artefacto: título + estrelas a aparecer uma a uma + VanBerto's a
+  // celebrar + confetti. onContinue() só corre quando o jogador toca
+  // "Continuar" (sem avanço automático, para não apressar ninguém).
+  function showLevelCompleteCelebration(levelIdx, onContinue) {
+    const overlay = document.getElementById("levelCompleteOverlay");
+    const panel   = document.getElementById("levelCompletePanel");
+    const nameEl  = document.getElementById("lcLevelName");
+    const starsWrap = document.getElementById("lcStars");
+    const unlockEl = document.getElementById("lcUnlock");
+    const confettiLayer = document.getElementById("lcConfettiLayer");
+    const btnContinue = document.getElementById("lcContinue");
+    if (!overlay || !panel) { onContinue?.(); return; }
+
+    const L = LEVELS[levelIdx];
+    const stars = starsForLevel(levelIdx);
+
+    if (nameEl) nameEl.textContent = L ? L.name : "";
+
+    // Reset estrelas
+    const starEls = starsWrap ? [...starsWrap.querySelectorAll(".lc-star")] : [];
+    starEls.forEach(s => s.classList.remove("lc-star--on"));
+
+    // Mensagem de desbloqueio — só faz sentido a meio de um mundo (o fim
+    // de mundo já tem a sua própria celebração própria, ver celebrateWorldComplete)
+    if (unlockEl) {
+      if (!isLastLevelOfRegion(levelIdx)) {
+        unlockEl.textContent = "🗺️ Próximo nível desbloqueado!";
+        unlockEl.style.display = "inline-block";
+      } else {
+        unlockEl.style.display = "none";
+      }
+    }
+
+    // Confetti — peças coloridas, posições/tempos aleatórios
+    if (confettiLayer) {
+      confettiLayer.innerHTML = "";
+      const colors = ["#ff6b8a", "#ffd700", "#7fe0ff", "#b0ff8a", "#ff9adf", "#ffa500"];
+      for (let i = 0; i < 24; i++) {
+        const piece = document.createElement("div");
+        piece.className = "lc-confetti-piece";
+        const left = Math.random() * 100;
+        const dur = 1.6 + Math.random() * 1.2;
+        const delay = Math.random() * 0.4;
+        const rot = 300 + Math.random() * 400;
+        piece.style.left = left + "%";
+        piece.style.background = colors[i % colors.length];
+        piece.style.animationDuration = dur + "s";
+        piece.style.animationDelay = delay + "s";
+        piece.style.setProperty("--lc-rot", rot + "deg");
+        confettiLayer.appendChild(piece);
+      }
+    }
+
+    ensureAudio();
+    SFX.levelComplete();
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden", "false");
+
+    // Estrelas a aparecer uma a uma, com um "ding" próprio para cada
+    starEls.forEach((s, i) => {
+      if (i >= stars) return;
+      setTimeout(() => {
+        s.classList.add("lc-star--on");
+        SFX.starDing(i);
+      }, 650 + i * 380);
+    });
+
+    if (btnContinue) {
+      btnContinue.onclick = () => {
+        SFX.coin?.();
+        overlay.classList.remove("show");
+        overlay.setAttribute("aria-hidden", "true");
+        onContinue?.();
+      };
+    }
+  }
+
   function showRightRecovered(levelIdx) {
     // ARTEFACTS[] e HISTORY[] estão alinhados pelos 20 níveis "de direitos" (0-19),
     // não pela posição bruta em LEVELS (que inclui os 3 bosses). Por isso usamos
@@ -3974,15 +4052,27 @@ window.addEventListener("DOMContentLoaded", () => {
                       showQuiz(pickQuizForLevel(currentLevel, LEVELS[currentLevel].quizTheme), (ok) => {
                         if(ok){
                           ensureAudio();
-                          if(currentLevel===LEVELS.length-1) SFX.finalWin(); else SFX.win();
                           finalizeLevelStars(currentLevel, livesLostThisLevel);
                           markLevelCompleted(currentLevel);
                           // Reavaliar conquistas AGORA, com a contagem de níveis já atualizada
                           // (a chamada dentro de showQuiz() corre antes de markLevelCompleted,
                           // por isso "Guardião", "Mestre" e "Lenda" nunca desbloqueavam — bug corrigido).
                           checkAchievements(mapProgress.levelsCompleted.length);
-                          showRightRecovered(currentLevel);
-                          nextLevel(scene);
+                          if (currentLevel === LEVELS.length - 1) {
+                            // Último nível do jogo — mantém-se o fluxo antigo; a festa
+                            // grande já acontece a seguir em showVictoryScreen().
+                            SFX.finalWin();
+                            showRightRecovered(currentLevel);
+                            nextLevel(scene);
+                          } else {
+                            // Todos os outros níveis — celebração nova primeiro
+                            // (título + estrelas a aparecer + VanBerto's + confetti),
+                            // só depois a revelação do artefacto de sempre.
+                            showLevelCompleteCelebration(currentLevel, () => {
+                              showRightRecovered(currentLevel);
+                              nextLevel(scene);
+                            });
+                          }
                         }
                       });
                     });

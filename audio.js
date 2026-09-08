@@ -105,6 +105,22 @@ export const SFX = {
     setTimeout(() => beep({ freq:700, dur:0.07, type:"square", vol:0.055, slideTo:840  }), 90);
     setTimeout(() => beep({ freq:840, dur:0.10, type:"square", vol:0.055, slideTo:1120 }), 180);
   },
+  // Fanfarra de "nível concluído" — mais festiva que win() (toca sempre que
+  // se acaba um nível), mas mais curta que finalWin() (só o fim do jogo).
+  levelComplete() {
+    const seq=[560,700,840,1120];
+    seq.forEach((n,i) => setTimeout(() =>
+      beep({ freq:n, dur:i<3?0.09:0.16, type:"square", vol:0.06, slideTo:n*1.1 }), i*100));
+    // Acorde final a fechar (3 notas juntas, tipo "tcham!")
+    setTimeout(() => {
+      [840,1120,1400].forEach((n,i)=>setTimeout(()=>beep({freq:n,dur:0.30,type:"triangle",vol:0.05,slideTo:n*1.04}),i*30));
+    }, seq.length*100+60);
+  },
+  // "Ding" curtinho — usado uma vez por estrela, ao aparecerem em sequência
+  starDing(pitch=0) {
+    const base=1050+pitch*220;
+    beep({ freq:base, dur:0.11, type:"triangle", vol:0.05, slideTo:base*1.35 });
+  },
   gameOver() {
     [330,262,196].forEach((n,i) => setTimeout(() => beep({ freq:n, dur:0.18, type:"square", vol:0.055, slideTo:n*0.75 }), i*220));
   },

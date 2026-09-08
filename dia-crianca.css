@@ -2427,6 +2427,123 @@ body.hc-mode .ar-name, body.hc-mode .ar-label { color: #ffff00 !important; }
 body.hc-mode .ar-speech { color: #fff !important; border-color: #fff !important; }
 
 /* =====================================================
+   NÍVEL CONCLUÍDO — celebração antes da revelação do artefacto
+   ===================================================== */
+#levelCompleteOverlay {
+  position: fixed; inset: 0;
+  display: none; align-items: center; justify-content: center;
+  z-index: 8800; pointer-events: none;
+  background: radial-gradient(circle at 50% 45%, rgba(255,215,0,0.16) 0%, rgba(10,4,20,0.55) 60%, rgba(10,4,20,0.75) 100%);
+}
+#levelCompleteOverlay.show { display: flex; pointer-events: auto; }
+
+#levelCompletePanel {
+  position: relative;
+  text-align: center;
+  font-family: 'Baloo 2', sans-serif;
+  padding: 20px;
+  max-width: 92vw;
+}
+
+.lc-vanberto {
+  height: clamp(70px, 14vw, 120px); width: auto;
+  margin: 0 auto 4px;
+  display: block;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5));
+  animation: lcVanbertoBounce 0.9s 0.5s ease-in-out infinite;
+  opacity: 0; animation-fill-mode: forwards;
+  animation-name: lcVanbertoIn, lcVanbertoBounce;
+  animation-duration: 0.5s, 0.9s;
+  animation-delay: 0s, 0.5s;
+  animation-iteration-count: 1, infinite;
+  animation-timing-function: cubic-bezier(.34,1.56,.64,1), ease-in-out;
+}
+@keyframes lcVanbertoIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.5) rotate(-15deg); }
+  to   { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+@keyframes lcVanbertoBounce {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50%      { transform: translateY(-16px) rotate(4deg); }
+}
+
+.lc-title {
+  font-size: clamp(28px, 6vw, 52px); font-weight: 800;
+  color: #fff6e8; -webkit-text-stroke: 2px #b5148a; paint-order: stroke fill;
+  text-shadow: 0 3px 0 #7a0a5c, 0 8px 24px rgba(0,0,0,0.5);
+  margin: 0 0 4px;
+  animation: lcTitlePop 0.5s 0.15s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes lcTitlePop {
+  from { opacity: 0; transform: scale(0.3) rotate(-8deg); }
+  60%  { transform: scale(1.12) rotate(3deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.lc-level-name {
+  font-size: clamp(13px, 2vw, 18px); font-weight: 700; color: #ffd9f0;
+  margin: 0 0 18px; opacity: 0;
+  animation: lcFadeUp 0.4s 0.5s ease-out both;
+}
+@keyframes lcFadeUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+.lc-stars {
+  display: flex; gap: clamp(6px, 1.5vw, 16px); justify-content: center;
+  margin-bottom: 16px;
+}
+.lc-star {
+  font-size: clamp(36px, 7vw, 64px); line-height: 1;
+  color: rgba(255,255,255,0.15);
+  text-shadow: none;
+  transform: scale(0.4) rotate(-25deg);
+  opacity: 0.6;
+  display: inline-block;
+  transition: none;
+}
+.lc-star.lc-star--on {
+  animation: lcStarPop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+  color: #ffd700;
+  text-shadow: 0 0 18px rgba(255,215,0,0.85), 0 0 36px rgba(255,215,0,0.5);
+}
+@keyframes lcStarPop {
+  0%   { transform: scale(0.3) rotate(-45deg); opacity: 0; }
+  55%  { transform: scale(1.35) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.lc-unlock {
+  font-size: clamp(13px, 2.2vw, 18px); font-weight: 800; color: #ffe680;
+  background: rgba(20,5,46,0.7); border: 2px solid rgba(255,215,0,0.4);
+  border-radius: 999px; padding: 6px 18px; margin: 0 0 18px; display: inline-block;
+  animation: lcFadeUp 0.4s 0.2s ease-out both;
+}
+
+.lc-continue-btn {
+  font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: clamp(14px, 2.2vw, 18px);
+  color: #fff6e8; background: linear-gradient(180deg, #ff8a4a 0%, #ff6b35 100%);
+  border: 2px solid #ffd700; border-radius: 999px;
+  padding: 10px 30px; cursor: pointer;
+  box-shadow: 0 4px 0 #b83e10, 0 8px 20px rgba(0,0,0,0.4);
+  opacity: 0; animation: lcFadeUp 0.4s 0.9s ease-out both;
+}
+.lc-continue-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #b83e10; }
+
+.lc-confetti-layer { position: absolute; inset: -40px 0 auto 0; height: 0; pointer-events: none; overflow: visible; }
+.lc-confetti-piece {
+  position: absolute; top: -20px;
+  width: 9px; height: 14px;
+  animation: lcConfettiFall linear forwards;
+  opacity: 0.95;
+}
+@keyframes lcConfettiFall {
+  to { transform: translateY(115vh) rotate(var(--lc-rot, 480deg)); opacity: 0.4; }
+}
+
+body.hc-mode #levelCompletePanel .lc-title { color: #ffff00 !important; -webkit-text-stroke: 0 !important; }
+body.hc-mode .lc-star.lc-star--on { color: #ffff00 !important; }
+
+
+/* =====================================================
    BÓNUS DE CONJUNTO
    ===================================================== */
 #setBonusOverlay {
