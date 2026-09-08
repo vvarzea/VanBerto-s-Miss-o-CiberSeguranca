@@ -1346,7 +1346,32 @@ body.hc-mode .menu-tile span { color: #ffff00 !important; }
 /* =====================================================
    MAPA DA AVENTURA (FASE 1)
    ===================================================== */
-.map-card { width: min(680px, 96vw) !important; }
+#mapOverlay { padding: 0; place-items: stretch; }
+.map-card {
+  width: 100vw !important;
+  height: 100vh; height: 100dvh;
+  max-width: none;
+  border-radius: 0;
+  box-sizing: border-box;
+  display: flex; flex-direction: column; justify-content: center;
+  overflow-y: auto;
+  padding: clamp(16px, 4vw, 40px) clamp(16px, 5vw, 56px);
+}
+/* Conteúdo interno num corredor legível — o cartão em si é que enche o
+   ecrã, para não ficar texto/grelha esticado de ponta a ponta em monitores
+   largos. */
+/* Conteúdo interno num corredor legível — o cartão em si é que enche o
+   ecrã, para não ficar texto/grelha esticado de ponta a ponta em monitores
+   largos. (Note: não usar ">*", isso também alargava o .card-seal, que é
+   um emblema pequeno posicionado em absoluto no canto.) */
+.map-card > h2,
+.map-card > .map-progress-line,
+.map-card > .map-progress-track,
+.map-card > .map-regions-grid,
+.map-card > .map-hint,
+.map-card > .row {
+  width: 100%; max-width: 920px; margin-left: auto; margin-right: auto;
+}
 .map-progress-line {
   text-align: center;
   font-size: 13px; font-weight: 800;
