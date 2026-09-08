@@ -70,10 +70,10 @@ export const BOSSES = [
     defeatLine: "Nãoo! Viste através do meu disfarce!",
     quizTheme: "phishing",
     hp: 3,
-    // Tema próprio (em vez do índigo/roxo-noturno nº16, que se confundia
-    // com o próprio Monstro — também roxo): castanho-ouro quente, para o
-    // vilão roxo se destacar claramente do fundo.
-    themeIdx: 15,
+    // Tema próprio removido — os temas passaram a estar agrupados por
+    // família de mundo (ver data-levels.js/THEMES), por isso "saltar" para
+    // um índice de outro mundo já não faz sentido; a arena usa agora o
+    // mesmo tema/imagem do nível anterior, como todos os outros ecrãs.
     rightRecovered: { emoji: "🕵️", name: "Alerta Anti-Phishing" },
     // Arena simples: do tamanho da janela (960x540, sem scroll), chão
     // principal + só 2 plataformas baixas para dar alguma variedade ao salto.
@@ -177,7 +177,7 @@ export const BOSSES = [
     defeatLine: "Argh! O antivírus... venceu-me!",
     quizTheme: "virus_malware",
     hp: 3,                     // 4→3: agora são sempre 3 saltos na cabeça, como os outros bosses "stomp"
-    themeIdx: 13,              // teal escuro noturno — contrasta com o âmbar/preto do boss
+    // themeIdx próprio removido — ver comentário igual no boss do phishing.
     rightRecovered: { emoji: "🛡️", name: "Dispositivo Protegido" },
     // Arena do tamanho do ecrã (960x540, sem scroll) — chão principal +
     // 2 plataformas baixas, tal como o Monstro do Phishing.
@@ -248,7 +248,7 @@ export const BOSSES = [
     defeatLine: "A tua privacidade... venceu-me!",
     quizTheme: "contacto_desconhecidos",
     hp: 3,                     // 4→3: agora são sempre 3 saltos na cabeça
-    themeIdx: 11,              // azul oceano noturno — fortaleza escura, sem exagerar no preto
+    // themeIdx próprio removido — ver comentário igual no boss do phishing.
     rightRecovered: { emoji: "🔐", name: "Privacidade Protegida" },
     // Arena do tamanho do ecrã, tal como o Monstro — 3 pontos de teletransporte
     // (spawnSpots) ajustados à nova largura de 960px em vez de 1600px.
@@ -307,7 +307,7 @@ export const BOSSES = [
     defeatLine: "As minhas mensagens... foram todas bloqueadas!",
     quizTheme: "spam_compras",
     hp: 3,                     // 5→3: agora são sempre 3 saltos na cabeça
-    themeIdx: 9,                // âmbar dourado enevoado — céu poluído, ainda de dia
+    // themeIdx próprio removido — ver comentário igual no boss do phishing.
     rightRecovered: { emoji: "📭", name: "Caixa de Correio Limpa" },
     // Arena do tamanho do ecrã, tal como o Monstro.
     arena: {

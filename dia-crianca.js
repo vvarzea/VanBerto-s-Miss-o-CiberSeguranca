@@ -371,6 +371,11 @@ window.addEventListener("DOMContentLoaded", () => {
     2: "bg_mundo1_n3e4", // Nível 3
     3: "bg_mundo1_n3e4", // Nível 4
     4: "bg_mundo1_n5",   // Nível 5
+    5: "bg_mundo2_n6e7", // Nível 6
+    6: "bg_mundo2_n6e7", // Nível 7
+    7: "bg_mundo2_n8",   // Nível 8
+    8: "bg_mundo2_n9",   // Nível 9
+    9: "bg_mundo3_n10",  // Nível 10
   };
 
   // Chave da textura Phaser (pré-carregada em preload()) com a ilustração
@@ -1146,6 +1151,10 @@ window.addEventListener("DOMContentLoaded", () => {
     this.load.image("bg_mundo1_n1e2", "mundo1_n1e2.jpg");
     this.load.image("bg_mundo1_n3e4", "mundo1_n3e4.jpg");
     this.load.image("bg_mundo1_n5", "mundo1_n5.jpg");
+    this.load.image("bg_mundo2_n6e7", "mundo2_n6e7.jpg");
+    this.load.image("bg_mundo2_n8", "mundo2_n8.jpg");
+    this.load.image("bg_mundo2_n9", "mundo2_n9.jpg");
+    this.load.image("bg_mundo3_n10", "mundo3_n10.jpg");
   }
 
   function initPhaser() {
@@ -3627,7 +3636,7 @@ window.addEventListener("DOMContentLoaded", () => {
         hideMainLevelForRoom();
         scene.physics.world.setBounds(0,0,ROOM_WORLD_W,514);
         scene.cameras.main.setBounds(0,0,ROOM_WORLD_W,540);
-        applyBackground(scene, ROOM_THEME_IDX, ROOM_WORLD_W, []);
+        applyBackground(scene, ROOM_THEME_IDX, ROOM_WORLD_W, [], bgKeyForLevel(currentLevel));
         buildSecretRoomContents(scene, p.kind, p.key, p.fact);
 
         player.x = 420; player.y = ROOM_LANDING_Y - 18;

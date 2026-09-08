@@ -1450,20 +1450,18 @@ body.hc-mode .map-progress-fill { background: #ffff00 !important; }
    botões redondos por cima, posicionados ao longo do caminho visível
    na própria imagem (ver nodePos em MAP_REGIONS, data-progression.js).
    ===================================================== */
-#worldMapOverlay { padding: 16px; }
+#worldMapOverlay { padding: 0; }
 .world-map-panel {
   position: relative;
-  width: min(1000px, 96vw);
-  aspect-ratio: 16 / 9;
-  border-radius: 18px;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* viewports com barras do browser (telemóvel) */
+  border-radius: 0;
   overflow: hidden;
   background-size: cover;
   background-position: center;
   background-color: #2a0a4e; /* enquanto a imagem carrega */
-  box-shadow:
-    0 0 0 3px #e0209a,
-    0 0 0 6px #ffd700,
-    0 20px 50px rgba(0,0,0,0.55);
+  box-shadow: inset 0 0 0 3px #e0209a, inset 0 0 0 6px #ffd700;
 }
 .world-map-panel::before {
   content: "";
