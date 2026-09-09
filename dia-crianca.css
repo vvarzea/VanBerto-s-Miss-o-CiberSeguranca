@@ -1603,9 +1603,21 @@ body.hc-mode .map-progress-fill { background: #ffff00 !important; }
 
 .level-node-stars {
   position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
-  font-size: clamp(6px,1.4vw,9px); white-space: nowrap; color: #ffd700;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.6);
+  font-size: clamp(6px,1.4vw,9px); white-space: nowrap;
 }
+/* Estrela ganha: dourada e com brilho. Estrela não-ganha: mesmo glifo "★",
+   mas apagada/cinzenta e sem brilho — assim as duas ficam claramente
+   diferentes mesmo neste tamanho minúsculo (ver correção acima em dia-crianca.js). */
+.level-node-star--on {
+  color: #ffd700;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.6), 0 0 4px rgba(255,215,0,0.7);
+}
+.level-node-star--off {
+  color: rgba(255,255,255,0.3);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+}
+body.hc-mode .level-node-star--on { color: #ffff00 !important; }
+body.hc-mode .level-node-star--off { color: rgba(255,255,255,0.25) !important; }
 
 /* VanBerto's a "pousar" no nível atual — reforça a sensação de aventura:
    é o próprio jogador (representado pelo robô) que está ali parado. */

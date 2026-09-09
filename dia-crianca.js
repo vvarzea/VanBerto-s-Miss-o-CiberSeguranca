@@ -545,7 +545,21 @@ window.addEventListener("DOMContentLoaded", () => {
       } else {
         if (status === "done") {
           const stars = starsForLevel(idx);
-          btn.innerHTML = `✓<span class="level-node-stars">${"★".repeat(stars)}${"☆".repeat(3 - stars)}</span>`;
+          // BUG CORRIGIDO: usava "★".repeat(stars) + "☆".repeat(3-stars) com a
+          // MESMA cor dourada (#ffd700) aplicada ao span todo — ao tamanho
+          // minúsculo deste crachá (6-9px), a estrela vazia "☆" (só um
+          // contorno) ficava visualmente indistinguível da estrela cheia "★"
+          // depois de colorida a dourado, por isso QUALQUER nível concluído
+          // parecia ter sempre 3 estrelas, mesmo tendo ganho só 1 ou 2.
+          // Agora cada estrela é o MESMO glifo cheio "★", mas as não-ganhas
+          // ficam com uma classe "--off" (cor apagada, sem brilho) e só as
+          // ganhas ficam douradas — igual à técnica já usada e comprovada no
+          // ecrã de fim de nível (.lc-star / .lc-star--on).
+          let starsHTML = "";
+          for (let s = 0; s < 3; s++) {
+            starsHTML += `<span class="level-node-star${s < stars ? " level-node-star--on" : " level-node-star--off"}">★</span>`;
+          }
+          btn.innerHTML = `✓<span class="level-node-stars">${starsHTML}</span>`;
           btn.setAttribute("aria-label", `Nível ${levelNum} — concluído, ${stars} estrelas. Toca para repetir.`);
         } else {
           btn.innerHTML = String(levelNum);
