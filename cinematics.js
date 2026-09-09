@@ -91,8 +91,9 @@ export function playCinematic(slides, onComplete, bars = true) {
     if (finished) return;
     finished = true;
     clearTimeout(showTimer);
-    dialogEl.removeEventListener("click", advance);
-    document.getElementById("cineSkip").removeEventListener("click", finish);
+    dialogEl.onclick = null; dialogEl.ontouchend = null;
+    const skipBtn = document.getElementById("cineSkip");
+    skipBtn.onclick = null; skipBtn.ontouchend = null;
     // Sair na ordem inversa: diálogo desce primeiro, barras fecham a seguir.
     dialogEl.classList.remove("cine-show");
     setTimeout(() => {
@@ -102,8 +103,17 @@ export function playCinematic(slides, onComplete, bars = true) {
   }
 
   render();
-  dialogEl.addEventListener("click", advance);
-  document.getElementById("cineSkip").addEventListener("click", finish);
+  // BUG CORRIGIDO: só "click" ficava por vezes surdo a toques em telemóvel/
+  // tablet (a sequência touchstart→touchend→click do browser pode falhar a
+  // converter num "click" — mesma razão pela qual o quiz já usa bindTap()).
+  // Sem "touchend" aqui, e sem nenhum temporizador de recurso, um toque que
+  // não vire "click" deixava o diálogo do boss (entrada ou vitória) parado
+  // para sempre — é este o bug do jogo "bloquear no nível do boss".
+  dialogEl.onclick = advance;
+  dialogEl.ontouchend = (e) => { e.preventDefault(); advance(); };
+  const skipBtn = document.getElementById("cineSkip");
+  skipBtn.onclick = finish;
+  skipBtn.ontouchend = (e) => { e.preventDefault(); finish(); };
 }
 
 function ensureTitleDOM() {
@@ -137,11 +147,12 @@ export function playTitleCard(data, onComplete) {
     lineEl.textContent = lines[i];
   }
   function finish() {
-    titleEl.removeEventListener("click", advance);
+    titleEl.onclick = null; titleEl.ontouchend = null;
     titleEl.classList.remove("show");
     setTimeout(() => onComplete?.(), 320);
   }
-  titleEl.addEventListener("click", advance);
+  titleEl.onclick = advance;
+  titleEl.ontouchend = (e) => { e.preventDefault(); advance(); };
   // avança sozinho ao fim de um tempo generoso, caso ninguém toque
   clearTimeout(titleEl._autoTimer);
   titleEl._autoTimer = setTimeout(() => { if (titleEl.classList.contains("show")) finish(); }, 2600 * lines.length);

@@ -41,7 +41,13 @@ export function markFirstTryThisLevel() { quizFirstTryThisLevel = true; }
 export function finalizeLevelStars(idx, livesLostThisLevel) {
   const L = LEVELS[idx];
   const hasSecrets = !!(L && L.secrets && L.secrets.length);
-  const rec = levelStars[idx] || { secret:false, noDamage:false, firstTry:false };
+  // BUG CORRIGIDO: isto lia o record já guardado (levelStars[idx] || {...}) e
+  // só ACRESCENTAVA flags a "true", nunca as repunha — por isso, assim que um
+  // nível ganhava as 3 estrelas uma única vez, ficava preso em 3/3 para
+  // sempre, mesmo que uma repetição perdesse vidas, não encontrasse o
+  // segredo ou errasse a pergunta à primeira. Agora cada finalização reflete
+  // só a tentativa que acabou de terminar.
+  const rec = { secret:false, noDamage:false, firstTry:false };
   // Se o nível não tem segredos, a 1ª estrela é concedida automaticamente ao concluir
   if (!hasSecrets) rec.secret = true;
   else if (secretsFoundThisLevel > 0) rec.secret = true;

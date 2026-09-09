@@ -371,11 +371,21 @@ window.addEventListener("DOMContentLoaded", () => {
     2: "bg_mundo1_n3e4", // Nível 3
     3: "bg_mundo1_n3e4", // Nível 4
     4: "bg_mundo1_n5",   // Nível 5
-    5: "bg_mundo2_n6e7", // Nível 6
-    6: "bg_mundo2_n6e7", // Nível 7
+    5: "bg_mundo2_n6",   // Nível 6
+    6: "bg_mundo2_n7",   // Nível 7
     7: "bg_mundo2_n8",   // Nível 8
     8: "bg_mundo2_n9",   // Nível 9
-    9: "bg_mundo3_n10",  // Nível 10
+    9: "bg_mundo3_n10e11", // Nível 10
+    10: "bg_mundo3_n10e11", // Nível 11
+    11: "bg_mundo3_n12e13", // Nível 12
+    12: "bg_mundo3_n12e13", // Nível 13
+    13: "bg_mundo3_n14e15", // Nível 14
+    14: "bg_mundo3_n14e15", // Nível 15
+    15: "bg_mundo4_n16e17", // Nível 16
+    16: "bg_mundo4_n16e17", // Nível 17
+    17: "bg_mundo4_n18e19", // Nível 18
+    18: "bg_mundo4_n18e19", // Nível 19
+    19: "bg_mundo4_n20",    // Nível 20 (final)
   };
 
   // Chave da textura Phaser (pré-carregada em preload()) com a ilustração
@@ -1228,17 +1238,27 @@ window.addEventListener("DOMContentLoaded", () => {
     this.load.image("bg_protecao", "map-mundo3.jpg");
     this.load.image("bg_participacao", "map-mundo4.jpg");
 
-    // Fundos por NÍVEL (mais detalhados que os do mapa) — por agora só o
-    // Mundo 1; os outros mundos continuam a usar a imagem única do mapa
-    // (bg_origens/desenvolvimento/protecao/participacao) até termos as suas
-    // versões por nível.
+    // Fundos por NÍVEL (mais detalhados que os do mapa) — os 4 Mundos têm
+    // agora fundo dedicado por nível (alguns partilhados entre pares); a
+    // imagem única do mapa (bg_origens/desenvolvimento/protecao/participacao)
+    // já só é usada como reserva para níveis "soltos" sem mundo atribuído.
     this.load.image("bg_mundo1_n1e2", "mundo1_n1e2.jpg");
     this.load.image("bg_mundo1_n3e4", "mundo1_n3e4.jpg");
     this.load.image("bg_mundo1_n5", "mundo1_n5.jpg");
-    this.load.image("bg_mundo2_n6e7", "mundo2_n6e7.jpg");
+    this.load.image("bg_mundo2_n6", "mundo2_n6.jpg");
+    this.load.image("bg_mundo2_n7", "mundo2_n7.jpg");
     this.load.image("bg_mundo2_n8", "mundo2_n8.jpg");
     this.load.image("bg_mundo2_n9", "mundo2_n9.jpg");
-    this.load.image("bg_mundo3_n10", "mundo3_n10.jpg");
+    this.load.image("bg_mundo3_n10e11", "mundo3_n10e11.jpg");
+    this.load.image("bg_mundo3_n12e13", "mundo3_n12e13.jpg");
+    this.load.image("bg_mundo3_n14e15", "mundo3_n14e15.jpg");
+    this.load.image("bg_mundo4_n16e17", "mundo4_n16e17.jpg");
+    this.load.image("bg_mundo4_n18e19", "mundo4_n18e19.jpg");
+    this.load.image("bg_mundo4_n20", "mundo4_n20.jpg");
+    // Fundo fixo das salas secretas (canos) — o mesmo em TODOS os mundos/níveis,
+    // de propósito (ver ROOM_THEME_IDX): reforça que o jogador entrou numa
+    // "sala secreta", reconhecível de imediato, independentemente de onde veio.
+    this.load.image("bg_sala_secreta", "sala_secreta.jpg");
   }
 
   function initPhaser() {
@@ -3723,7 +3743,7 @@ window.addEventListener("DOMContentLoaded", () => {
         hideMainLevelForRoom();
         scene.physics.world.setBounds(0,0,ROOM_WORLD_W,514);
         scene.cameras.main.setBounds(0,0,ROOM_WORLD_W,540);
-        applyBackground(scene, ROOM_THEME_IDX, ROOM_WORLD_W, [], bgKeyForLevel(currentLevel));
+        applyBackground(scene, ROOM_THEME_IDX, ROOM_WORLD_W, [], "bg_sala_secreta");
         buildSecretRoomContents(scene, p.kind, p.key, p.fact);
 
         player.x = 420; player.y = ROOM_LANDING_Y - 18;
