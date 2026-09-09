@@ -2782,6 +2782,19 @@ body.cine-active .cine-bar-top,body.cine-active .cine-bar-bottom{height:13vh;}
 #cineDialog{
   position:fixed; left:50%; bottom:0; transform:translate(-50%,120%);
   width:min(640px,92vw); z-index:9560;
+  /* CORRIGIDO: sem box-sizing:border-box, o padding e a borda somavam-se por
+     cima do "width" (box-sizing por omissão é content-box) — a caixa acabava
+     sempre mais larga do que o "width" declarado (ex.: no telemóvel, 96vw
+     de largura + padding + borda facilmente ultrapassava a própria largura
+     do ecrã). Como a caixa flutuante (.cine-floating, usada na entrada do
+     boss) se posiciona em JS a partir de uma margem calculada a pensar
+     exactamente neste "width" (ver dialogHalfWidth() em dia-crianca.js),
+     uma caixa mais larga do que o assumido saía do ecrã — incluindo, por
+     vezes, o próprio botão "⏭ Saltar" lá dentro — sem nada tocável nessa
+     parte cortada, dando a sensação de o jogo "bloquear" ao início do boss.
+     border-box garante que "width" já inclui padding+borda, batendo certo
+     com o que o JS assume. */
+  box-sizing:border-box;
   display:flex; align-items:flex-start; gap:12px;
   background:rgba(6,10,28,0.94); border:2px solid #80c8ff; border-radius:16px 16px 0 0;
   padding:14px 18px 16px; box-shadow:0 -4px 24px rgba(0,0,0,0.5), 0 0 20px rgba(128,200,255,0.25);

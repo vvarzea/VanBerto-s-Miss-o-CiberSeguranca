@@ -82,6 +82,28 @@ window.addEventListener("DOMContentLoaded", () => {
     playCinematic(slides, onComplete, false);
   }
 
+  // Meia-largura REAL da caixa flutuante #cineDialog (dia-crianca.css), usada
+  // por bossDialogueAnchor/vbDialogueAnchor para não a deixar sair do ecrã.
+  // CORRIGIDO: esta conta vivia duplicada nas duas funções e não batia certo
+  // com o CSS — assumia sempre "width:92vw", mas o CSS tem uma media query
+  // (max-width:600px, ou seja, QUALQUER telemóvel) que muda a largura para
+  // "96vw". Em conjunto com a falta de box-sizing:border-box no CSS (ver
+  // dia-crianca.css, #cineDialog — corrigido também), a caixa acabava mais
+  // larga do que esta conta previa, saindo parcialmente do ecrã em qualquer
+  // telemóvel — incluindo, por vezes, o próprio botão "⏭ Saltar" lá dentro,
+  // sem nada tocável nessa parte cortada. Sem conseguir tocar na caixa nem
+  // no "Saltar", o jogo só desbloqueava sozinho ao fim do temporizador de 9s
+  // por fala (ver armAutoAdvance em cinematics.js) — dava exatamente a
+  // sensação de "bloqueia ao começar o boss" reportada. Agora que o CSS usa
+  // border-box, "width" já é a largura total real — só falta espelhar aqui
+  // a mesma media query. Qualquer alteração ao "width"/breakpoint no CSS de
+  // #cineDialog tem de vir acompanhada da mesma alteração aqui.
+  function dialogHalfWidth() {
+    const isNarrow = window.innerWidth <= 600;
+    const cssWidth = isNarrow ? window.innerWidth * 0.96 : Math.min(640, window.innerWidth * 0.92);
+    return cssWidth / 2;
+  }
+
   // Calcula, em pixels CSS de ecrã, o ponto por cima da cabeça do boss —
   // usado para o balão de fala dele flutuar ali em vez de ficar fixo no
   // fundo do ecrã (ver s.anchor em cinematics.js). Devolve null se não
@@ -102,11 +124,8 @@ window.addEventListener("DOMContentLoaded", () => {
     let x = rect.left + (b.x - cam.scrollX) * scaleX;
     let y = rect.top + (b.y - aboveHead - cam.scrollY) * scaleY;
     // Não deixar o balão sair do ecrã pelas laterais. A margem tem de
-    // acompanhar a largura REAL da caixa (#cineDialog usa width:min(640px,92vw)
-    // — até 320px de meia-largura); um valor fixo de 130px (sobrado de uma
-    // caixa mais pequena) deixava a caixa sair do ecrã sempre que o ponto de
-    // ancoragem ficava perto da borda, cortando o início do texto/nome.
-    const halfDialogW = Math.min(640, window.innerWidth*0.92)/2 + 12;
+    // acompanhar a largura REAL da caixa — ver dialogHalfWidth() acima.
+    const halfDialogW = dialogHalfWidth() + 12;
     x = Math.max(rect.left+halfDialogW, Math.min(rect.right-halfDialogW, x));
     // CORREÇÃO: faltava impedir o balão de saltar por cima do topo do ecrã
     // (só x estava limitado). Se a "cabeça" do boss ficasse perto do topo do
@@ -134,8 +153,8 @@ window.addEventListener("DOMContentLoaded", () => {
     const aboveHead = (player.displayHeight/2 || 36) + 40;
     let x = rect.left + (player.x - cam.scrollX) * scaleX;
     let y = rect.top + (player.y - aboveHead - cam.scrollY) * scaleY;
-    // Mesma margem dinâmica que bossDialogueAnchor() — ver comentário lá.
-    const halfDialogW = Math.min(640, window.innerWidth*0.92)/2 + 12;
+    // Mesma margem dinâmica que bossDialogueAnchor() — ver dialogHalfWidth() acima.
+    const halfDialogW = dialogHalfWidth() + 12;
     x = Math.max(rect.left+halfDialogW, Math.min(rect.right-halfDialogW, x));
     // Mesma correção de y que bossDialogueAnchor() — ver comentário lá.
     y = Math.max(rect.top + 90, y);
