@@ -17,7 +17,7 @@ import { PRAISE, PAUSE_TIPS, LEVEL_ENTRY_PHRASES, DYNAMIC_MSGS_CORRECT, DYNAMIC_
          VB_LEVEL_INTRO, VB_HIT, VB_QUIZ_CORRECT, VB_QUIZ_WRONG, VB_STAR_POWER, VB_PERFECT_LEVEL } from "./data-flavor.js";
 import { ensureAudio, beep, SFX, isMuted, setMuted, toggleMuted } from "./audio.js";
 import { starsForLevel, totalStarsEarned, resetLevelStarTracking, finalizeLevelStars,
-         resetAllStars } from "./stars.js";
+         resetAllStars, getStarRecord } from "./stars.js";
 import { unlockedAchievements, checkAchievements, onSecretFoundForAchievements,
          onHistoryReadForAchievements, onCorrectAnswerForAchievements, renderAchievements,
          resetAchievements, showAchievementToast, onSecretRoomFoundForAchievements } from "./achievements.js";
@@ -784,13 +784,31 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btnCloseQuiz")?.classList.add("hidden");
 
     const L = LEVELS[levelIdx];
-    const stars = starsForLevel(levelIdx);
 
     if (nameEl) nameEl.textContent = L ? L.name : "";
 
+    // CLARIFICAÇÃO: antes, as estrelas só se acendiam pela ORDEM (1ª, 2ª,
+    // 3ª), sem ligação a um critério fixo — um jogador com 2 estrelas nunca
+    // sabia QUAL critério faltou para a 3ª. Agora cada posição representa
+    // SEMPRE o mesmo critério (1=segredo, 2=sem perder vidas, 3=1ª
+    // tentativa), com uma legenda por baixo, e só acende se esse critério
+    // específico tiver sido mesmo cumprido nesta tentativa.
+    const rec = getStarRecord(levelIdx);
+    const hasSecrets = !!(L && L.secrets && L.secrets.length);
+    const starCriteria = [
+      { on: rec.secret,   label: hasSecrets ? "🔍 Segredo encontrado" : "🗺️ Nível concluído" },
+      { on: rec.noDamage, label: "❤️ Sem perder vidas" },
+      { on: rec.firstTry, label: "🎯 Acertaste à 1ª tentativa" }
+    ];
+
     // Reset estrelas
-    const starEls = starsWrap ? [...starsWrap.querySelectorAll(".lc-star")] : [];
+    const starEls  = starsWrap ? [...starsWrap.querySelectorAll(".lc-star")] : [];
+    const labelEls  = starsWrap ? [...starsWrap.querySelectorAll(".lc-star-label")] : [];
     starEls.forEach(s => s.classList.remove("lc-star--on"));
+    labelEls.forEach((lbl, i) => {
+      lbl.textContent = starCriteria[i] ? starCriteria[i].label : "";
+      lbl.classList.remove("lc-star-label--on");
+    });
 
     // Mensagem de desbloqueio — só faz sentido a meio de um mundo (o fim
     // de mundo já tem a sua própria celebração própria, ver celebrateWorldComplete)
@@ -828,11 +846,13 @@ window.addEventListener("DOMContentLoaded", () => {
     overlay.classList.add("show");
     overlay.setAttribute("aria-hidden", "false");
 
-    // Estrelas a aparecer uma a uma, com um "ding" próprio para cada
+    // Estrelas a aparecer uma a uma, com um "ding" próprio para cada —
+    // cada uma só acende se o SEU critério específico foi cumprido.
     starEls.forEach((s, i) => {
-      if (i >= stars) return;
+      if (!starCriteria[i] || !starCriteria[i].on) return;
       setTimeout(() => {
         s.classList.add("lc-star--on");
+        if (labelEls[i]) labelEls[i].classList.add("lc-star-label--on");
         SFX.starDing(i);
       }, 650 + i * 380);
     });
@@ -4147,6 +4167,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const elTitle  = document.getElementById("ltTitle");
     const elPhrase = document.getElementById("ltPhrase");
     const elName   = document.getElementById("ltName");
+    const elTap    = document.getElementById("ltTap");
     if(!ov){ onMidpoint?.(); onComplete?.(); return; }
 
     // Cor do céu do nível seguinte
@@ -4182,6 +4203,12 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     elName.style.color   = nameCol;
     elName.textContent   = playerName ? `✨ Vai, ${playerName}! ✨` : "✨ Vai lá! ✨";
+    // BUG CORRIGIDO: "toca para continuar" nunca tinha cor própria definida
+    // — ficava sempre com a cor de texto padrão do browser (preto), que
+    // desaparecia quase por completo sobre fundos escuros (a maioria dos
+    // níveis). Agora segue a mesma cor clara/escura escolhida para o resto
+    // do texto deste ecrã, consoante o fundo do nível seguinte.
+    if (elTap) elTap.style.color = nameCol;
 
     // Mostrar overlay com fade-in CSS
     ov.style.opacity   = "0";

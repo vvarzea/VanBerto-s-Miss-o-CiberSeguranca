@@ -25,6 +25,14 @@ export function starsForLevel(idx) {
   if (!rec) return 0;
   return (rec.secret ? 1 : 0) + (rec.noDamage ? 1 : 0) + (rec.firstTry ? 1 : 0);
 }
+// Devolve o registo completo (secret/noDamage/firstTry) de um nível, para que
+// o ecrã de "Nível Concluído" possa mostrar exatamente QUAL critério foi
+// cumprido em cada estrela, e não só quantas estrelas no total — pedido
+// explicitamente para deixar claro o que faltou para a 3ª estrela.
+export function getStarRecord(idx) {
+  const rec = levelStars[idx];
+  return rec ? rec : { secret:false, noDamage:false, firstTry:false };
+}
 export function totalStarsEarned() {
   return Object.keys(levelStars).reduce((sum, k) => sum + starsForLevel(k), 0);
 }
