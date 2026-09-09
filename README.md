@@ -319,3 +319,16 @@ do boss (`playCinematic`/`playBossDialogue`):
    tocar. Adicionado um limite mínimo de y.
 
 Ficheiros tocados: `cinematics.js`, `dia-crianca.js`.
+
+## Correção — popup "⭐⭐⭐ +50 Nível Perfeito!" mentia sobre as estrelas
+
+Este popup só verificava "não perdeste vidas neste nível" — mas isso é só 1
+dos 3 critérios reais das estrelas (ver stars.js: segredo + sem-dano +
+acertar o quiz à primeira). Um nível terminado sem perder vidas mas sem
+encontrar o segredo (ou sem acertar o quiz à primeira) ficava correctamente
+com 2/3 estrelas no ecrã de fim de nível — mas este popup à parte continuava
+a dizer sempre "⭐⭐⭐ Nível Perfeito!", dando a falsa impressão de um bug na
+contagem de estrelas. Agora só mostra as 3 estrelas se as 3 tiverem mesmo
+sido ganhas; caso contrário mostra "🛡️ +50 Sem perder vidas!".
+
+Ficheiro tocado: `dia-crianca.js`.

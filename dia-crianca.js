@@ -6436,7 +6436,21 @@ window.addEventListener("DOMContentLoaded", () => {
     scene.physics.pause();
 
     if(livesLostThisLevel===0){
-      score+=50; bonusStars.textContent="⭐⭐⭐\n+50 Nível Perfeito!";
+      // BUG CORRIGIDO: este bónus dizia sempre "⭐⭐⭐ Nível Perfeito!" só por
+      // não teres perdido vidas nesse nível — mas isso é só UM dos 3
+      // critérios reais (ver stars.js: segredo + sem-dano + acertar à
+      // primeira). Um nível sem segredo encontrado ou sem acertar o quiz à
+      // primeira ficava corretamente com 2 estrelas no ecrã de fim de nível
+      // (showLevelCompleteCelebration, que usa starsForLevel de verdade) mas
+      // este popup à parte continuava a anunciar "3 estrelas" — dando a
+      // impressão de um bug de contagem. Agora só mostra "⭐⭐⭐ Nível
+      // Perfeito!" se as 3 estrelas reais tiverem sido mesmo ganhas; caso
+      // contrário mostra um bónus mais honesto, só pelo "sem perder vidas".
+      const realStars = starsForLevel(currentLevel);
+      score+=50;
+      bonusStars.textContent = (realStars === 3)
+        ? "⭐⭐⭐\n+50 Nível Perfeito!"
+        : "🛡️\n+50 Sem perder vidas!";
       bonusStars.classList.add("show"); setTimeout(()=>bonusStars.classList.remove("show"),2000);
     }
     livesLostThisLevel=0;
