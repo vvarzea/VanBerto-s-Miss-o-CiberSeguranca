@@ -48,7 +48,7 @@ export const ARTEFACTS = [
 ];
 
 export const ARTEFACT_SETS = [
-  { name:"Fundamentos da Ciberseguranca", icon:"🌐", bonus:150 },
+  { name:"Fundamentos da Cibersegurança", icon:"🌐", bonus:150 },
   { name:"Comunicação Segura",            icon:"📡", bonus:150 },
   { name:"Proteção Digital",              icon:"🛡️", bonus:150 },
   { name:"Identidade e Privacidade",      icon:"🔒", bonus:200 },
@@ -58,7 +58,7 @@ export const SET_REACTIONS = [
   "🎉 Conjunto FUNDAMENTOS completo! És um verdadeiro pioneiro da internet!",
   "📡 Conjunto COMUNICAÇÃO completo! Ninguém te engana com fake news ou phishing!",
   "🛡️ Conjunto PROTEÇÃO completo! Os teus dispositivos estão sempre seguros!",
-  "🔒 Conjunto COMPLETO! GUARDIÃO SUPREMO da Ciberseguranca!",
+  "🔒 Conjunto COMPLETO! GUARDIÃO SUPREMO da Cibersegurança!",
 ];
 
 export const ACHIEVEMENTS_DEFS = [
@@ -67,7 +67,7 @@ export const ACHIEVEMENTS_DEFS = [
   { id:"explorador",       tier:"🥈", name:"Explorador",               desc:"Encontra todos os segredos de um nível." },
   { id:"sabio",            tier:"🥈", name:"Sábio",                    desc:"Acerta 20 perguntas." },
   { id:"caca_tesouros",    tier:"🏆", name:"Caçador de Tesouros",      desc:"Encontra todas as salas secretas do jogo." },
-  { id:"guardiao",         tier:"🥇", name:"Guardião da Ciberseguranca",desc:"Completa o jogo." },
+  { id:"guardiao",         tier:"🥇", name:"Guardião da Cibersegurança",desc:"Completa o jogo." },
   { id:"mestre",           tier:"🥇", name:"Mestre VanBerto's",        desc:"Acerta todas as perguntas à primeira tentativa." },
   { id:"lenda",            tier:"🏆", name:"Lenda Digital",            desc:"100% de conclusão — todos os níveis e todas as estrelas." },
 ];

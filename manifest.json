@@ -1,7 +1,7 @@
 {
   "name": "VanBerto's — Missão Cibersegurança",
   "short_name": "VanBerto's",
-  "description": "Um jogo de plataformas sobre ciberseguranca para crianças, com o VanBerto's!",
+  "description": "Um jogo de plataformas sobre cibersegurança para crianças, com o VanBerto's!",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

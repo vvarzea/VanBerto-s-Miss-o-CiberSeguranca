@@ -2,12 +2,12 @@
  * VanBerto's — Missão Cibersegurança 🛡️
  * Professora: Vanda Várzea
  *
- * Jogo educativo sobre Ciberseguranca para crianças:
+ * Jogo educativo sobre Cibersegurança para crianças:
  * palavras-passe, dados pessoais, phishing, privacidade
  * e outros hábitos digitais seguros.
  *
  * 20 níveis · 3 opções por pergunta · Segunda tentativa
- * VanBerto's: mascote-robô guardião da ciberseguranca
+ * VanBerto's: mascote-robô guardião da cibersegurança
  *************************************************/
 
 import { HISTORY, QUIZ_TIPS, QUIZ_ARTICLE, QUIZ_BY_THEME } from "./data-quiz.js";
@@ -280,7 +280,7 @@ window.addEventListener("DOMContentLoaded", () => {
     return pool[pick];
   }
 
-  // ===== "Sabias que…?" — curiosidades sobre Ciberseguranca =====
+  // ===== "Sabias que…?" — curiosidades sobre Cibersegurança =====
 
   let pausedByTeacher = false;
   let _overlayPaused  = false; // true quando um overlay de consulta (mapa, conquistas, etc.) está aberto
@@ -659,7 +659,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // Popup curto "Direito recuperado!" — mostrado ao concluir um nível
   // =====================================================
   // ===== SISTEMA DE ARTEFACTOS MÁGICOS =====
-  // 20 artefactos únicos — um por competência de ciberseguranca recuperada.
+  // 20 artefactos únicos — um por competência de cibersegurança recuperada.
   // Cada artefacto tem: emoji visual, nome curto, cor temática,
   // fala do VanBerto e conjunto temático para bónus.
   // =====================================================
@@ -1222,7 +1222,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // /câmara encolhem para uma sala pequena e independente, com fundo
   // totalmente redesenhado (applyBackground com o seu próprio tema — ver
   // ROOM_THEME_IDX). Por não destruir nada do nível, o regresso é
-  // instantâneo e exacto: nenhum item já apanhado reaparece, nenhum vilão
+  // instantâneo e exato: nenhum item já apanhado reaparece, nenhum vilão
   // volta à posição inicial, nenhuma plataforma móvel salta de posição.
   const ROOM_WORLD_W   = 1000;  // > 960 (largura do ecrã) para nunca sobrar canto vazio
   const ROOM_THEME_IDX = 12;    // "violeta mágico" 🌙 — assinatura visual fixa de TODAS as salas secretas, sempre igual, para se reconhecer logo "sala secreta" independentemente do nível
@@ -3094,7 +3094,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // nível. Ao usar uma altura por omissão maior, preservamos essa MESMA
     // base (só o topo sobe) para não ser preciso recalcular y em lado
     // nenhum. Se p.h vier definido explicitamente, assume-se que y já foi
-    // calculado de propósito para essa altura exacta — não se mexe.
+    // calculado de propósito para essa altura exata — não se mexe.
     const pipeCenterY = (p) => p.h ? p.y : ((p.y + 32) - PIPE_DEFAULT_H / 2);
     pipes = [];
     decorativePipes = [];
@@ -4602,7 +4602,7 @@ window.addEventListener("DOMContentLoaded", () => {
           // ponto qualquer da onda mal a fase "platform" arrancava — podia
           // muito bem calhar mesmo em cima do VanBerto's, sem aviso nenhum
           // nem tempo de reação, dependendo só de há quanto tempo o jogo
-          // estava aberto. Guardar aqui o instante exacto em que o combate
+          // estava aberto. Guardar aqui o instante exato em que o combate
           // começa (waveStartTime) e usar SÓ o tempo decorrido a partir daí
           // (ver updateBossFight) garante que a onda começa sempre no
           // centro da arena, previsível, dando ao jogador um instante para
@@ -4626,7 +4626,7 @@ window.addEventListener("DOMContentLoaded", () => {
         // dependendo só de quanto tempo tinha demorado a ler o diálogo (o
         // mesmo problema de fundo já corrigido para o movimento em onda do
         // Vírus Gigante, ver bossState.waveStartTime, mais acima). Agora só
-        // começam a contar a partir DAQUI — o instante exacto em que o
+        // começam a contar a partir DAQUI — o instante exato em que o
         // combate a sério começa — e o 1º arremesso tem ainda um alívio
         // extra (+1500ms) por cima do intervalo normal, para dar tempo a
         // perceber o movimento do boss antes do primeiro ataque de verdade.
@@ -5818,7 +5818,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // nada a ver com a arena do boss onde o jogador está fisicamente. Era isto
     // que podia fazer o VanBerto's aparecer numa posição errada a meio ou no
     // fim de um combate (ex.: o corpo do boss ainda por desativar no instante
-    // exacto em que passa a "defeat", ou um vírus pequeno da arena contaminada
+    // exato em que passa a "defeat", ou um vírus pequeno da arena contaminada
     // que ainda não foi limpo).
     if (bossState.phase !== "platform") {
       // Exceção: em "defeat" o boss está deliberadamente a fugir a correr
@@ -6578,7 +6578,7 @@ window.addEventListener("DOMContentLoaded", () => {
       let medal="🥉 Bronze — missão concluída!";
       if(pct>=70) medal="🥈 Prata — muito bem!";
       if(pct>=90) medal="🥇 Ouro — excelente!";
-      const master=(!quizStats.everWrong&&quizStats.total>0)?" 🌟 Defensor Perfeito da Ciberseguranca!":"";
+      const master=(!quizStats.everWrong&&quizStats.total>0)?" 🌟 Defensor Perfeito da Cibersegurança!":"";
       document.getElementById("winPlayerName").textContent=playerName||"Ciber-Herói";
       document.getElementById("winScore").textContent=score;
       document.getElementById("winPct").textContent=`${quizStats.correct}/${quizStats.total} (${pct}%)`;

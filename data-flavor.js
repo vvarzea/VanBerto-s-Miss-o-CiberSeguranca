@@ -95,7 +95,7 @@ export const VB_QUIZ_CORRECT = [
   "INCRÍVEL! Sabias mesmo a resposta! 🏆",
   "Que craque! Competência recuperada! ✨",
   "Fantástico! Estou tão orgulhoso de ti! 🎉",
-  "Isso mesmo! A ciberseguranca agradece! 🛡️",
+  "Isso mesmo! A cibersegurança agradece! 🛡️",
   "Brilhante! Nada te escapa! 🌟",
   "Que resposta! Mereces uma estrela! ⭐"
 ];
@@ -118,6 +118,6 @@ export const VB_STAR_POWER = [
 export const VB_PERFECT_LEVEL = [
   "PERFEITO! Nenhuma vida perdida! Lendário! 🏆",
   "Uau! Passaste o nível sem um arranhão! ⭐",
-  "Impecável! Guardião da Ciberseguranca nível máximo! 🌟",
+  "Impecável! Guardião da Cibersegurança nível máximo! 🌟",
   "Incrível! Isso merecia um bónus extra! 🎉"
 ];

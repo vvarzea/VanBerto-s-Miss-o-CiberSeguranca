@@ -5,7 +5,7 @@
 export const HISTORY = [
   {
     title: "🌐 Nasce a Internet",
-    text: "A World Wide Web foi criada em 1989 por Tim Berners-Lee. Desde então, a internet ligou o mundo inteiro — mas também trouxe novos riscos. A ciberseguranca é o conjunto de práticas que nos protege quando usamos computadores, telemóveis e a internet."
+    text: "A World Wide Web foi criada em 1989 por Tim Berners-Lee. Desde então, a internet ligou o mundo inteiro — mas também trouxe novos riscos. A cibersegurança é o conjunto de práticas que nos protege quando usamos computadores, telemóveis e a internet."
   },
   {
     title: "🔐 Palavras-passe Fortes",
@@ -17,7 +17,7 @@ export const HISTORY = [
   },
   {
     title: "🆘 Quem Nos Protege Online",
-    text: "Em Portugal, o Centro Nacional de Cibersegurança (CNCS) e o projeto SeguraNet ajudam crianças e escolas a navegar em segurança. A Linha Internet Segura (1800 21 22 23) e o site internetsegura.pt apoiam quem tiver um problema online."
+    text: "Em Portugal, o Centro Nacional de Cibersegurança (CNCS) e o projeto SeguraNet ajudam crianças e escolas a navegar em segurança. A Linha Internet Segura (800 21 90 90) e o site internetsegura.pt apoiam quem tiver um problema online."
   },
   {
     title: "🦠 Vírus e Malware",
@@ -86,10 +86,10 @@ export const HISTORY = [
 ];
 
 export const QUIZ_TIPS = {
-  historia_internet:      "A World Wide Web nasceu em 1989. A ciberseguranca protege-te sempre que usas a internet.",
+  historia_internet:      "A World Wide Web nasceu em 1989. A cibersegurança protege-te sempre que usas a internet.",
   palavras_passe:         "Usa letras, números e símbolos numa palavra-passe forte, e ativa a verificação em dois passos (2FA).",
   dados_pessoais:         "Nunca partilhes nome completo, morada, telefone ou palavras-passe com desconhecidos online.",
-  instituicoes_apoio:     "Em Portugal, a Linha Internet Segura (1800 21 22 23) e o SeguraNet ajudam com problemas online.",
+  instituicoes_apoio:     "Em Portugal, a Linha Internet Segura (800 21 90 90) e o SeguraNet ajudam com problemas online.",
   virus_malware:          "Um antivírus atualizado e nunca instalar programas de fontes desconhecidas protegem o computador.",
   jogos_seguros:          "As classificações etárias (PEGI) indicam a idade recomendada para cada jogo — respeita-as.",
   pegada_digital:         "Tudo o que publicas deixa um rasto digital que pode durar para sempre — pensa antes de publicar.",
@@ -112,7 +112,7 @@ export const QUIZ_ARTICLE = {
   historia_internet:      null,
   palavras_passe:         "Dica 1",
   dados_pessoais:         "Dica 2",
-  instituicoes_apoio:     "1800 21 22 23",
+  instituicoes_apoio:     "800 21 90 90",
   virus_malware:          null,
   jogos_seguros:          "PEGI",
   pegada_digital:         "Dica 3",
@@ -134,10 +134,10 @@ export const QUIZ_ARTICLE = {
 export const QUIZ_BY_THEME = {
   historia_internet: [
     { q:"Quem criou a World Wide Web e em que ano?", a:[{t:"Tim Berners-Lee, em 1989",ok:true},{t:"Bill Gates, em 1975",ok:false},{t:"Steve Jobs, em 2001",ok:false}], exp:"Tim Berners-Lee criou a World Wide Web em 1989, permitindo ligar documentos através de hiperligações — a base da internet que usamos hoje." },
-    { q:"O que significa 'ciberseguranca'?", a:[{t:"O conjunto de práticas que protegem pessoas e dados no mundo digital",ok:true},{t:"Um tipo de vírus informático",ok:false},{t:"Uma marca de computadores",ok:false}], exp:"Ciberseguranca é o conjunto de práticas, ferramentas e hábitos que protegem computadores, telemóveis, dados e pessoas dos riscos do mundo digital." },
-    { q:"Porque é importante aprender ciberseguranca desde criança?", a:[{t:"Porque cada vez mais crianças usam a internet e a tecnologia no dia a dia",ok:true},{t:"Só é importante para adultos que trabalham com computadores",ok:false},{t:"Não é importante, só os hackers precisam de saber",ok:false}], exp:"As crianças usam cada vez mais dispositivos e a internet para estudar e brincar, por isso aprender a proteger-se online é tão importante como aprender regras de segurança no mundo real." },
+    { q:"O que significa 'cibersegurança'?", a:[{t:"O conjunto de práticas que protegem pessoas e dados no mundo digital",ok:true},{t:"Um tipo de vírus informático",ok:false},{t:"Uma marca de computadores",ok:false}], exp:"Cibersegurança é o conjunto de práticas, ferramentas e hábitos que protegem computadores, telemóveis, dados e pessoas dos riscos do mundo digital." },
+    { q:"Porque é importante aprender cibersegurança desde criança?", a:[{t:"Porque cada vez mais crianças usam a internet e a tecnologia no dia a dia",ok:true},{t:"Só é importante para adultos que trabalham com computadores",ok:false},{t:"Não é importante, só os hackers precisam de saber",ok:false}], exp:"As crianças usam cada vez mais dispositivos e a internet para estudar e brincar, por isso aprender a proteger-se online é tão importante como aprender regras de segurança no mundo real." },
     { q:"O que é a internet?", a:[{t:"Uma rede mundial que liga milhões de computadores e dispositivos entre si",ok:true},{t:"Um programa que só existe num computador",ok:false},{t:"Um tipo de jogo de vídeo",ok:false}], exp:"A internet é uma rede global que liga computadores e dispositivos em todo o mundo, permitindo partilhar informação, comunicar e aceder a serviços." },
-    { q:"Qual destes é um exemplo de bom hábito de ciberseguranca?", a:[{t:"Pensar antes de clicar e antes de partilhar informação",ok:true},{t:"Clicar em tudo o que aparece no ecrã",ok:false},{t:"Partilhar a palavra-passe com todos os amigos",ok:false}], exp:"Pensar antes de agir — antes de clicar num link, instalar algo ou partilhar dados — é a base de todos os bons hábitos de ciberseguranca." }
+    { q:"Qual destes é um exemplo de bom hábito de cibersegurança?", a:[{t:"Pensar antes de clicar e antes de partilhar informação",ok:true},{t:"Clicar em tudo o que aparece no ecrã",ok:false},{t:"Partilhar a palavra-passe com todos os amigos",ok:false}], exp:"Pensar antes de agir — antes de clicar num link, instalar algo ou partilhar dados — é a base de todos os bons hábitos de cibersegurança." }
   ],
   palavras_passe: [
     { q:"O que torna uma palavra-passe forte?", a:[{t:"Combinar letras maiúsculas, minúsculas, números e símbolos",ok:true},{t:"Usar só o teu nome próprio",ok:false},{t:"Usar sempre '123456'",ok:false}], exp:"Uma palavra-passe forte mistura vários tipos de carateres e evita informação óbvia, como o teu nome, para ser mais difícil de adivinhar." },
@@ -154,10 +154,10 @@ export const QUIZ_BY_THEME = {
     { q:"O que é mais seguro fazer antes de preencher um formulário online com dados pessoais?", a:[{t:"Confirmar com um adulto se o site é de confiança e se é mesmo necessário preenchê-lo",ok:true},{t:"Preencher tudo rapidamente sem pensar",ok:false},{t:"Inventar sempre dados falsos, mesmo em sites oficiais",ok:false}], exp:"Antes de partilhar dados pessoais num formulário, vale a pena confirmar com um adulto se o site é de confiança e se essa informação é mesmo necessária." }
   ],
   instituicoes_apoio: [
-    { q:"Qual é a linha de apoio gratuita em Portugal para problemas online?", a:[{t:"Linha Internet Segura: 1800 21 22 23",ok:true},{t:"Linha de Saúde: 808 24 24 24",ok:false},{t:"Número da polícia local",ok:false}], exp:"A Linha Internet Segura é gratuita e apoia crianças e jovens com ciberbullying, conteúdos perturbadores ou outros problemas online." },
-    { q:"O que é o CNCS?", a:[{t:"O Centro Nacional de Cibersegurança, que protege Portugal no mundo digital",ok:true},{t:"Uma marca de antivírus",ok:false},{t:"Uma rede social portuguesa",ok:false}], exp:"O Centro Nacional de Cibersegurança (CNCS) é a entidade portuguesa responsável por promover a ciberseguranca e ajudar a proteger o país no mundo digital." },
+    { q:"Qual é a linha de apoio gratuita em Portugal para problemas online?", a:[{t:"Linha Internet Segura: 800 21 90 90",ok:true},{t:"Linha de Saúde: 808 24 24 24",ok:false},{t:"Número da polícia local",ok:false}], exp:"A Linha Internet Segura é gratuita e apoia crianças e jovens com ciberbullying, conteúdos perturbadores ou outros problemas online." },
+    { q:"O que é o CNCS?", a:[{t:"O Centro Nacional de Cibersegurança, que protege Portugal no mundo digital",ok:true},{t:"Uma marca de antivírus",ok:false},{t:"Uma rede social portuguesa",ok:false}], exp:"O Centro Nacional de Cibersegurança (CNCS) é a entidade portuguesa responsável por promover a cibersegurança e ajudar a proteger o país no mundo digital." },
     { q:"O que é o SeguraNet?", a:[{t:"Um projeto português que ensina crianças e escolas a navegar com segurança",ok:true},{t:"Um jogo de vídeo popular",ok:false},{t:"Uma empresa de telemóveis",ok:false}], exp:"O SeguraNet é um projeto nacional dedicado à literacia digital e à segurança online de crianças e jovens em contexto escolar." },
-    { q:"Onde podes denunciar um problema ou conteúdo perigoso encontrado online, em Portugal?", a:[{t:"Em www.internetsegura.pt ou através da Linha Internet Segura",ok:true},{t:"Apenas na esquadra de polícia mais próxima",ok:false},{t:"Não há onde denunciar problemas online",ok:false}], exp:"O site internetsegura.pt e a Linha Internet Segura (1800 21 22 23) permitem denunciar problemas online e pedir ajuda de forma gratuita e confidencial." },
+    { q:"Onde podes denunciar um problema ou conteúdo perigoso encontrado online, em Portugal?", a:[{t:"Em www.internetsegura.pt ou através da Linha Internet Segura",ok:true},{t:"Apenas na esquadra de polícia mais próxima",ok:false},{t:"Não há onde denunciar problemas online",ok:false}], exp:"O site internetsegura.pt e a Linha Internet Segura (800 21 90 90) permitem denunciar problemas online e pedir ajuda de forma gratuita e confidencial." },
     { q:"Além das instituições, quem deve ser sempre a primeira pessoa a quem contar um problema online?", a:[{t:"Um adulto de confiança, como um familiar ou professor",ok:true},{t:"Um desconhecido que se ofereceu para ajudar online",ok:false},{t:"Ninguém, é melhor resolver sozinho",ok:false}], exp:"Falar com um adulto de confiança — pais, professores ou familiares — é sempre o primeiro passo quando algo corre mal online, mesmo antes de contactar uma linha de apoio." }
   ],
   virus_malware: [
@@ -268,8 +268,8 @@ export const QUIZ_BY_THEME = {
   direitos_digitais: [
     { q:"Desde quando é que a ONU reconhece que os direitos das crianças se aplicam também ao mundo digital?", a:[{t:"Desde 2021",ok:true},{t:"Desde 1989",ok:false},{t:"Ainda não são reconhecidos oficialmente",ok:false}], exp:"Em 2021, o Comité dos Direitos da Criança da ONU confirmou que todos os direitos da Convenção se aplicam ao ambiente digital — privacidade, proteção, expressão e educação incluídas." },
     { q:"Além de direitos, que outra responsabilidade têm os utilizadores da internet?", a:[{t:"Deveres, como usar a internet com responsabilidade e respeito por todos",ok:true},{t:"Nenhuma, só existem direitos online",ok:false},{t:"Só os adultos têm deveres online",ok:false}], exp:"Com os direitos digitais vêm também deveres: usar a internet de forma responsável, respeitando a privacidade e a segurança de todos." },
-    { q:"O que resume melhor tudo o que aprendeste sobre ciberseguranca?", a:[{t:"Pensar antes de agir, proteger os teus dados e pedir ajuda sempre que precisares",ok:true},{t:"Nunca usar a internet, é a única forma de estar seguro",ok:false},{t:"Confiar sempre em tudo o que aparece online",ok:false}], exp:"A ciberseguranca resume-se a pensar antes de agir, proteger dados e palavras-passe, e pedir ajuda a um adulto sempre que algo parecer errado." },
+    { q:"O que resume melhor tudo o que aprendeste sobre cibersegurança?", a:[{t:"Pensar antes de agir, proteger os teus dados e pedir ajuda sempre que precisares",ok:true},{t:"Nunca usar a internet, é a única forma de estar seguro",ok:false},{t:"Confiar sempre em tudo o que aparece online",ok:false}], exp:"A cibersegurança resume-se a pensar antes de agir, proteger dados e palavras-passe, e pedir ajuda a um adulto sempre que algo parecer errado." },
     { q:"Os direitos digitais das crianças incluem proteção contra o quê?", a:[{t:"Ciberbullying, exploração de dados e conteúdos inadequados",ok:true},{t:"Apenas contra vírus informáticos",ok:false},{t:"Não incluem qualquer forma de proteção",ok:false}], exp:"Os direitos digitais das crianças incluem proteção contra ciberbullying, uso indevido de dados pessoais e exposição a conteúdos inadequados para a sua idade." },
-    { q:"Porque é importante continuar a aprender sobre ciberseguranca ao longo da vida?", a:[{t:"Porque a tecnologia e os riscos online mudam constantemente",ok:true},{t:"Não é importante, depois de aprender uma vez está resolvido para sempre",ok:false},{t:"Só é importante para quem trabalha em informática",ok:false}], exp:"A tecnologia evolui rapidamente e surgem novos riscos — por isso a ciberseguranca é uma aprendizagem contínua, para todas as idades." }
+    { q:"Porque é importante continuar a aprender sobre cibersegurança ao longo da vida?", a:[{t:"Porque a tecnologia e os riscos online mudam constantemente",ok:true},{t:"Não é importante, depois de aprender uma vez está resolvido para sempre",ok:false},{t:"Só é importante para quem trabalha em informática",ok:false}], exp:"A tecnologia evolui rapidamente e surgem novos riscos — por isso a cibersegurança é uma aprendizagem contínua, para todas as idades." }
   ]
 };
