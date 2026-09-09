@@ -4067,21 +4067,16 @@ window.addEventListener("DOMContentLoaded", () => {
                           // (a chamada dentro de showQuiz() corre antes de markLevelCompleted,
                           // por isso "Guardião", "Mestre" e "Lenda" nunca desbloqueavam — bug corrigido).
                           checkAchievements(mapProgress.levelsCompleted.length);
-                          if (currentLevel === LEVELS.length - 1) {
-                            // Último nível do jogo — mantém-se o fluxo antigo; a festa
-                            // grande já acontece a seguir em showVictoryScreen().
-                            SFX.finalWin();
+                          // Celebração (título + estrelas a aparecer + VanBerto's +
+                          // confetti) antes da revelação do artefacto de sempre — em
+                          // TODOS os níveis, incluindo o último: se houver boss a
+                          // seguir (ex.: o do Mundo 4, agora preso ao Nível 20),
+                          // nextLevel() trata de o lutar antes do ecrã de vitória
+                          // final aparecer (ver goToNextLevel).
+                          showLevelCompleteCelebration(currentLevel, () => {
                             showRightRecovered(currentLevel);
                             nextLevel(scene);
-                          } else {
-                            // Todos os outros níveis — celebração nova primeiro
-                            // (título + estrelas a aparecer + VanBerto's + confetti),
-                            // só depois a revelação do artefacto de sempre.
-                            showLevelCompleteCelebration(currentLevel, () => {
-                              showRightRecovered(currentLevel);
-                              nextLevel(scene);
-                            });
-                          }
+                          });
                         }
                       });
                     });
@@ -6418,11 +6413,19 @@ window.addEventListener("DOMContentLoaded", () => {
     livesLostThisLevel=0;
 
     setTimeout(()=>{
-      if(next>=LEVELS.length){scene.physics.resume();showVictoryScreen(scene);return;}
       score+=100; scoreText.setText(`🌟 Pontos: ${score}`); _hudDirty=true;
 
       const goToNextLevel = () => {
         const justFinished = currentLevel; // ainda não foi atualizado por loadLevel
+        if (next >= LEVELS.length) {
+          // Não há mais níveis a seguir a este — fim do jogo. Verifica-se
+          // AQUI (depois do boss, se houver um) e não mais cedo, para um
+          // boss preso ao último nível (ex.: o do Mundo 4) ter sempre
+          // oportunidade de lutar antes do ecrã de vitória final aparecer.
+          scene.physics.resume();
+          showVictoryScreen(scene);
+          return;
+        }
         if (isLastLevelOfRegion(justFinished)) {
           // awaitingQuiz/awaitingStory só são libertados DEPOIS do mapa já estar
           // aberto (cobrindo tudo) — mantê-los a true durante o cartão "Mundo

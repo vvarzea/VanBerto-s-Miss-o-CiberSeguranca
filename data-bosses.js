@@ -204,9 +204,10 @@ export const BOSSES = [
   },
   {
     id: "espiao_sombras",
-    afterLevel: 18,          // Último boss, a fechar o mundo "Cidade da Identidade Digital"
-                              // (Níveis 16-19 — denúncia, identidade, privacidade, desconhecidos),
-                              // com o Nível 20 (Direitos e Deveres Digitais) como epílogo depois dele.
+    afterLevel: 19,          // Último boss do jogo — fecha o mundo "Cidade da Identidade
+                              // Digital" (Níveis 16-20) E o jogo inteiro. Ao ser derrotado,
+                              // nextLevel() já não tem mais níveis a seguir (ver next>=LEVELS.length
+                              // em goToNextLevel) e mostra o ecrã de vitória final.
     name: "Espião das Sombras",
     emoji: "🌑",
     color: 0x3a3a5c,
