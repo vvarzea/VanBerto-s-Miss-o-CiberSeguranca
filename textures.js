@@ -1834,87 +1834,129 @@ function makeItemTextures(scene){
     tex.refresh();
   });
 
-  // Mini-Drone amigável — 64×52. Silhueta de quadricóptero a sério: chassis
-  // achatado (não uma "cabeça" redonda), 4 discos de hélice bem afastados
-  // do corpo, pernas de aterragem e uma câmara em gimbal pendurada por
-  // baixo — em vez de um olho gigante a ocupar a cara toda.
+  // Mini-Drone amigável — 64×52. Visual futurista: chassis facetado tipo
+  // "stealth", núcleo de energia pulsante ao centro, faixa de luz cyan,
+  // braços finos luminosos terminados em anéis de plasma (em vez de
+  // discos de hélice comuns), estabilizadores em lâmina e um scanner
+  // com feixe de luz por baixo em vez de uma câmara comum.
   if(!scene.textures.exists("item_drone")){
     const tex=scene.textures.createCanvas("item_drone",64,52), ctx=tex.getContext();
-    const bx=32, by=22; // centro do corpo (mais alto, para dar espaço ao gimbal)
+    const bx=32, by=23; // centro do corpo
 
-    // --- 4 BRAÇOS + DISCOS DE HÉLICE (atrás do corpo) ---
+    // --- AURA AMBIENTE (glow cyan por trás de tudo) ---
+    const aura=ctx.createRadialGradient(bx,by,4,bx,by,29);
+    aura.addColorStop(0,"rgba(80,220,255,0.22)");
+    aura.addColorStop(1,"rgba(80,220,255,0)");
+    ctx.fillStyle=aura;
+    ctx.beginPath(); ctx.arc(bx,by,29,0,Math.PI*2); ctx.fill();
+
+    // --- 4 BRAÇOS + ANÉIS DE PLASMA (atrás do corpo) ---
     const arms=[[-21,-8],[21,-8],[-21,8],[21,8]];
     arms.forEach(([dx,dy])=>{
       const rx=bx+dx, ry=by+dy;
-      ctx.strokeStyle="#2c3648"; ctx.lineWidth=3.4; ctx.lineCap="round";
-      ctx.beginPath(); ctx.moveTo(bx+dx*0.25,by+dy*0.25); ctx.lineTo(rx,ry); ctx.stroke();
-      // motor na ponta do braço
-      ctx.fillStyle="#3a4658";
-      ctx.beginPath(); ctx.roundRect(rx-4,ry-2.5,8,5,2); ctx.fill();
-      // disco da hélice, achatado (elipse) para sugerir rotação vista de lado
+      ctx.strokeStyle="#182230"; ctx.lineWidth=3; ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(bx+dx*0.22,by+dy*0.3); ctx.lineTo(rx,ry); ctx.stroke();
+      ctx.strokeStyle="rgba(110,225,255,0.85)"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(bx+dx*0.22,by+dy*0.3); ctx.lineTo(rx,ry); ctx.stroke();
+      // housing do motor, hexagonal
+      ctx.fillStyle="#1c2836";
+      ctx.beginPath();
+      ctx.moveTo(rx-4,ry); ctx.lineTo(rx-2,ry-3); ctx.lineTo(rx+2,ry-3);
+      ctx.lineTo(rx+4,ry); ctx.lineTo(rx+2,ry+3); ctx.lineTo(rx-2,ry+3);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle="rgba(110,225,255,0.6)"; ctx.lineWidth=0.8; ctx.stroke();
+      // anel de plasma do motor, achatado para sugerir perspetiva
       ctx.save();
       ctx.translate(rx,ry-1); ctx.scale(1,0.38);
-      const propGr=ctx.createRadialGradient(0,0,1,0,0,11);
-      propGr.addColorStop(0,"rgba(220,235,248,0.75)"); propGr.addColorStop(1,"rgba(220,235,248,0.08)");
-      ctx.fillStyle=propGr;
-      ctx.beginPath(); ctx.arc(0,0,11,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle="rgba(255,255,255,0.55)"; ctx.lineWidth=0.8;
-      ctx.beginPath(); ctx.arc(0,0,11,0,Math.PI*2); ctx.stroke();
+      const ringGr=ctx.createRadialGradient(0,0,1,0,0,10);
+      ringGr.addColorStop(0,"rgba(200,245,255,0.95)");
+      ringGr.addColorStop(0.5,"rgba(70,200,255,0.55)");
+      ringGr.addColorStop(1,"rgba(70,200,255,0)");
+      ctx.fillStyle=ringGr;
+      ctx.shadowColor="#5ce1ff"; ctx.shadowBlur=6;
+      ctx.beginPath(); ctx.arc(0,0,10,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.strokeStyle="rgba(255,255,255,0.8)"; ctx.lineWidth=0.9;
+      ctx.beginPath(); ctx.arc(0,0,10,0,Math.PI*2); ctx.stroke();
       ctx.restore();
     });
 
-    // --- PERNAS DE ATERRAGEM ---
-    ctx.strokeStyle="#2c3648"; ctx.lineWidth=2;
-    [[-10,1],[10,1]].forEach(([dx])=>{
-      ctx.beginPath(); ctx.moveTo(bx+dx,by+9); ctx.lineTo(bx+dx*1.35,by+16); ctx.stroke();
+    // --- ESTABILIZADORES EM LÂMINA (em vez de pernas em L) ---
+    ctx.strokeStyle="#182230"; ctx.lineWidth=2;
+    [[-9,1],[9,1]].forEach(([dx])=>{
+      ctx.beginPath(); ctx.moveTo(bx+dx,by+8); ctx.lineTo(bx+dx*1.6,by+15); ctx.stroke();
     });
-    ctx.lineWidth=2.6; ctx.lineCap="round";
-    ctx.beginPath(); ctx.moveTo(bx-15,by+16); ctx.lineTo(bx-9,by+16); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bx+9,by+16); ctx.lineTo(bx+15,by+16); ctx.stroke();
+    ctx.strokeStyle="rgba(110,225,255,0.7)"; ctx.lineWidth=1.4; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(bx-16,by+15); ctx.lineTo(bx-8,by+15); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx+8,by+15); ctx.lineTo(bx+16,by+15); ctx.stroke();
 
-    // --- ANTENA (estilo VanBerto's: haste + halo dourado da marca) ---
-    ctx.strokeStyle="#2c3648"; ctx.lineWidth=1.8;
-    ctx.beginPath(); ctx.moveTo(bx,by-9); ctx.lineTo(bx,by-15); ctx.stroke();
-    const halo=ctx.createRadialGradient(bx,by-17,0.5,bx,by-17,5.5);
-    halo.addColorStop(0,"rgba(255,210,74,0.65)"); halo.addColorStop(1,"rgba(255,210,74,0)");
-    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(bx,by-17,5.5,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#ffd24a"; ctx.shadowColor="#ffd24a"; ctx.shadowBlur=4;
-    ctx.beginPath(); ctx.arc(bx,by-17,2,0,Math.PI*2); ctx.fill();
+    // --- ANTENA (estilo VanBerto's: haste fina + halo dourado da marca) ---
+    ctx.strokeStyle="#182230"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(bx,by-9); ctx.lineTo(bx,by-16); ctx.stroke();
+    const halo=ctx.createRadialGradient(bx,by-18,0.5,bx,by-18,6);
+    halo.addColorStop(0,"rgba(255,210,74,0.7)"); halo.addColorStop(1,"rgba(255,210,74,0)");
+    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(bx,by-18,6,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#ffd24a"; ctx.shadowColor="#ffd24a"; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.arc(bx,by-18,2,0,Math.PI*2); ctx.fill();
     ctx.shadowBlur=0;
 
-    // --- CORPO (chassis achatado, tipo veículo) ---
-    const bodyGr=ctx.createLinearGradient(bx,by-8,bx,by+9);
-    bodyGr.addColorStop(0,"#f0f6ff"); bodyGr.addColorStop(0.6,"#c4d6ec"); bodyGr.addColorStop(1,"#7f96b4");
-    ctx.fillStyle=bodyGr;
-    ctx.beginPath(); ctx.roundRect(bx-13,by-8,26,17,7); ctx.fill();
-    ctx.strokeStyle="#2c3648"; ctx.lineWidth=1.6;
-    ctx.beginPath(); ctx.roundRect(bx-13,by-8,26,17,7); ctx.stroke();
-    // brilho superior
-    ctx.save(); ctx.beginPath(); ctx.roundRect(bx-13,by-8,26,17,7); ctx.clip();
-    ctx.fillStyle="rgba(255,255,255,0.55)";
-    ctx.beginPath(); ctx.ellipse(bx-4,by-5,8,3,-0.3,0,Math.PI*2); ctx.fill();
-    ctx.restore();
+    // --- CORPO (chassis angular facetado, tipo "stealth") ---
+    ctx.beginPath();
+    ctx.moveTo(bx-14,by);
+    ctx.lineTo(bx-7,by-9);
+    ctx.lineTo(bx+7,by-9);
+    ctx.lineTo(bx+14,by);
+    ctx.lineTo(bx+7,by+9);
+    ctx.lineTo(bx-7,by+9);
+    ctx.closePath();
+    const bodyGr=ctx.createLinearGradient(bx,by-9,bx,by+9);
+    bodyGr.addColorStop(0,"#3a4a60"); bodyGr.addColorStop(0.5,"#20293a"); bodyGr.addColorStop(1,"#10151f");
+    ctx.fillStyle=bodyGr; ctx.fill();
+    ctx.strokeStyle="rgba(110,225,255,0.9)"; ctx.lineWidth=1.3;
+    ctx.shadowColor="#5ce1ff"; ctx.shadowBlur=3;
+    ctx.stroke();
+    ctx.shadowBlur=0;
 
-    // Luzes de estado verde/vermelho (detalhe clássico de drone a sério)
+    // faixa de luz central (linha de energia)
+    const stripGr=ctx.createLinearGradient(bx-11,by,bx+11,by);
+    stripGr.addColorStop(0,"rgba(90,225,255,0)");
+    stripGr.addColorStop(0.5,"rgba(150,240,255,0.9)");
+    stripGr.addColorStop(1,"rgba(90,225,255,0)");
+    ctx.fillStyle=stripGr;
+    ctx.beginPath(); ctx.roundRect(bx-11,by-1,22,2,1); ctx.fill();
+
+    // núcleo de energia (diamante pulsante ao centro)
+    ctx.save(); ctx.translate(bx,by-3); ctx.rotate(Math.PI/4);
+    const coreGr=ctx.createRadialGradient(0,0,0.5,0,0,4.5);
+    coreGr.addColorStop(0,"#ffffff"); coreGr.addColorStop(0.4,"#7fe0ff"); coreGr.addColorStop(1,"rgba(70,200,255,0)");
+    ctx.fillStyle=coreGr; ctx.shadowColor="#7fe0ff"; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.roundRect(-3.2,-3.2,6.4,6.4,1.5); ctx.fill();
+    ctx.restore(); ctx.shadowBlur=0;
+
+    // Luzes de estado verde/vermelho, pequenas e nítidas
     ctx.fillStyle="#3ef07a"; ctx.shadowColor="#3ef07a"; ctx.shadowBlur=3;
-    ctx.beginPath(); ctx.arc(bx-9,by-3,1.4,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(bx-10,by+4,1.3,0,Math.PI*2); ctx.fill();
     ctx.fillStyle="#ff4a4a"; ctx.shadowColor="#ff4a4a";
-    ctx.beginPath(); ctx.arc(bx+9,by-3,1.4,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(bx+10,by+4,1.3,0,Math.PI*2); ctx.fill();
     ctx.shadowBlur=0;
 
-    // --- GIMBAL/CÂMARA PENDURADA POR BAIXO (não ocupa a "cara" toda) ---
-    ctx.strokeStyle="#2c3648"; ctx.lineWidth=1.6;
-    ctx.beginPath(); ctx.moveTo(bx,by+9); ctx.lineTo(bx,by+12); ctx.stroke();
-    ctx.fillStyle="#232c3a";
-    ctx.beginPath(); ctx.roundRect(bx-6,by+11,12,8,3); ctx.fill();
-    ctx.strokeStyle="#0e1420"; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.roundRect(bx-6,by+11,12,8,3); ctx.stroke();
-    const lensIris=ctx.createRadialGradient(bx-0.6,by+14.4,0.3,bx,by+15,3.4);
-    lensIris.addColorStop(0,"#7fe0ff"); lensIris.addColorStop(0.6,"#2a9bf0"); lensIris.addColorStop(1,"#1366c6");
-    ctx.fillStyle=lensIris;
-    ctx.beginPath(); ctx.arc(bx,by+15,3.4,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="rgba(255,255,255,0.85)";
-    ctx.beginPath(); ctx.arc(bx-0.9,by+13.9,0.9,0,Math.PI*2); ctx.fill();
+    // --- SCANNER PENDURADO POR BAIXO (lente com anel + feixe de luz) ---
+    ctx.strokeStyle="#182230"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(bx,by+9); ctx.lineTo(bx,by+11); ctx.stroke();
+    ctx.fillStyle="#0e1420";
+    ctx.beginPath(); ctx.roundRect(bx-6,by+10,12,7,3); ctx.fill();
+    ctx.strokeStyle="rgba(110,225,255,0.6)"; ctx.lineWidth=0.9;
+    ctx.beginPath(); ctx.roundRect(bx-6,by+10,12,7,3); ctx.stroke();
+    const lensIris=ctx.createRadialGradient(bx-0.6,by+13.3,0.3,bx,by+13.8,3.2);
+    lensIris.addColorStop(0,"#ffffff"); lensIris.addColorStop(0.35,"#7fe0ff"); lensIris.addColorStop(1,"#0f6fb8");
+    ctx.fillStyle=lensIris; ctx.shadowColor="#7fe0ff"; ctx.shadowBlur=3;
+    ctx.beginPath(); ctx.arc(bx,by+13.8,3.2,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    // feixe de scan subtil
+    const beam=ctx.createLinearGradient(bx,by+16,bx,by+22);
+    beam.addColorStop(0,"rgba(120,230,255,0.5)"); beam.addColorStop(1,"rgba(120,230,255,0)");
+    ctx.fillStyle=beam;
+    ctx.beginPath(); ctx.moveTo(bx-3,by+16); ctx.lineTo(bx+3,by+16); ctx.lineTo(bx+5,by+22); ctx.lineTo(bx-5,by+22); ctx.closePath(); ctx.fill();
 
     tex.refresh();
   }
