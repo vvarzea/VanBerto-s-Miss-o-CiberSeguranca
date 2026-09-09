@@ -809,13 +809,20 @@ window.addEventListener("DOMContentLoaded", () => {
     // CLARIFICAÇÃO: antes, as estrelas só se acendiam pela ORDEM (1ª, 2ª,
     // 3ª), sem ligação a um critério fixo — um jogador com 2 estrelas nunca
     // sabia QUAL critério faltou para a 3ª. Agora cada posição representa
-    // SEMPRE o mesmo critério (1=segredo, 2=sem perder vidas, 3=1ª
+    // SEMPRE o mesmo critério (1=todos os itens, 2=sem perder vidas, 3=1ª
     // tentativa), com uma legenda por baixo, e só acende se esse critério
     // específico tiver sido mesmo cumprido nesta tentativa.
+    // TROCA (pedido): a 1ª estrela era "encontrou 1 segredo" — passou a ser
+    // "apanhou todos os itens do nível" (mesma contagem do HUD "⭐ Itens:
+    // X/Y" — itemsCollected/itemsTotal, ainda válidos aqui porque loadLevel()
+    // do próximo nível só corre depois desta celebração). hasItems espelha o
+    // antigo hasSecrets: se o nível não tiver nenhum item, a estrela mostra
+    // "Nível concluído" em vez de "0/0 itens", tal como antes mostrava
+    // "Nível concluído" para níveis sem segredos.
     const rec = getStarRecord(levelIdx);
-    const hasSecrets = !!(L && L.secrets && L.secrets.length);
+    const hasItems = itemsTotal > 0;
     const starCriteria = [
-      { on: rec.secret,   label: hasSecrets ? "🔍 Segredo encontrado" : "🗺️ Nível concluído" },
+      { on: rec.allItems, label: hasItems ? "⭐ Todos os itens apanhados" : "🗺️ Nível concluído" },
       { on: rec.noDamage, label: "❤️ Sem perder vidas" },
       { on: rec.firstTry, label: "🎯 Acertaste à 1ª tentativa" }
     ];
@@ -4143,7 +4150,7 @@ window.addEventListener("DOMContentLoaded", () => {
                       showQuiz(pickQuizForLevel(currentLevel, LEVELS[currentLevel].quizTheme), (ok) => {
                         if(ok){
                           ensureAudio();
-                          finalizeLevelStars(currentLevel, livesLostThisLevel);
+                          finalizeLevelStars(currentLevel, livesLostThisLevel, itemsCollected, itemsTotal);
                           markLevelCompleted(currentLevel);
                           // Reavaliar conquistas AGORA, com a contagem de níveis já atualizada
                           // (a chamada dentro de showQuiz() corre antes de markLevelCompleted,
@@ -4320,6 +4327,25 @@ window.addEventListener("DOMContentLoaded", () => {
     // corrigido em bossHitPlayer, mais abaixo). Sem isto, TODOS os toques no
     // boss, incluindo saltar-lhe em cima, eram ignorados em silêncio.
     invuln = false;
+    // NOVO — bug reportado ("trava ao chegar ao boss", visto com STAR POWER
+    // ainda visível no HUD no momento do travamento): loadLevel() já limpa
+    // todos os poderes (clearPower/clearDoubleJump/clearStarPower) sempre que
+    // um nível novo começa — startBossFight() nunca fazia o mesmo, porque não
+    // passa por loadLevel() (tem a sua própria montagem de arena). Um poder
+    // apanhado nos últimos instantes do nível anterior (estrela/escudo/duplo
+    // salto) ficava então "pendurado": os seus temporizadores (scene.time,
+    // independentes de scene.physics.pause()) continuavam a contar e a tocar
+    // durante toda a cinemática de entrada do boss — incluindo o intervalo
+    // de melodia (_starMelodyInterval, um setInterval() nativo, à parte de
+    // qualquer array de timers que a arena do boss limpa) e o próprio
+    // clearStarPower/clearPower a meio da cinemática, a forçar setAlpha(1)/
+    // setScale/clearTint no VanBerto's exactamente enquanto este código está
+    // com muito cuidado a posicioná-lo e a só revelá-lo no momento certo (ver
+    // comentário mais abaixo, "setAlpha(1) só aqui"). Limpar tudo aqui, ANTES
+    // de mais nada, garante que nenhum poder da tentativa anterior sobrevive
+    // para a arena do boss — mesmo comportamento que já existe ao entrar em
+    // qualquer nível normal.
+    clearPower(scene); clearDoubleJump(scene); clearStarPower(scene);
     // Defesa extra: se uma tentativa anterior tiver ficado presa a meio da
     // animação do portal (ex.: o jogador mudou de separador exatamente ao
     // tocar-lhe), _doorAnimRunning podia ficar "true" para sempre, bloqueando
@@ -4615,11 +4641,17 @@ window.addEventListener("DOMContentLoaded", () => {
     // 3 falas em vez de 2: o VanBerto's reage ANTES do boss se apresentar, e responde
     // com um "grito de guerra" DEPOIS — dá a sensação de cena, não de anúncio a passar depressa.
     const introVB = BOSS_INTRO_VB[def.id] || { reaction: "Sinto algo estranho aqui...", rally: "Vamos enfrentar isto juntos!" };
-    playBossDialogue([
-      { speaker:"vb",   text: introVB.reaction, anchor: vbDialogueAnchor() },
-      { speaker:"boss", name: def.name, emoji: def.emoji, text: def.intro, anchor: bossDialogueAnchor() },
-      { speaker:"vb",   text: introVB.rally, anchor: vbDialogueAnchor() }
-    ], () => {
+    // NOVO — try/catch à volta de toda a cinemática de entrada (ver mais
+    // abaixo, junto à chamada a playBossDialogue): se algo aqui lançar um
+    // erro (ex.: cálculo do anchor com um valor inesperado do ecrã/canvas),
+    // sem isto o erro escapava por completo do controlo do Phaser e travava
+    // o jogo inteiro na entrada do boss — exactamente o "trava ao chegar ao
+    // boss" reportado, sem nada a responder e sem o auto-avanço de 9s (nunca
+    // chegava a ser armado, porque a exceção interrompia tudo antes disso).
+    // Extraído para uma função nomeada para poder ser chamado tanto pela
+    // cinemática (via callback normal) como pelo catch (a saltar direto para
+    // o combate, sem cinemática, em vez de travar por completo).
+    const startBossPlatformPhase = () => {
       if (!bossState) return; // segurança: nível pode ter sido reiniciado entretanto
       bossState.phase = "platform";
       // Sai do riso maléfico da intro (ver spawnBossSprite) assim que o
@@ -4725,7 +4757,17 @@ window.addEventListener("DOMContentLoaded", () => {
       } else {
         itemCountText.setText(`⚡ Carga: 0/${def.specialAttack.chargeCount}`);
       }
-    });
+    };
+    try {
+      playBossDialogue([
+        { speaker:"vb",   text: introVB.reaction, anchor: vbDialogueAnchor() },
+        { speaker:"boss", name: def.name, emoji: def.emoji, text: def.intro, anchor: bossDialogueAnchor() },
+        { speaker:"vb",   text: introVB.rally, anchor: vbDialogueAnchor() }
+      ], startBossPlatformPhase);
+    } catch (err) {
+      console.error("Cinemática de entrada do boss falhou — a avançar direto para o combate:", err);
+      startBossPlatformPhase();
+    }
   }
 
   // ===== Fases de combate por HP — Fase "Batalhas Épicas" =====
@@ -6300,15 +6342,25 @@ window.addEventListener("DOMContentLoaded", () => {
       }
       // awaitingQuiz continua true durante a cinemática de vitória — só liberta
       // o jogador quando o portal for criado, a seguir ao diálogo.
-      playBossDialogue([
-        { speaker:"boss", name:def.name, emoji:def.emoji, text: def.defeatLine, anchor: bossDialogueAnchor() },
-        { speaker:"vb", text: BOSS_VICTORY_VB[def.id] || "Conseguimos! Mais um direito está a salvo!", anchor: vbDialogueAnchor() }
-      ], () => {
+      // NOVO — mesma rede de segurança da cinemática de entrada (ver
+      // comentário completo em startBossFight): sem o try/catch, um erro
+      // aqui travava o jogo com o combate já vencido mas o portal por criar,
+      // ficando o jogador presa na arena para sempre.
+      const startBossPortalPhase = () => {
         awaitingQuiz = false;
         scene_resumeAfterBoss();
         tipText.setText("🌀 Caminha até ao portal para continuares a aventura!");
         spawnBossPortal(sceneRef, finished, def);
-      });
+      };
+      try {
+        playBossDialogue([
+          { speaker:"boss", name:def.name, emoji:def.emoji, text: def.defeatLine, anchor: bossDialogueAnchor() },
+          { speaker:"vb", text: BOSS_VICTORY_VB[def.id] || "Conseguimos! Mais um direito está a salvo!", anchor: vbDialogueAnchor() }
+        ], startBossPortalPhase);
+      } catch (err) {
+        console.error("Cinemática de vitória do boss falhou — a criar o portal de qualquer forma:", err);
+        startBossPortalPhase();
+      }
     });
   }
 
