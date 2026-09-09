@@ -5,7 +5,13 @@
 export const HISTORY = [
   {
     title: "🌐 Nasce a Internet",
-    text: "A World Wide Web foi criada em 1989 por Tim Berners-Lee. Desde então, a internet ligou o mundo inteiro — mas também trouxe novos riscos. A cibersegurança é o conjunto de práticas que nos protege quando usamos computadores, telemóveis e a internet."
+    // BUG CORRIGIDO: dizia "A World Wide Web foi criada em 1989... [logo
+    // depois do título] Nasce a Internet" — confundindo a Internet (a rede
+    // global de computadores, que já existia desde 1969, com a ARPANET) com
+    // a World Wide Web (o sistema de páginas com links criado por Tim
+    // Berners-Lee só 20 anos depois, em 1989). São coisas diferentes: a Web
+    // é um serviço que corre POR CIMA da internet, não a internet em si.
+    text: "A Internet nasceu em 1969, quando os primeiros computadores foram ligados em rede (a ARPANET). Só 20 anos depois, em 1989, é que o cientista Tim Berners-Lee criou a World Wide Web — as páginas com links que hoje usamos para navegar. Essa ligação global trouxe também novos riscos. A cibersegurança é o conjunto de práticas que nos protege quando usamos computadores, telemóveis e a internet."
   },
   {
     title: "🔐 Palavras-passe Fortes",
@@ -86,7 +92,7 @@ export const HISTORY = [
 ];
 
 export const QUIZ_TIPS = {
-  historia_internet:      "A World Wide Web nasceu em 1989. A cibersegurança protege-te sempre que usas a internet.",
+  historia_internet:      "A Internet nasceu em 1969; a World Wide Web (as páginas com links) surgiu 20 anos depois, em 1989. A cibersegurança protege-te sempre que as usas.",
   palavras_passe:         "Usa letras, números e símbolos numa palavra-passe forte, e ativa a verificação em dois passos (2FA).",
   dados_pessoais:         "Nunca partilhes nome completo, morada, telefone ou palavras-passe com desconhecidos online.",
   instituicoes_apoio:     "Em Portugal, a Linha Internet Segura (800 21 90 90) e o SeguraNet ajudam com problemas online.",
