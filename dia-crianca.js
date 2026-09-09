@@ -2162,6 +2162,23 @@ window.addEventListener("DOMContentLoaded", () => {
     malwareGroup.getChildren().forEach(m=>{
       if (!m.active || !m.body) return;
       const isBoss = !!m.getData("isBoss"); // bosses não devem girar como os vilões pequenos
+      // NOVO — bug encontrado a investigar o travamento no boss: esta
+      // atualização genérica foi escrita para os vilões pequenos (patrol/
+      // mini/jumper) e corre em TODOS os elementos de malwareGroup, sem
+      // exceção — incluindo o próprio boss (que também é criado dentro de
+      // malwareGroup, ver spawnBossSprite). O boss já tem o seu PRÓPRIO
+      // sistema de movimento dedicado (updateBossFight/doBossHop/
+      // doBossTeleport/etc.) — ter também este código genérico a chamar
+      // m.setVelocityX() no boss, a cada frame, incluindo durante a
+      // cinemática de entrada (esta função corre mesmo com awaitingQuiz
+      // ainda a true, física pausada ou não), fazia dois sistemas de
+      // movimento diferentes disputar a velocidade do mesmo sprite ao mesmo
+      // tempo — pior ainda em bosses "teleport"/"wave", cujo corpo físico
+      // não se comporta como um vilão normal de plataforma (sem gravidade,
+      // por vezes sem colisão com o chão), o que podia deixar este código
+      // num estado inesperado. Bosses continuam a ter o seu próprio
+      // tratamento — não precisam (nem devem) passar por aqui.
+      if (isBoss) return;
       const pat = m.getData("pattern") || "patrol";
       const spd = m.getData("speed") || 120;
       const dir = m.getData("dir") || 1;  // direcao guardada
