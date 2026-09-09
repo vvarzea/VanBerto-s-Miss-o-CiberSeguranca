@@ -6601,14 +6601,28 @@ window.addEventListener("DOMContentLoaded", () => {
     ensureAudio(); SFX.finalWin(); startConfetti(28000);
     // Galeria de artefactos → depois ecrã de vitória
     showArtefactGallery(() => {
-      const pct=quizStats.total?Math.round((quizStats.correct/quizStats.total)*100):0;
+      // BUG CORRIGIDO: a percentagem/medalha aqui vinham de quizStats, que é
+      // só desta "sessão" do browser (reinicia sempre que a página é
+      // recarregada — ver resetQuizStats). Como o mapa/estrelas/conquistas
+      // TODOS persistem entre sessões (é assim que o jogo permite continuar
+      // outro dia), um jogador que fechasse e reabrisse o jogo a meio da
+      // aventura via aqui uma percentagem a refletir só a última sessão, não
+      // o percurso todo — podendo até mostrar uma medalha pior do que a
+      // realidade mesmo com todos os níveis a 3 estrelas. globalStats.quizTotal/
+      // quizCorrect são a versão persistente do mesmo contador (ver
+      // loadGlobalStats/saveGlobalStats), por isso é essa que deve mandar
+      // aqui — e é também a que o Certificado usa, para os dois ecrãs
+      // nunca se contradizerem entre si.
+      const _allStars = totalStarsEarned() === LEVELS.length * 3;
+      const gTotal = globalStats.quizTotal, gCorrect = globalStats.quizCorrect;
+      const pct = _allStars ? 100 : (gTotal ? Math.round((gCorrect / gTotal) * 100) : 0);
       let medal="🥉 Bronze — missão concluída!";
       if(pct>=70) medal="🥈 Prata — muito bem!";
       if(pct>=90) medal="🥇 Ouro — excelente!";
-      const master=(!quizStats.everWrong&&quizStats.total>0)?" 🌟 Defensor Perfeito da Cibersegurança!":"";
+      const master=(_allStars||(gTotal>0&&gCorrect===gTotal))?" 🌟 Defensor Perfeito da Cibersegurança!":"";
       document.getElementById("winPlayerName").textContent=playerName||"Ciber-Herói";
       document.getElementById("winScore").textContent=score;
-      document.getElementById("winPct").textContent=`${quizStats.correct}/${quizStats.total} (${pct}%)`;
+      document.getElementById("winPct").textContent=_allStars?`${gTotal}/${gTotal} (100%)`:`${gCorrect}/${gTotal} (${pct}%)`;
       document.getElementById("winMedal").textContent=medal+master;
 
       // ── Tabela de temas com erros — aparece logo se existirem ───────
@@ -7909,23 +7923,40 @@ window.addEventListener("DOMContentLoaded", () => {
     const certScore = document.getElementById("certScore");
     if (certScore) certScore.textContent = score;
 
+    // Estrelas — fonte de verdade (persistente) para tudo o resto abaixo
+    const earned = totalStarsEarned();
+    const totalStarsPossible = LEVELS.length * 3;
+    const allThreeStarsEverywhere = earned === totalStarsPossible;
+
     // Percentagem
-    const pct = quizStats.total > 0 ? Math.round((quizStats.correct / quizStats.total) * 100) : 0;
+    // BUG CORRIGIDO: isto usava quizStats (contador só desta sessão do
+    // browser, reposto a 0 sempre que a página é recarregada — ver
+    // resetQuizStats), enquanto "Estrelas" logo abaixo já usa
+    // totalStarsEarned(), que É persistente. Resultado: um jogador que
+    // fechasse e reabrisse o jogo a meio da aventura podia ver, no MESMO
+    // certificado, "60/60 estrelas" e ao mesmo tempo uma percentagem/medalha
+    // baixa (ou 0%), porque só contava os quizzes respondidos depois do
+    // último carregamento da página — incoerente. globalStats.quizTotal/
+    // quizCorrect é a versão persistente do mesmo contador (soma de todas as
+    // sessões), por isso é essa que deve ser usada aqui. Além disso, se
+    // todos os níveis já têm 3 estrelas, o certificado garante sempre
+    // 100% / Perfeito — nunca deve contradizer esse resultado.
+    const pct = allThreeStarsEverywhere
+      ? 100
+      : (globalStats.quizTotal > 0 ? Math.round((globalStats.quizCorrect / globalStats.quizTotal) * 100) : 0);
     const certCorrect = document.getElementById("certCorrect");
     if (certCorrect) certCorrect.textContent = `${pct}%`;
 
     // Medalha
     const certMedal = document.getElementById("certMedal");
     if (certMedal) {
-      certMedal.textContent = pct === 100 ? "🥇 Perfeito" : pct >= 80 ? "🥈 Excelente" : pct >= 60 ? "🥉 Bom" : "📚 A Melhorar";
+      certMedal.textContent = allThreeStarsEverywhere ? "🥇 Perfeito" : pct >= 80 ? "🥈 Excelente" : pct >= 60 ? "🥉 Bom" : "📚 A Melhorar";
     }
 
-    // Estrelas — novo
+    // Estrelas
     const certStars = document.getElementById("certStars");
     if (certStars) {
-      const earned = totalStarsEarned();
-      const total  = LEVELS.length * 3;
-      certStars.textContent = `${earned}/${total}`;
+      certStars.textContent = `${earned}/${totalStarsPossible}`;
     }
 
     // Data
