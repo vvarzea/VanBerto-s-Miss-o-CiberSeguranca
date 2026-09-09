@@ -299,3 +299,23 @@ Ficheiros tocados: `dia-crianca.js` (mecânica, input, hitbox), `index.html`
 (botão touch + atalhos de teclado documentados), `dia-crianca.css` (estilo
 do botão), `data-levels.js` (túnel de demonstração no Nível 1) e
 `data-flavor.js` (nova dica no ecrã de pausa).
+
+
+## Correção — jogo "bloqueava" no boss do Mundo 1 (Vírus Gigante)
+
+Encontradas duas falhas relacionadas, ambas na cinemática de entrada/vitória
+do boss (`playCinematic`/`playBossDialogue`):
+
+1. **Sem rede de segurança**: se o toque não acertasse na caixa de diálogo
+   por qualquer razão específica do dispositivo/ecrã, não havia nenhum plano
+   B — ficava para sempre à espera. O cartão de título de região já tinha um
+   auto-avanço destes; faltava na caixa de diálogo do boss. Adicionado: se
+   ninguém tocar em 9 segundos, a fala avança sozinha (tal como um toque
+   faria).
+2. **Balão "flutuante" sem limite no topo**: `bossDialogueAnchor()` e
+   `vbDialogueAnchor()` (`dia-crianca.js`) só impediam a caixa de sair pelos
+   lados do ecrã, não por cima — se o ponto de ancoragem ficasse perto do
+   topo, a caixa podia ficar parcial/totalmente fora do ecrã, impossível de
+   tocar. Adicionado um limite mínimo de y.
+
+Ficheiros tocados: `cinematics.js`, `dia-crianca.js`.

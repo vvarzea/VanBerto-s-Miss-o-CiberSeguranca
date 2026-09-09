@@ -108,6 +108,13 @@ window.addEventListener("DOMContentLoaded", () => {
     // ancoragem ficava perto da borda, cortando o início do texto/nome.
     const halfDialogW = Math.min(640, window.innerWidth*0.92)/2 + 12;
     x = Math.max(rect.left+halfDialogW, Math.min(rect.right-halfDialogW, x));
+    // CORREÇÃO: faltava impedir o balão de saltar por cima do topo do ecrã
+    // (só x estava limitado). Se a "cabeça" do boss ficasse perto do topo do
+    // canvas, aboveHead empurrava y para negativo, e a caixa ".cine-floating"
+    // (que se estica para CIMA a partir do ponto de ancoragem) ficava parcial
+    // ou totalmente fora do ecrã — sem nada visível/tocável para avançar a
+    // fala, o jogo parecia "bloqueado" na cinemática de entrada do boss.
+    y = Math.max(rect.top + 90, y);
     return { x, y };
   }
 
@@ -130,6 +137,8 @@ window.addEventListener("DOMContentLoaded", () => {
     // Mesma margem dinâmica que bossDialogueAnchor() — ver comentário lá.
     const halfDialogW = Math.min(640, window.innerWidth*0.92)/2 + 12;
     x = Math.max(rect.left+halfDialogW, Math.min(rect.right-halfDialogW, x));
+    // Mesma correção de y que bossDialogueAnchor() — ver comentário lá.
+    y = Math.max(rect.top + 90, y);
     return { x, y };
   }
 

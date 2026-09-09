@@ -49,6 +49,22 @@ export function playCinematic(slides, onComplete, bars = true) {
   ensureDialogDOM();
   let i = 0;
   let finished = false;
+  // REDE DE SEGURANÇA (nova): mesmo com a correção do touchend mais abaixo,
+  // não havia NENHUM plano B se um toque simplesmente não acertasse na caixa
+  // — por exemplo no diálogo "flutuante" (s.anchor, usado pelo boss/
+  // VanBerto's durante um combate), que se posiciona por cima da cabeça de
+  // um sprite; nalgum ecrã/dispositivo concreto isso podia deixar a caixa
+  // parcialmente fora do ecrã ou tapada por outro elemento — nada tocável,
+  // e o jogo ficava preso ali para sempre ("bloqueado no boss"). O cartão de
+  // título (playTitleCard, mais abaixo neste ficheiro) já tinha um auto-
+  // avanço destes; faltava aqui. Rearma-se a cada fala nova (armAutoAdvance,
+  // chamado por render()); se ninguém tocar em 9s, avança sozinho (ou
+  // termina, na última fala) — exactamente como um toque faria.
+  let autoTimer = null;
+  function armAutoAdvance() {
+    clearTimeout(autoTimer);
+    autoTimer = setTimeout(() => { if (!finished) advance(); }, 9000);
+  }
   // 1) barras entram primeiro, a estabelecer o "modo cinema"...
   if (bars) document.body.classList.add("cine-active");
   // 2) ...só depois a caixa de diálogo desliza para cima — sem isto tudo
@@ -78,6 +94,7 @@ export function playCinematic(slides, onComplete, bars = true) {
       dialogEl.style.left = "";
       dialogEl.style.top = "";
     }
+    armAutoAdvance();
   }
 
   function advance() {
@@ -91,6 +108,7 @@ export function playCinematic(slides, onComplete, bars = true) {
     if (finished) return;
     finished = true;
     clearTimeout(showTimer);
+    clearTimeout(autoTimer);
     dialogEl.onclick = null; dialogEl.ontouchend = null;
     const skipBtn = document.getElementById("cineSkip");
     skipBtn.onclick = null; skipBtn.ontouchend = null;
@@ -114,6 +132,7 @@ export function playCinematic(slides, onComplete, bars = true) {
   const skipBtn = document.getElementById("cineSkip");
   skipBtn.onclick = finish;
   skipBtn.ontouchend = (e) => { e.preventDefault(); finish(); };
+  armAutoAdvance(); // arma já para a 1ª fala (as seguintes são armadas por render(), acima)
 }
 
 function ensureTitleDOM() {
