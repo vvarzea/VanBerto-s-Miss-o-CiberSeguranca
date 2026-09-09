@@ -1419,23 +1419,24 @@ body.hc-mode .menu-tile span { color: #ffff00 !important; }
 
 .map-region {
   position: relative;
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; gap: clamp(12px, 1.6vw, 22px);
   background: rgba(255,107,53,0.10);
+  background-size: cover; background-position: center;
   border: 2px solid rgba(255,215,0,0.22);
-  border-radius: 10px;
-  padding: 10px 12px;
+  border-radius: clamp(10px, 1vw, 16px);
+  padding: clamp(18px, 2.6vw, 34px) clamp(16px, 2vw, 28px);
+  min-height: clamp(74px, 11vw, 132px);
+  box-sizing: border-box;
   cursor: pointer;
   text-align: left;
   font-family: 'Nunito', sans-serif;
-  transition: transform 0.1s, background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s;
   color: inherit;
 }
 .map-region:hover:not(.map-region--locked) {
-  background: rgba(255,107,53,0.18);
+  background-color: rgba(255,107,53,0.18);
   border-color: #ffd700;
-  transform: translateY(-1px);
 }
-.map-region:active:not(.map-region--locked) { transform: translateY(0); }
 
 .map-region-icon { font-size: clamp(30px, 3.2vw, 52px); flex-shrink: 0; width: clamp(38px, 4vw, 62px); text-align: center; }
 .map-region-body { flex: 1; min-width: 0; }
@@ -2433,7 +2434,7 @@ body.hc-mode .ar-speech { color: #fff !important; border-color: #fff !important;
   position: fixed; inset: 0;
   display: none; align-items: center; justify-content: center;
   z-index: 8800; pointer-events: none;
-  background: radial-gradient(circle at 50% 45%, rgba(255,215,0,0.16) 0%, rgba(10,4,20,0.55) 60%, rgba(10,4,20,0.75) 100%);
+  background: radial-gradient(circle at 50% 45%, #3a1450 0%, #200a38 55%, #150626 100%);
 }
 #levelCompleteOverlay.show { display: flex; pointer-events: auto; }
 

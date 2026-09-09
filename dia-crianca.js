@@ -744,6 +744,12 @@ window.addEventListener("DOMContentLoaded", () => {
     const btnContinue = document.getElementById("lcContinue");
     if (!overlay || !panel) { onContinue?.(); return; }
 
+    // Defesa extra: garantir SEMPRE que o quiz (e o seu botão "Continuar")
+    // ficam escondidos antes desta celebração aparecer — encontrámos um caso
+    // em que a caixa do quiz ainda ficava visível por trás.
+    document.getElementById("quizOverlay")?.classList.add("hidden");
+    document.getElementById("btnCloseQuiz")?.classList.add("hidden");
+
     const L = LEVELS[levelIdx];
     const stars = starsForLevel(levelIdx);
 
@@ -1981,9 +1987,12 @@ window.addEventListener("DOMContentLoaded", () => {
     sunAngle += 0.004;
     drawSun(sunAngle);
 
-    // Animar estrelas noturnas (piscar) — durante um boss, segue o tema do boss
+    // Animar estrelas noturnas (piscar) — durante um boss, segue o tema do
+    // nível que o boss fecha (def.themeIdx já não existe — foi removido ao
+    // deixar de haver temas "à parte" por boss, ver data-bosses.js).
     if (inBossFight && bossState) {
-      if (NIGHT_THEMES.has(bossState.def.themeIdx)) drawStars(bossState.def.themeIdx, 1600);
+      const bossThemeIdx = LEVELS[currentLevel] ? LEVELS[currentLevel].theme % THEMES.length : 0;
+      if (NIGHT_THEMES.has(bossThemeIdx)) drawStars(bossThemeIdx, 1600);
     } else if(LEVELS[currentLevel]&&NIGHT_THEMES.has(LEVELS[currentLevel].theme)) {
       drawStars(LEVELS[currentLevel].theme, LEVELS[currentLevel].worldW||2600);
     }
