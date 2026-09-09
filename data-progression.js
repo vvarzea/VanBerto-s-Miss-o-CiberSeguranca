@@ -22,7 +22,7 @@ export const MAP_REGIONS = [
 
 export const ARTEFACTS = [
   // idx 0-4 — Conjunto: Fundamentos
-  { emoji:"🌐", name:"Fio da Internet",       short:"Nasce a Internet",          color:"#40d0ff", glow:"rgba(64,208,255,0.6)",  vanberto:"1989! O mundo ficou todo ligado!", set:0 },
+  { emoji:"🌐", name:"Fio da Internet",       short:"Nasce a Internet",          color:"#40d0ff", glow:"rgba(64,208,255,0.6)",  vanberto:"1969! Os primeiros computadores ligaram-se em rede!", set:0 },
   { emoji:"🔐", name:"Cadeado da Palavra-Passe",short:"Palavras-passe Fortes",   color:"#ffd700", glow:"rgba(255,215,0,0.6)",   vanberto:"Letras, números e símbolos — imbatível!", set:0 },
   { emoji:"🪪", name:"Escudo dos Dados",      short:"Dados Pessoais Protegidos", color:"#ff9060", glow:"rgba(255,144,96,0.6)", vanberto:"Os teus dados são só teus!", set:0 },
   { emoji:"🆘", name:"Sinal de Ajuda",        short:"Quem Nos Protege Online",   color:"#80ffb0", glow:"rgba(128,255,176,0.6)",vanberto:"Nunca estamos sozinhos online!", set:0 },
