@@ -100,7 +100,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // balão não colar à barra de vida.
     const aboveHead = (def.hpBarOffset != null ? def.hpBarOffset : ((b.displayHeight/2||40)+42)) + 46;
     let x = rect.left + (b.x - cam.scrollX) * scaleX;
-    const y = rect.top + (b.y - aboveHead - cam.scrollY) * scaleY;
+    let y = rect.top + (b.y - aboveHead - cam.scrollY) * scaleY;
     // Não deixar o balão sair do ecrã pelas laterais. A margem tem de
     // acompanhar a largura REAL da caixa (#cineDialog usa width:min(640px,92vw)
     // — até 320px de meia-largura); um valor fixo de 130px (sobrado de uma
@@ -133,7 +133,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const scaleX = rect.width / 960, scaleY = rect.height / 540;
     const aboveHead = (player.displayHeight/2 || 36) + 40;
     let x = rect.left + (player.x - cam.scrollX) * scaleX;
-    const y = rect.top + (player.y - aboveHead - cam.scrollY) * scaleY;
+    let y = rect.top + (player.y - aboveHead - cam.scrollY) * scaleY;
     // Mesma margem dinâmica que bossDialogueAnchor() — ver comentário lá.
     const halfDialogW = Math.min(640, window.innerWidth*0.92)/2 + 12;
     x = Math.max(rect.left+halfDialogW, Math.min(rect.right-halfDialogW, x));
