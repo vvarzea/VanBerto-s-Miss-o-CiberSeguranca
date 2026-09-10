@@ -1878,7 +1878,36 @@ window.addEventListener("DOMContentLoaded", () => {
          // cinematics.js) também contam como overlay visível — awaitingQuiz
          // fica true durante ambos (ver goToNextLevel/spawnBossPortal).
          && (document.getElementById("mapOverlay")?.classList.contains("hidden") ?? true)
-         && !document.getElementById("cineTitleCard")?.classList.contains("show");
+         && !document.getElementById("cineTitleCard")?.classList.contains("show")
+         // CORRIGIDO: faltava aqui a MESMA verificação que o handler de
+         // "visibilitychange" mais abaixo já faz (ver esse comentário) — as
+         // cinemáticas de boss (cinematics.js: caixa "#cineDialog" com a
+         // classe "cine-show", diálogo de entrada/vitória do boss) criam o
+         // seu próprio DOM fora da lista de overlays acima, por isso este
+         // watchdog não as via como "coisa legítima a decorrer". Cada fala
+         // do diálogo do boss pode legitimamente ficar até 9s à espera de um
+         // toque (ver armAutoAdvance em cinematics.js) — bem acima do
+         // threshold de 6s abaixo — por isso o watchdog disparava A MEIO da
+         // entrada do boss, quase sempre, resumindo a física e limpando
+         // awaitingQuiz enquanto a fala ainda estava no ecrã. Com o resto do
+         // jogo já "destravado" por baixo da cinemática (updateCritters/
+         // updateHazards/etc. voltavam a correr, o boss ainda em fase
+         // "intro"), o jogador podia mover-se e a arena reagir de forma
+         // inconsistente enquanto a caixa de fala continuava especada por
+         // cima — exactamente a sensação de "o jogo bloqueia ao chegar ao
+         // boss" reportada. Sem esta linha, era só uma questão de tempo (o
+         // combate acabava mesmo por arrancar quando a cinemática terminasse
+         // sozinha, ~9-27s depois) — mas com ela o watchdog deixa de mexer
+         // em nada enquanto o diálogo do boss estiver mesmo visível.
+         && !document.getElementById("cineDialog")?.classList.contains("cine-show")
+         && !document.body.classList.contains("cine-active")
+         // Mesma lacuna, para o ecrã de "Nível completo!" (estrelas/confetti,
+         // ver showLevelCompleteCelebration) — este também fica à espera de
+         // um toque em "Continuar", sem NENHUM limite de tempo (ao contrário
+         // do diálogo do boss, que pelo menos teria o auto-avanço de 9s).
+         // Uma criança a apreciar as estrelas/confetti mais de 6s já bastava
+         // para o watchdog disparar por baixo deste ecrã também.
+         && !document.getElementById("levelCompleteOverlay")?.classList.contains("show");
       if ((awaitingQuiz || awaitingStory) && !_overlayPaused && _noVisibleOverlay) {
         if (!sceneRef._wdStart) sceneRef._wdStart = Date.now();
         if (Date.now() - sceneRef._wdStart > 6000) {
@@ -2162,23 +2191,6 @@ window.addEventListener("DOMContentLoaded", () => {
     malwareGroup.getChildren().forEach(m=>{
       if (!m.active || !m.body) return;
       const isBoss = !!m.getData("isBoss"); // bosses não devem girar como os vilões pequenos
-      // NOVO — bug encontrado a investigar o travamento no boss: esta
-      // atualização genérica foi escrita para os vilões pequenos (patrol/
-      // mini/jumper) e corre em TODOS os elementos de malwareGroup, sem
-      // exceção — incluindo o próprio boss (que também é criado dentro de
-      // malwareGroup, ver spawnBossSprite). O boss já tem o seu PRÓPRIO
-      // sistema de movimento dedicado (updateBossFight/doBossHop/
-      // doBossTeleport/etc.) — ter também este código genérico a chamar
-      // m.setVelocityX() no boss, a cada frame, incluindo durante a
-      // cinemática de entrada (esta função corre mesmo com awaitingQuiz
-      // ainda a true, física pausada ou não), fazia dois sistemas de
-      // movimento diferentes disputar a velocidade do mesmo sprite ao mesmo
-      // tempo — pior ainda em bosses "teleport"/"wave", cujo corpo físico
-      // não se comporta como um vilão normal de plataforma (sem gravidade,
-      // por vezes sem colisão com o chão), o que podia deixar este código
-      // num estado inesperado. Bosses continuam a ter o seu próprio
-      // tratamento — não precisam (nem devem) passar por aqui.
-      if (isBoss) return;
       const pat = m.getData("pattern") || "patrol";
       const spd = m.getData("speed") || 120;
       const dir = m.getData("dir") || 1;  // direcao guardada
