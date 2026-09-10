@@ -11,6 +11,28 @@
 let dialogEl = null, barTop = null, barBottom = null, dlgAvatar = null, dlgName = null, dlgText = null, dlgHint = null;
 let titleEl = null;
 
+// Enter faz a MESMA coisa que tocar na caixa — pedido: quem joga com
+// teclado não devia ter de alcançar o rato só para avançar uma fala.
+// (Não usámos também Espaço de propósito: é a tecla de saltar durante o
+// jogo normal, e ficaria fácil de carregar sem querer a meio de um diálogo.)
+// Guarda-se sempre a função "avançar" ativa (uma por cada playCinematic/
+// playTitleCard em curso); o listener só existe UMA vez (module-level) e
+// decide qual delas chamar consoante o que está mesmo visível no momento.
+let _activeDialogAdvance = null;
+let _activeTitleAdvance = null;
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  // Não roubar o Enter a um campo de texto (ex.: nome do jogador no ecrã inicial)
+  if (e.target && e.target.matches("input, textarea, button")) return;
+  if (dialogEl && dialogEl.classList.contains("cine-show") && _activeDialogAdvance) {
+    e.preventDefault();
+    _activeDialogAdvance();
+  } else if (titleEl && titleEl.classList.contains("show") && _activeTitleAdvance) {
+    e.preventDefault();
+    _activeTitleAdvance();
+  }
+});
+
 function ensureDialogDOM() {
   if (dialogEl) return;
   barTop = document.createElement("div"); barTop.id = "cineBarTop"; barTop.className = "cine-bar cine-bar-top";
@@ -109,6 +131,7 @@ export function playCinematic(slides, onComplete, bars = true) {
     finished = true;
     clearTimeout(showTimer);
     clearTimeout(autoTimer);
+    if (_activeDialogAdvance === advance) _activeDialogAdvance = null;
     dialogEl.onclick = null; dialogEl.ontouchend = null;
     const skipBtn = document.getElementById("cineSkip");
     skipBtn.onclick = null; skipBtn.ontouchend = null;
@@ -132,6 +155,7 @@ export function playCinematic(slides, onComplete, bars = true) {
   const skipBtn = document.getElementById("cineSkip");
   skipBtn.onclick = finish;
   skipBtn.ontouchend = (e) => { e.preventDefault(); finish(); };
+  _activeDialogAdvance = advance;
   armAutoAdvance(); // arma já para a 1ª fala (as seguintes são armadas por render(), acima)
 }
 
@@ -166,12 +190,14 @@ export function playTitleCard(data, onComplete) {
     lineEl.textContent = lines[i];
   }
   function finish() {
+    if (_activeTitleAdvance === advance) _activeTitleAdvance = null;
     titleEl.onclick = null; titleEl.ontouchend = null;
     titleEl.classList.remove("show");
     setTimeout(() => onComplete?.(), 320);
   }
   titleEl.onclick = advance;
   titleEl.ontouchend = (e) => { e.preventDefault(); advance(); };
+  _activeTitleAdvance = advance;
   // avança sozinho ao fim de um tempo generoso, caso ninguém toque
   clearTimeout(titleEl._autoTimer);
   titleEl._autoTimer = setTimeout(() => { if (titleEl.classList.contains("show")) finish(); }, 2600 * lines.length);
