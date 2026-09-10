@@ -4082,6 +4082,39 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Extraído de startDoorAnimation para poder ser chamado tanto no fim normal
+  // da animação da porta, como num "fallback" de segurança se a animação
+  // falhar a meio (ver bug "trava no boss 3" — mesma família de problema
+  // pode acontecer na porta normal se `door` deixar de ser válida a meio).
+  function showQuizAfterDoorAnimation(scene){
+    scene.time.delayedCall(560, () => {
+      if(!awaitingQuiz) return; // segurança: só mostrar se ainda estamos à espera
+      _doorAnimRunning = false; // reset para próxima porta
+      lastQuizTheme = LEVELS[currentLevel].quizTheme;
+      showQuiz(pickQuizForLevel(currentLevel, LEVELS[currentLevel].quizTheme), (ok) => {
+        if(ok){
+          ensureAudio();
+          finalizeLevelStars(currentLevel, livesLostThisLevel, itemsCollected, itemsTotal);
+          markLevelCompleted(currentLevel);
+          // Reavaliar conquistas AGORA, com a contagem de níveis já atualizada
+          // (a chamada dentro de showQuiz() corre antes de markLevelCompleted,
+          // por isso "Guardião", "Mestre" e "Lenda" nunca desbloqueavam — bug corrigido).
+          checkAchievements(mapProgress.levelsCompleted.length);
+          // Celebração (título + estrelas a aparecer + VanBerto's +
+          // confetti) antes da revelação do artefacto de sempre — em
+          // TODOS os níveis, incluindo o último: se houver boss a
+          // seguir (ex.: o do Mundo 4, agora preso ao Nível 20),
+          // nextLevel() trata de o lutar antes do ecrã de vitória
+          // final aparecer (ver goToNextLevel).
+          showLevelCompleteCelebration(currentLevel, () => {
+            showRightRecovered(currentLevel);
+            nextLevel(scene);
+          });
+        }
+      });
+    });
+  }
+
   let _doorAnimRunning = false;
   function startDoorAnimation(scene, doorOrigX){
     // Impedir execução dupla — só pode correr uma vez por abertura de porta
@@ -4120,113 +4153,103 @@ window.addEventListener("DOMContentLoaded", () => {
 
         // FASE 1.5 — o VanBerto's faz a dança do robô antes de ser sugado
         playVanBertoDance(scene, () => {
+          try {
+            if (!door || !door.active) { showQuizAfterDoorAnimation(scene); return; }
 
-        // FASE 2 — portal gira e cresce (ativação)
-        scene.tweens.add({
-          targets: door,
-          angle: { from: 0, to: 360 },
-          scaleX: { from: 1, to: 1.3 },
-          scaleY: { from: 1, to: 1.3 },
-          duration: 400, ease: "Back.easeIn",
-          onComplete: () => {
-
-            // FASE 3 — robot voa para o portal (spin + encolhe)
-            player.setDepth(2);
-            player.setFlipX(false);
-
-            // Pequenas partículas do portal ao absorver
-            const burst = scene.add.particles(0, 0, "spark_item", {
-              x: doorOrigX, y: door.y - 10,
-              speed: { min: 30, max: 120 },
-              lifespan: 400, quantity: 14,
-              scale: { start: 0.8, end: 0 },
-              gravityY: -40,
-              angle: { min: 0, max: 360 },
-              tint: [0xffd700, 0xa060ff, 0xffffff, 0x80d0ff]
-            });
-            scene.time.delayedCall(320, () => burst.destroy());
-
-            // Robot desloca-se até ao portal enquanto gira
+            // FASE 2 — portal gira e cresce (ativação)
             scene.tweens.add({
-              targets: player,
-              x: doorOrigX,
-              y: door.y - 18,
-              duration: 280, ease: "Sine.easeIn",
+              targets: door,
+              angle: { from: 0, to: 360 },
+              scaleX: { from: 1, to: 1.3 },
+              scaleY: { from: 1, to: 1.3 },
+              duration: 400, ease: "Back.easeIn",
               onComplete: () => {
+                try {
+                  if (!player || !player.active || !door) { showQuizAfterDoorAnimation(scene); return; }
 
-                // FASE 4 — robot entra no portal: gira e desaparece no vórtice
-                scene.tweens.add({
-                  targets: player,
-                  scaleX: { from: player.scaleX, to: 0.05 },
-                  scaleY: { from: player.scaleY, to: 0.05 },
-                  angle:  { from: 0, to: 720 },
-                  alpha: { from: 1, to: 0 },
-                  duration: 280, ease: "Sine.easeIn",
-                  onComplete: () => {
-                    // Robot está completamente dentro da porta
-                    // Matar todos os tweens (invuln, star power, etc.) para nenhum restaurar o alpha
-                    if(scene && scene.tweens) scene.tweens.killTweensOf(player);
-                    if(invulnBlinkEvent){ invulnBlinkEvent.remove(false); invulnBlinkEvent=null; }
-                    if(invulnEndEvent){   invulnEndEvent.remove(false);   invulnEndEvent=null; }
-                    invuln = false;
-                    player.setOrigin(0.5, 0.5);
-                    player.setScale(1);
-                    player.setAlpha(0); // manter invisível enquanto o quiz está aberto
-                    player.setDepth(3);
-                    // Esconder porta completamente durante o quiz
-                    door.setOrigin(0.5, 0.5);
-                    door.x = doorOrigX;
-                    door.setScale(1);
-                    door.setAlpha(0);
+                  // FASE 3 — robot voa para o portal (spin + encolhe)
+                  player.setDepth(2);
+                  player.setFlipX(false);
 
-                    // Label "Responde!"
-                    const label = scene.add.text(doorOrigX, door.y - 70, "✨ Responde! ✨", {
-                      fontSize: "20px", fontStyle: "900",
-                      color: "#ffd700", stroke: "#200040", strokeThickness: 5
-                    }).setOrigin(0.5).setDepth(20).setAlpha(0);
-                    scene.tweens.add({
-                      targets: label, alpha: 1, y: door.y - 88,
-                      duration: 240, ease: "Back.easeOut",
-                      onComplete: () => scene.time.delayedCall(280, () => {
-                        scene.tweens.add({ targets: label, alpha: 0, duration: 160,
-                          onComplete: () => label.destroy() });
-                      })
-                    });
+                  // Pequenas partículas do portal ao absorver
+                  const burst = scene.add.particles(0, 0, "spark_item", {
+                    x: doorOrigX, y: door.y - 10,
+                    speed: { min: 30, max: 120 },
+                    lifespan: 400, quantity: 14,
+                    scale: { start: 0.8, end: 0 },
+                    gravityY: -40,
+                    angle: { min: 0, max: 360 },
+                    tint: [0xffd700, 0xa060ff, 0xffffff, 0x80d0ff]
+                  });
+                  scene.time.delayedCall(320, () => burst.destroy());
 
-                    // FASE 5 — mostrar quiz
-                    scene.time.delayedCall(560, () => {
-                      if(!awaitingQuiz) return; // segurança: só mostrar se ainda estamos à espera
-                      _doorAnimRunning = false; // reset para próxima porta
-                      lastQuizTheme = LEVELS[currentLevel].quizTheme;
-                      showQuiz(pickQuizForLevel(currentLevel, LEVELS[currentLevel].quizTheme), (ok) => {
-                        if(ok){
-                          ensureAudio();
-                          finalizeLevelStars(currentLevel, livesLostThisLevel, itemsCollected, itemsTotal);
-                          markLevelCompleted(currentLevel);
-                          // Reavaliar conquistas AGORA, com a contagem de níveis já atualizada
-                          // (a chamada dentro de showQuiz() corre antes de markLevelCompleted,
-                          // por isso "Guardião", "Mestre" e "Lenda" nunca desbloqueavam — bug corrigido).
-                          checkAchievements(mapProgress.levelsCompleted.length);
-                          // Celebração (título + estrelas a aparecer + VanBerto's +
-                          // confetti) antes da revelação do artefacto de sempre — em
-                          // TODOS os níveis, incluindo o último: se houver boss a
-                          // seguir (ex.: o do Mundo 4, agora preso ao Nível 20),
-                          // nextLevel() trata de o lutar antes do ecrã de vitória
-                          // final aparecer (ver goToNextLevel).
-                          showLevelCompleteCelebration(currentLevel, () => {
-                            showRightRecovered(currentLevel);
-                            nextLevel(scene);
-                          });
-                        }
-                      });
-                    });
-                  }
-                });
+                  // Robot desloca-se até ao portal enquanto gira
+                  scene.tweens.add({
+                    targets: player,
+                    x: doorOrigX,
+                    y: door.y - 18,
+                    duration: 280, ease: "Sine.easeIn",
+                    onComplete: () => {
+                      try {
+                        if (!player || !player.active || !door) { showQuizAfterDoorAnimation(scene); return; }
+
+                        // FASE 4 — robot entra no portal: gira e desaparece no vórtice
+                        scene.tweens.add({
+                          targets: player,
+                          scaleX: { from: player.scaleX, to: 0.05 },
+                          scaleY: { from: player.scaleY, to: 0.05 },
+                          angle:  { from: 0, to: 720 },
+                          alpha: { from: 1, to: 0 },
+                          duration: 280, ease: "Sine.easeIn",
+                          onComplete: () => {
+                            try {
+                              // Robot está completamente dentro da porta
+                              // Matar todos os tweens (invuln, star power, etc.) para nenhum restaurar o alpha
+                              if(scene && scene.tweens) scene.tweens.killTweensOf(player);
+                              if(invulnBlinkEvent){ invulnBlinkEvent.remove(false); invulnBlinkEvent=null; }
+                              if(invulnEndEvent){   invulnEndEvent.remove(false);   invulnEndEvent=null; }
+                              invuln = false;
+                              player.setOrigin(0.5, 0.5);
+                              player.setScale(1);
+                              player.setAlpha(0); // manter invisível enquanto o quiz está aberto
+                              player.setDepth(3);
+                              // Esconder porta completamente durante o quiz
+                              if (door) {
+                                door.setOrigin(0.5, 0.5);
+                                door.x = doorOrigX;
+                                door.setScale(1);
+                                door.setAlpha(0);
+                              }
+
+                              // Label "Responde!"
+                              const label = scene.add.text(doorOrigX, door.y - 70, "✨ Responde! ✨", {
+                                fontSize: "20px", fontStyle: "900",
+                                color: "#ffd700", stroke: "#200040", strokeThickness: 5
+                              }).setOrigin(0.5).setDepth(20).setAlpha(0);
+                              scene.tweens.add({
+                                targets: label, alpha: 1, y: door.y - 88,
+                                duration: 240, ease: "Back.easeOut",
+                                onComplete: () => scene.time.delayedCall(280, () => {
+                                  scene.tweens.add({ targets: label, alpha: 0, duration: 160,
+                                    onComplete: () => label.destroy() });
+                                })
+                              });
+
+                              // FASE 5 — mostrar quiz
+                              showQuizAfterDoorAnimation(scene);
+                            } catch (e) { console.error("Fase 4 da porta falhou — a mostrar o quiz de qualquer forma:", e); showQuizAfterDoorAnimation(scene); }
+                          }
+                        });
+                      } catch (e) { console.error("Fase 3 da porta falhou — a mostrar o quiz de qualquer forma:", e); showQuizAfterDoorAnimation(scene); }
+                    }
+                  });
+                } catch (e) { console.error("Fase 2 da porta falhou — a mostrar o quiz de qualquer forma:", e); showQuizAfterDoorAnimation(scene); }
               }
             });
+          } catch (e) {
+            console.error("Animação da porta falhou a meio — a mostrar o quiz de qualquer forma:", e);
+            showQuizAfterDoorAnimation(scene);
           }
-        });
-
         }); // fim playVanBertoDance (FASE 1.5)
       }
     });
@@ -6517,44 +6540,63 @@ window.addEventListener("DOMContentLoaded", () => {
           });
           scene.time.delayedCall(420, () => { try{burst.destroy();}catch{} });
 
+          // Ponto único de conclusão desta sequência — garante que onEnter()
+          // é chamado exatamente uma vez, mesmo que o portal ou o jogador
+          // deixem de existir a meio (ex.: "targets is null" ao construir um
+          // tween sobre um objeto já destruído). BUG CORRIGIDO ("trava no
+          // boss 3"): antes, se `portal` (ou `player`) fosse inválido no
+          // momento em que a FASE 2/3 era construída, o tween atirava um
+          // erro que escapava sem ser apanhado (a chamada final a
+          // onComplete?.() dentro de playVanBertoDance não tinha try/catch),
+          // e como isso acontecia a meio da cadeia, onEnter() nunca chegava
+          // a ser chamado — o jogo ficava preso para sempre depois do boss.
+          let _portalSeqDone = false;
+          const finishPortalSequence = () => {
+            if (_portalSeqDone) return;
+            _portalSeqDone = true;
+            try { if (scene && scene.tweens) scene.tweens.killTweensOf(player); } catch(e) {}
+            try { if (player) { player.setAlpha(0); player.setAngle(0); player.setScale(1); } } catch(e) {}
+            try{ ring.destroy(); }catch{}
+            try{ portal.destroy(); }catch{}
+            _doorAnimRunning = false; // reset — sequência do portal genuinamente terminada
+            // Repor awaitingQuiz=true (tinha sido desligado de propósito, mais acima,
+            // só para o jogador poder caminhar até ao portal) — sem isto, o VanBerto's
+            // ficava sem NENHUMA proteção contra o "safety-net" de alpha do update()
+            // durante o fade-in do ecrã seguinte (cartão de fim de mundo ou transição
+            // de nível), reaparecendo por instantes antes desse ecrã cobrir tudo.
+            // goToNextLevel()/loadLevel() tratam de repor awaitingQuiz=false quando o
+            // ecrã seguinte já estiver mesmo pronto — tal como já acontece na porta normal.
+            awaitingQuiz = true;
+            onEnter();
+          };
+
           // FASE 1.5 — o VanBerto's faz a dança do robô antes de ser sugado
           playVanBertoDance(scene, () => {
+            try {
+              if (!portal || !portal.active) { finishPortalSequence(); return; }
 
-          // FASE 2 — o portal gira e cresce (efeito de antecipação), só depois é que "suga"
-          scene.tweens.add({
-            targets: portal,
-            angle: { from: 0, to: 360 },
-            scaleX: { from: 1, to: 1.3 },
-            scaleY: { from: 1, to: 1.3 },
-            duration: 380, ease: "Back.easeIn",
-            onComplete: () => {
-
-              // FASE 3 — jogador é puxado para o centro do portal e desaparece no vórtice
+              // FASE 2 — o portal gira e cresce (efeito de antecipação), só depois é que "suga"
               scene.tweens.add({
-                targets: player, x: portal.x, y: portal.y - 10,
-                scaleX: 0.05, scaleY: 0.05, angle: 720, alpha: 0,
-                duration: 380, ease: "Sine.easeIn",
-
+                targets: portal,
+                angle: { from: 0, to: 360 },
+                scaleX: { from: 1, to: 1.3 },
+                scaleY: { from: 1, to: 1.3 },
+                duration: 380, ease: "Back.easeIn",
                 onComplete: () => {
-                  if (scene && scene.tweens) scene.tweens.killTweensOf(player);
-                  player.setAlpha(0); player.setAngle(0); player.setScale(1);
-                  try{ ring.destroy(); }catch{}
-                  try{ portal.destroy(); }catch{}
-                  _doorAnimRunning = false; // reset — sequência do portal genuinamente terminada
-                  // Repor awaitingQuiz=true (tinha sido desligado de propósito, mais acima,
-                  // só para o jogador poder caminhar até ao portal) — sem isto, o VanBerto's
-                  // ficava sem NENHUMA proteção contra o "safety-net" de alpha do update()
-                  // durante o fade-in do ecrã seguinte (cartão de fim de mundo ou transição
-                  // de nível), reaparecendo por instantes antes desse ecrã cobrir tudo.
-                  // goToNextLevel()/loadLevel() tratam de repor awaitingQuiz=false quando o
-                  // ecrã seguinte já estiver mesmo pronto — tal como já acontece na porta normal.
-                  awaitingQuiz = true;
-                  onEnter();
+                  try {
+                    if (!player || !player.active || !portal) { finishPortalSequence(); return; }
+
+                    // FASE 3 — jogador é puxado para o centro do portal e desaparece no vórtice
+                    scene.tweens.add({
+                      targets: player, x: portal.x, y: portal.y - 10,
+                      scaleX: 0.05, scaleY: 0.05, angle: 720, alpha: 0,
+                      duration: 380, ease: "Sine.easeIn",
+                      onComplete: finishPortalSequence
+                    });
+                  } catch (e) { console.error("Fase 3 do portal (pós-boss) falhou — a continuar de qualquer forma:", e); finishPortalSequence(); }
                 }
               });
-            }
-          });
-
+            } catch (e) { console.error("Fase 2 do portal (pós-boss) falhou — a continuar de qualquer forma:", e); finishPortalSequence(); }
           }); // fim playVanBertoDance (FASE 1.5)
         }
       });
@@ -7547,7 +7589,11 @@ window.addEventListener("DOMContentLoaded", () => {
           if (!usingPng && player.setTexture) player.setTexture("vanberto_open");
         }
       } catch (e) {}
-      onComplete?.();
+      // onComplete?.() é a única saída desta função e TEM de correr sempre — os
+      // dois chamadores (porta normal e portal pós-boss) já protegem a sua
+      // própria sequência com try/catch, mas este apanha-tudo extra garante
+      // que um erro nunca escapa daqui por cima sem sequer ser registado.
+      try { onComplete?.(); } catch (e) { console.error("onComplete da dança do VanBerto's falhou:", e); }
     });
   }
 
