@@ -202,6 +202,21 @@ canvas { width: 100% !important; height: 100% !important; display: block; touch-
   text-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
 
+/* Navegação por teclado (setas ↑/↓ + Enter) — destaque visual da resposta
+   focada. Usa :focus-visible como alvo principal (não acende com um clique
+   de rato, só com teclado) mas cai para :focus em navegadores sem suporte. */
+#quizAnswers .btn:focus,
+#quizAnswers .btn:focus-visible {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 0 3px rgba(255,215,0,0.55), 4px 4px 0 #0a0520, inset 0 1px 0 rgba(255,220,100,0.22);
+}
+#btnCloseQuiz:focus,
+#btnCloseQuiz:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255,215,0,0.55), 4px 4px 0 #0a0520, inset 0 1px 0 rgba(255,220,100,0.22);
+}
+
 #quizAnswers .btn {
   width: 100%; text-align: center; font-size: 13px;
   transition: background 0.18s, border-color 0.18s, opacity 0.18s, transform 0.08s;

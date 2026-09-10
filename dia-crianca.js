@@ -6933,6 +6933,7 @@ window.addEventListener("DOMContentLoaded", () => {
               if(sceneRef&&player){ sceneRef.tweens.killTweensOf(player); player.setAlpha(0); }
               quizOverlay.classList.add("hidden"); done(true);
             });
+            btnCloseQuiz.focus({ preventScroll: true });
           } else {
             setTimeout(()=>{
               // Esconder robot ANTES de fechar o overlay
@@ -6968,10 +6969,15 @@ window.addEventListener("DOMContentLoaded", () => {
             btnCloseQuiz.classList.add("hidden");
             showQuiz(pickQuizForLevel(currentLevel,_qTheme),done,attemptNum+1);
           });
+          btnCloseQuiz.focus({ preventScroll: true });
         }
       });
       quizAnswers.appendChild(b);
     });
+
+    // Foca a primeira resposta automaticamente — permite já usar as setas
+    // ↑/↓ e Enter sem ter de tocar antes no botão com o rato/dedo.
+    quizAnswers.querySelector(".btn")?.focus({ preventScroll: true });
   }
 
   // ===== Itens =====
@@ -7636,6 +7642,49 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     });
   })();
+
+  // ===== Navegação por teclado no Quiz — setas ↑/↓ escolhem, Enter confirma =====
+  // Enter para avançar diálogos/cartões de título já existe em cinematics.js;
+  // isto trata do quiz (vive fora desse módulo). Em vez de gerir uma seleção
+  // à parte, usa-se o focus() real do botão: as setas movem o foco entre as
+  // respostas (a caixa dourada vem do CSS em #quizAnswers .btn:focus) e o
+  // Enter sobre um botão focado já dispara o "click" nativamente — não é
+  // preciso lógica extra para isso aqui. mostrar a pergunta já foca a 1ª
+  // resposta (ver showQuiz) e cada botão "Continuar"/"Tentar outra pergunta"
+  // foca-se a si próprio ao aparecer, pela mesma razão.
+  window.addEventListener("keydown", e => {
+    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+    if (quizOverlay.classList.contains("hidden")) return;
+    if (e.target && e.target.matches("input, textarea")) return;
+    const btns = Array.from(quizAnswers.querySelectorAll(".btn:not(:disabled)"));
+    if (!btns.length) return;
+    e.preventDefault();
+    let idx = btns.indexOf(document.activeElement);
+    idx = idx === -1 ? 0 : idx + (e.key === "ArrowDown" ? 1 : -1);
+    idx = ((idx % btns.length) + btns.length) % btns.length;
+    btns[idx].focus({ preventScroll: true });
+  });
+
+  // ===== Enter = clicar no botão principal ("OK"/"Continuar ▶") do ecrã aberto =====
+  // Cobre os overlays de um único botão de avançar/fechar — histórico
+  // ("Sabias que...?"), conquistas, álbum, estatísticas, opções, certificado,
+  // galeria final, etc. — que já seguem a convenção .btn.primary no HTML, e
+  // o popup de "Competência Recuperada", que é o único caso que não segue
+  // essa convenção (usa a classe .show em vez de .hidden, e o botão não tem
+  // .primary). O quiz tem o seu próprio fluxo acima, por isso fica de fora
+  // aqui (evita clicar duas vezes no mesmo botão já focado).
+  window.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    if (e.target && e.target.matches("input, textarea, button")) return;
+    const reveal = document.getElementById("artefactRevealOverlay");
+    if (reveal && reveal.classList.contains("show")) {
+      e.preventDefault();
+      document.getElementById("arRevClose")?.click();
+      return;
+    }
+    const primary = document.querySelector(".overlay:not(.hidden) .btn.primary:not(:disabled)");
+    if (primary) { e.preventDefault(); primary.click(); }
+  });
 
   btnStart.onclick=()=>{
     ensureAudio();SFX.coin();
