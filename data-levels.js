@@ -43,7 +43,8 @@ export const THEMES = [
 //     lá está. Só define returnX/returnY quando o regresso tiver mesmo de
 //     ficar noutro sítio do nível (usado só no Nível 4, de propósito, como
 //     atalho alternativo ao vão do trampolim) — nesse caso é desenhado um
-//     2º cano, só decorativo, no ponto de regresso. O cano de volta dentro
+//     2º cano no ponto de regresso, que também é ENTRÁVEL (dá para voltar a
+//     entrar por ali e visitar a sala secreta outra vez). O cano de volta dentro
 //     da própria sala secreta é sempre criado automaticamente pelo motor,
 //     não precisa de ser definido aqui. Ver ROOM_* e
 //     enterSecretRoomFlow()/exitSecretRoomFlow() em dia-crianca.js.
@@ -471,7 +472,7 @@ export const LEVELS = [
       {x:2540,y:480,vx:-190,pattern:"jumper"},
       {x:3050,y:480,vx:188,pattern:"patrol"}
     ],
-    secrets:[{x:2960,y:390,kind:"estrela",points:30}]
+    secrets:[{x:2895,y:390,kind:"estrela",points:30}]
   },
   {
     name: "Nível 15 — Spam e Compras Seguras",

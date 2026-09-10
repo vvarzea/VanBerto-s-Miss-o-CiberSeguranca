@@ -3201,9 +3201,9 @@ window.addEventListener("DOMContentLoaded", () => {
         // que entrou). Só quando o nível define returnX/returnY diferentes
         // (ver data-levels.js) é que o regresso fica noutro sítio — usado só
         // no Nível 4, de propósito, como atalho alternativo ao vão do
-        // trampolim. Nesse caso (e só nesse) desenhamos um 2º cano decorativo
-        // no ponto de regresso, do MESMO tamanho/proporção do cano normal
-        // (64×64 — antes era 56×44, espremido, o que o fazia parecer cortado).
+        // trampolim. Nesse caso (e só nesse) desenhamos um 2º cano no ponto
+        // de regresso, do MESMO tamanho/proporção do cano normal (64×64 —
+        // antes era 56×44, espremido, o que o fazia parecer cortado).
         const hasCustomReturn = p.returnX!=null && p.returnY!=null
           && (p.returnX!==p.x || p.returnY!==p.y);
         const returnX = hasCustomReturn ? p.returnX : p.x;
@@ -3213,12 +3213,20 @@ window.addEventListener("DOMContentLoaded", () => {
           // Físico (entra no grupo "platforms", tal como um cano decorativo
           // normal) — antes era só uma imagem sem corpo, por isso o
           // VanBerto's nunca conseguia mesmo ficar em cima dele: caía sempre
-          // na plataforma por baixo. Não entra no array "pipes", logo
-          // tryEnterPipe() nunca o reconhece como entrável (tal como um cano
-          // decorative:true).
+          // na plataforma por baixo.
           const exImg = platforms.create(returnX, pipeCenterY({x:returnX,y:returnY,h:p.h}), "pipe_mario");
           exImg.displayWidth = w; exImg.displayHeight = h; exImg.refreshBody();
-          exImg.setTint(0x9fb89f);
+          // Pedido: "os túneis por onde saímos também dá para voltar a
+          // entrar" — por isso este cano de saída ENTRA no array "pipes"
+          // (deixa de ser só decorativo), com room:true e regresso PARA SI
+          // PRÓPRIO (returnX/returnY = as suas próprias coordenadas — igual
+          // ao comportamento por omissão de um cano sem returnX/returnY
+          // definidos). Mesma roomKey do cano de entrada original, para o
+          // prémio da sala continuar a ser contado uma única vez, venha o
+          // jogador por que lado vier. Sem tint acinzentado — agora é um
+          // cano a sério, tal como o de entrada, e deve parecer um.
+          pipes.push({x:returnX, y:returnY, w, room:true, kind:p.kind,
+            returnX, returnY, key:roomKey, fact:p.fact});
           pipeExitDecor.push(exImg);
         }
       } else {
@@ -3637,7 +3645,21 @@ window.addEventListener("DOMContentLoaded", () => {
       if (rp && Math.abs(player.x - rp.x) <= (rp.w/2 + 20)) exitSecretRoomFlow(scene);
       return;
     }
-    const p = pipes.find(pp => Math.abs(player.x - pp.x) <= (pp.w/2 + 20));
+    // Corrigido: antes usava-se o 1º cano dentro da tolerância (.find),
+    // mas pares de cano "atalho" ficam tipicamente muito perto um do outro
+    // no eixo X (ex.: chão em x:570, topo em x:620 — só 50px de distância),
+    // menos do que a tolerância combinada dos dois (52px cada lado), por
+    // isso as duas zonas de deteção sobrepunham-se. Estando em cima do
+    // cano de CIMA, o jogo continuava a "encontrar" primeiro o cano de
+    // BAIXO (que aparece primeiro no array) e reenviava o jogador para o
+    // mesmo sítio onde já estava — parecia que o caminho de volta
+    // simplesmente não funcionava. Agora escolhe-se sempre o cano
+    // FISICAMENTE mais próximo (menor distância em X), não o primeiro.
+    let p = null, bestDist = Infinity;
+    pipes.forEach(pp => {
+      const d = Math.abs(player.x - pp.x);
+      if (d <= (pp.w/2 + 20) && d < bestDist) { bestDist = d; p = pp; }
+    });
     if (!p) return;
     if (p.room) enterSecretRoomFlow(scene, p);
     else enterPipe(scene, p);
