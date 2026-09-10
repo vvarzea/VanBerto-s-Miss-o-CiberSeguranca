@@ -1380,9 +1380,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // Assinatura da professora — dentro da faixa castanha do chão, muito subtil
     this.add.text(960-8, 536, "✦ © Prof.ª Vanda Várzea ✦", {
-      fontSize:"8px", fontStyle:"italic", color:"#f5d9a8",
-      stroke:"#3a1a00", strokeThickness:1
-    }).setScrollFactor(0).setDepth(100).setOrigin(1,1).setAlpha(0.55);
+      fontSize:"11px", fontStyle:"italic", fontFamily:"Georgia, 'Times New Roman', serif", color:"#f5d9a8",
+      stroke:"#3a1a00", strokeThickness:2
+    }).setScrollFactor(0).setDepth(100).setOrigin(1,1).setAlpha(0.7);
 
     pauseOverlayGfx = this.add.graphics().setScrollFactor(0).setDepth(500);
     // pauseVanImg e pauseLabel removidos — substituídos pelo overlay HTML #pauseInfoOverlay

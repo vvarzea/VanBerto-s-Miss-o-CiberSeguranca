@@ -1817,6 +1817,13 @@ function makeItemTextures(scene){
     ctx.strokeStyle="rgba(60,16,48,0.5)"; ctx.lineWidth=1;
     ctx.stroke();
 
+    // Símbolo "@" na aba — reforça a leitura de "mensagem/email digital",
+    // ligando o objeto ao tema de cibersegurança.
+    ctx.fillStyle="rgba(58,16,48,0.7)";
+    ctx.font="bold 10px sans-serif";
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText("@", cx, cy-7);
+
     // Cadeado dourado no lacre — o elemento que liga isto ao tema de
     // cibersegurança (mensagem fechada = dado protegido).
     const lockY=cy+1;
